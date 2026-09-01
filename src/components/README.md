@@ -2,3 +2,4 @@
 
 Reusable, business-agnostic UI components belong here. Components that serve
 only one domain belong inside that domain's `features/<domain>/components`.
+Use client components only when their behavior requires browser APIs or events.
