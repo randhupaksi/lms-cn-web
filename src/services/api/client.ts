@@ -1,4 +1,8 @@
 import axios from "axios";
-import { appConfig } from "@/app/config/env";
+import { publicEnv } from "@/config/public-env";
 
-export const apiClient = axios.create({ baseURL: appConfig.apiBaseUrl, timeout: 30_000, headers: { "Content-Type": "application/json" } });
+export const apiClient = axios.create({
+  baseURL: publicEnv.apiBaseUrl,
+  timeout: 30_000,
+  headers: { "Content-Type": "application/json" },
+});
