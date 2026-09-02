@@ -9,6 +9,8 @@ import {
   useExams,
 } from "@/features/exams/use-exams";
 import { publishExam, unpublishExam } from "@/services/exams.service";
+import { PageHeader } from "@/components/ui/page-header";
+import { GraduationCap } from "lucide-react";
 
 export default function ExamsPage() {
   const academics = useAcademicData();
@@ -54,14 +56,12 @@ export default function ExamsPage() {
   return (
     <RoleBoundary allow={["teacher"]}>
       <div className="space-y-8">
-        <header>
-          <p className="eyebrow">EXAM AUTHORING</p>
-          <h1 className="page-title">Ujian</h1>
-          <p className="page-description">
-            Siapkan jadwal dan durasi dalam status draft. Soal dan peserta harus
-            ditetapkan sebelum ujian dipublikasikan.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Exam authoring"
+          title="Ujian"
+          description="Siapkan jadwal dan durasi dalam status draft. Soal dan peserta harus ditetapkan sebelum ujian dipublikasikan."
+          icon={GraduationCap}
+        />
         <label className="field-label max-w-lg">
           Course
           <select
@@ -187,7 +187,7 @@ export default function ExamsPage() {
         )}
         <section className="grid gap-4 md:grid-cols-2">
           {exams.data?.data.map((exam) => (
-            <article className="panel" key={exam.id}>
+            <article className="panel panel-interactive" key={exam.id}>
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <span

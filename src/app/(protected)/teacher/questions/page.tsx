@@ -9,6 +9,8 @@ import {
   useSaveQuestion,
 } from "@/features/questions/use-questions";
 import type { Question } from "@/types/lms";
+import { PageHeader } from "@/components/ui/page-header";
+import { BookOpenCheck } from "lucide-react";
 
 const emptyOptions = () =>
   Array.from({ length: 4 }, (_, index) => ({
@@ -78,14 +80,12 @@ export default function QuestionsPage() {
   return (
     <RoleBoundary allow={["teacher"]}>
       <div className="space-y-8">
-        <header>
-          <p className="eyebrow">QUESTION AUTHORING</p>
-          <h1 className="page-title">Bank soal</h1>
-          <p className="page-description">
-            Soal sumber dikelola per course. Saat dipakai dalam ujian, kontennya
-            disalin sebagai snapshot agar tetap konsisten.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Question authoring"
+          title="Bank soal"
+          description="Soal sumber dikelola per course. Saat dipakai dalam ujian, kontennya disalin sebagai snapshot agar tetap konsisten."
+          icon={BookOpenCheck}
+        />
         <label className="field-label max-w-lg">
           Course
           <select
@@ -237,7 +237,7 @@ export default function QuestionsPage() {
                 Daftar soal ({questions.data?.meta.total ?? 0})
               </h2>
               {questions.data?.data.map((question, index) => (
-                <article className="panel" key={question.id}>
+                <article className="panel panel-interactive" key={question.id}>
                   <p className="text-xs font-bold text-muted">
                     SOAL {index + 1} · {question.default_points} POIN
                   </p>

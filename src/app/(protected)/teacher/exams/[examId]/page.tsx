@@ -7,6 +7,8 @@ import { RoleBoundary } from "@/components/role-boundary";
 import { useConfigureExam, useExam } from "@/features/exams/use-exams";
 import { useQuestions } from "@/features/questions/use-questions";
 import { useCourseMembers } from "@/features/academics/use-academics";
+import { PageHeader } from "@/components/ui/page-header";
+import { Settings2 } from "lucide-react";
 
 export default function ConfigureExamPage() {
   const examId = useParams<{ examId: string }>().examId;
@@ -40,24 +42,20 @@ export default function ConfigureExamPage() {
   return (
     <RoleBoundary allow={["teacher"]}>
       <div className="space-y-8">
-        <header>
-          <Link className="button-ghost -ml-3" href="/teacher/exams">
-            ← Kembali
-          </Link>
-          <p className="eyebrow mt-3">EXAM CONFIGURATION</p>
-          <h1 className="page-title">{exam.data?.title}</h1>
-          <p className="page-description">
-            Perubahan soal dan peserta hanya diizinkan saat ujian masih draft
-            dan belum memiliki attempt.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Exam configuration"
+          title={exam.data?.title ?? "Konfigurasi ujian"}
+          description="Perubahan soal dan peserta hanya diizinkan saat ujian masih draft dan belum memiliki attempt."
+          icon={Settings2}
+          actions={<Link className="button-secondary" href="/teacher/exams">← Kembali</Link>}
+        />
         <div className="grid gap-6 xl:grid-cols-2">
           <section className="panel">
             <h2 className="section-title">Pilih soal</h2>
             <div className="mt-4 space-y-3">
               {questions.data?.data.map((question) => (
                 <label
-                  className="flex items-start gap-3 rounded-lg border border-border p-3"
+                  className="selection-item flex items-start gap-3 p-3"
                   key={question.id}
                 >
                   <input
@@ -121,7 +119,7 @@ export default function ConfigureExamPage() {
             <div className="mt-4 max-h-96 space-y-2 overflow-y-auto">
               {students.map((student) => (
                 <label
-                  className="flex items-center gap-3 rounded-lg border border-border p-3 text-sm"
+                  className="selection-item flex items-center gap-3 p-3 text-sm"
                   key={student.id}
                 >
                   <input
