@@ -6,6 +6,8 @@ import {
   useAvailableExams,
   useStartExam,
 } from "@/features/attempts/use-attempts";
+import { PageHeader } from "@/components/ui/page-header";
+import { GraduationCap } from "lucide-react";
 
 export default function StudentExamsPage() {
   const exams = useAvailableExams();
@@ -14,17 +16,15 @@ export default function StudentExamsPage() {
   return (
     <RoleBoundary allow={["student"]}>
       <div className="space-y-8">
-        <header>
-          <p className="eyebrow">ASSESSMENT</p>
-          <h1 className="page-title">Ujian saya</h1>
-          <p className="page-description">
-            Waktu ujian dihitung oleh server. Pastikan koneksi stabil sebelum
-            mulai.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Assessment"
+          title="Ujian saya"
+          description="Waktu ujian dihitung oleh server. Pastikan koneksi stabil sebelum mulai."
+          icon={GraduationCap}
+        />
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {exams.data?.map((exam) => (
-            <article className="panel" key={exam.id}>
+            <article className="panel panel-interactive" key={exam.id}>
               <span className="status-badge">
                 {exam.attempt_status ?? "belum dimulai"}
               </span>
