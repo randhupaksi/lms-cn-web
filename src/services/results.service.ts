@@ -14,6 +14,13 @@ export async function publishResults(examId: string) {
   >(`/results/exams/${examId}/publish`);
   return data.data;
 }
+export async function exportExamResults(examId: string) {
+  const { data } = await apiClient.get<Blob>("/results/export", {
+    params: { exam_id: examId },
+    responseType: "blob",
+  });
+  return data;
+}
 export async function listStudentResults() {
   const { data } =
     await apiClient.get<PaginatedEnvelope<ExamResult>>("/student/results");

@@ -28,6 +28,12 @@ export function useAcademicData() {
     }),
   };
 }
+export function useCourses() {
+  return useQuery({
+    queryKey: academicKeys.courses,
+    queryFn: service.listCourses,
+  });
+}
 function useInvalidatingMutation<T>(
   mutationFn: (input: T) => Promise<unknown>,
   key: readonly string[],
