@@ -137,7 +137,7 @@ function MemberSelector({
       <div className="mt-3 max-h-72 space-y-2 overflow-y-auto">
         {users.map((user) => (
           <label
-            className="flex items-center gap-3 rounded-lg border border-border p-3 text-sm"
+            className="selection-item flex items-center gap-3 p-3 text-sm"
             key={user.id}
           >
             <input

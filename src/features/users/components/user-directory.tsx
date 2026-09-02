@@ -6,6 +6,7 @@ import {
   useToggleUser,
   useUsers,
 } from "@/features/users/use-users";
+import { DataTable, DataTableShell } from "@/components/ui/data-table";
 
 export function UserDirectory() {
   const [search, setSearch] = useState("");
@@ -32,7 +33,7 @@ export function UserDirectory() {
   }
 
   return (
-    <section className="panel overflow-hidden p-0">
+    <DataTableShell>
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border p-5">
         <div>
           <h2 className="section-title">Daftar pengguna</h2>
@@ -66,7 +67,7 @@ export function UserDirectory() {
         </div>
       </div>
       <div className="overflow-x-auto">
-        <table className="data-table">
+        <DataTable>
           <thead>
             <tr>
               <th>Nama</th>
@@ -124,7 +125,7 @@ export function UserDirectory() {
               </tr>
             )}
           </tbody>
-        </table>
+        </DataTable>
       </div>
       {resetUserId && (
         <form
@@ -179,6 +180,6 @@ export function UserDirectory() {
           </button>
         </div>
       </div>
-    </section>
+    </DataTableShell>
   );
 }

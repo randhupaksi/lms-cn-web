@@ -11,6 +11,8 @@ import {
 } from "@/features/academics/use-academics";
 import { CourseAssignments } from "@/features/academics/components/course-assignments";
 import { CourseTable } from "@/features/academics/components/course-table";
+import { PageHeader } from "@/components/ui/page-header";
+import { School } from "lucide-react";
 
 export default function AcademicsPage() {
   const data = useAcademicData();
@@ -43,14 +45,12 @@ export default function AcademicsPage() {
   return (
     <RoleBoundary allow={["admin"]}>
       <div className="space-y-8">
-        <header>
-          <p className="eyebrow">STRUKTUR AKADEMIK</p>
-          <h1 className="page-title">Akademik</h1>
-          <p className="page-description">
-            Susun tahun ajaran, kelas, mata pelajaran, dan course sebagai
-            fondasi seluruh aktivitas LMS.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Struktur akademik"
+          title="Akademik"
+          description="Susun tahun ajaran, kelas, mata pelajaran, dan course sebagai fondasi seluruh aktivitas LMS."
+          icon={School}
+        />
         <div className="grid gap-6 xl:grid-cols-2">
           <section className="panel">
             <h2 className="section-title">Tahun ajaran</h2>

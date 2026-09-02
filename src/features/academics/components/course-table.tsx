@@ -1,13 +1,14 @@
 import type { Course } from "@/types/lms";
+import { DataTable, DataTableShell } from "@/components/ui/data-table";
 
 export function CourseTable({ courses }: Readonly<{ courses: Course[] }>) {
   return (
-    <section className="panel overflow-hidden p-0">
+    <DataTableShell>
       <div className="border-b border-border p-5">
         <h2 className="section-title">Course aktif</h2>
       </div>
       <div className="overflow-x-auto">
-        <table className="data-table">
+        <DataTable>
           <thead>
             <tr>
               <th>Course</th>
@@ -26,8 +27,8 @@ export function CourseTable({ courses }: Readonly<{ courses: Course[] }>) {
               </tr>
             ))}
           </tbody>
-        </table>
+        </DataTable>
       </div>
-    </section>
+    </DataTableShell>
   );
 }
