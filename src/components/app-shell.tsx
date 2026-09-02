@@ -6,10 +6,14 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   BookOpenCheck,
+  BookOpenText,
+  ClipboardList,
+  Activity,
   GraduationCap,
   LayoutDashboard,
   LogOut,
   School,
+  ShieldCheck,
   UsersRound,
 } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
@@ -23,14 +27,23 @@ const navigation: Record<
     { href: "/dashboard", label: "Ringkasan", icon: LayoutDashboard },
     { href: "/admin/users", label: "Pengguna", icon: UsersRound },
     { href: "/admin/academics", label: "Akademik", icon: School },
+    { href: "/admin/monitoring", label: "Monitoring", icon: Activity },
+    { href: "/teacher/results", label: "Hasil ujian", icon: GraduationCap },
+    { href: "/admin/audit", label: "Audit", icon: ShieldCheck },
   ],
   teacher: [
     { href: "/dashboard", label: "Ringkasan", icon: LayoutDashboard },
     { href: "/teacher/questions", label: "Bank soal", icon: BookOpenCheck },
+    { href: "/teacher/materials", label: "Materi", icon: BookOpenText },
+    { href: "/teacher/assignments", label: "Tugas", icon: ClipboardList },
     { href: "/teacher/exams", label: "Ujian", icon: GraduationCap },
+    { href: "/teacher/monitoring", label: "Monitoring", icon: Activity },
     { href: "/teacher/results", label: "Hasil", icon: School },
   ],
   student: [
+    { href: "/dashboard", label: "Ringkasan", icon: LayoutDashboard },
+    { href: "/student/materials", label: "Materi", icon: BookOpenText },
+    { href: "/student/assignments", label: "Tugas", icon: ClipboardList },
     { href: "/student/exams", label: "Ujian saya", icon: LayoutDashboard },
     { href: "/student/results", label: "Hasil", icon: GraduationCap },
   ],
