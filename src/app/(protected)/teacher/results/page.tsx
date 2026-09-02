@@ -11,6 +11,9 @@ import {
   usePublishResults,
 } from "@/features/results/use-results";
 import { exportExamResults } from "@/services/results.service";
+import { PageHeader } from "@/components/ui/page-header";
+import { ChartNoAxesCombined } from "lucide-react";
+import { DataTable, DataTableShell } from "@/components/ui/data-table";
 
 export default function TeacherResultsPage() {
   const academics = useAcademicData();
@@ -32,14 +35,12 @@ export default function TeacherResultsPage() {
   return (
     <RoleBoundary allow={["teacher", "admin"]}>
       <div className="space-y-8">
-        <header>
-          <p className="eyebrow">GRADING & RESULTS</p>
-          <h1 className="page-title">Hasil ujian</h1>
-          <p className="page-description">
-            Nilai objektif dihitung server secara deterministik. Siswa hanya
-            dapat melihat hasil setelah dipublikasikan.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Grading & results"
+          title="Hasil ujian"
+          description="Nilai objektif dihitung server secara deterministik. Siswa hanya dapat melihat hasil setelah dipublikasikan."
+          icon={ChartNoAxesCombined}
+        />
         <div className="grid gap-4 md:grid-cols-2">
           <label className="field-label">
             Course
@@ -103,7 +104,7 @@ export default function TeacherResultsPage() {
                 ]}
               />
             )}
-            <section className="panel overflow-hidden p-0">
+            <DataTableShell>
               <div className="flex items-center justify-between border-b border-border p-5">
                 <div>
                   <h2 className="section-title">Daftar nilai</h2>
@@ -129,7 +130,7 @@ export default function TeacherResultsPage() {
                 </div>
               </div>
               <div className="overflow-x-auto">
-                <table className="data-table">
+                <DataTable>
                   <thead>
                     <tr>
                       <th>Siswa</th>
@@ -165,11 +166,11 @@ export default function TeacherResultsPage() {
                       </tr>
                     )}
                   </tbody>
-                </table>
+                </DataTable>
               </div>
-            </section>
+            </DataTableShell>
             {analytics.data && analytics.data.items.length > 0 && (
-              <section className="panel overflow-hidden p-0">
+              <DataTableShell>
                 <div className="border-b border-border p-5">
                   <h2 className="section-title">Analisis butir soal</h2>
                   <p className="mt-1 text-xs text-muted">
@@ -177,7 +178,7 @@ export default function TeacherResultsPage() {
                   </p>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="data-table">
+                  <DataTable>
                     <thead>
                       <tr>
                         <th>Soal</th>
@@ -198,9 +199,9 @@ export default function TeacherResultsPage() {
                         </tr>
                       ))}
                     </tbody>
-                  </table>
+                  </DataTable>
                 </div>
-              </section>
+              </DataTableShell>
             )}
           </div>
         )}

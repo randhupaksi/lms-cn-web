@@ -6,6 +6,9 @@ import { MetricGrid } from "@/components/metric-grid";
 import { useAcademicData } from "@/features/academics/use-academics";
 import { useExams } from "@/features/exams/use-exams";
 import { useExamMonitoring } from "@/features/monitoring/use-monitoring";
+import { PageHeader } from "@/components/ui/page-header";
+import { Activity } from "lucide-react";
+import { DataTable, DataTableShell } from "@/components/ui/data-table";
 
 const statusLabels: Record<string, string> = {
   not_started: "Belum mulai",
@@ -22,14 +25,12 @@ export function MonitoringWorkspace() {
   const monitoring = useExamMonitoring(examId);
   return (
     <div className="space-y-8">
-      <header>
-        <p className="eyebrow">LIVE EXAM OPERATIONS</p>
-        <h1 className="page-title">Monitoring ujian</h1>
-        <p className="page-description">
-          Status peserta diperbarui otomatis setiap 10 detik dan tetap mengikuti
-          status attempt di server.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Live exam operations"
+        title="Monitoring ujian"
+        description="Status peserta diperbarui otomatis setiap 10 detik dan tetap mengikuti status attempt di server."
+        icon={Activity}
+      />
       <div className="grid gap-4 md:grid-cols-2">
         <label className="field-label">
           Course
@@ -102,9 +103,9 @@ export function MonitoringWorkspace() {
               description="Tambahkan peserta pada konfigurasi ujian terlebih dahulu."
             />
           ) : (
-            <section className="panel overflow-hidden p-0">
+            <DataTableShell>
               <div className="overflow-x-auto">
-                <table className="data-table">
+                <DataTable>
                   <thead>
                     <tr>
                       <th>Peserta</th>
@@ -140,9 +141,9 @@ export function MonitoringWorkspace() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                </DataTable>
               </div>
-            </section>
+            </DataTableShell>
           )}
         </>
       )}

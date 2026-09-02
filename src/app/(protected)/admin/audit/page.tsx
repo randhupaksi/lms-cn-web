@@ -4,6 +4,9 @@ import { useState } from "react";
 import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
 import { useAuditEvents } from "@/features/audit/use-audit";
+import { PageHeader } from "@/components/ui/page-header";
+import { ShieldCheck } from "lucide-react";
+import { DataTable, DataTableShell } from "@/components/ui/data-table";
 
 export default function AuditPage() {
   const [action, setAction] = useState("");
@@ -12,14 +15,12 @@ export default function AuditPage() {
   return (
     <RoleBoundary allow={["admin"]}>
       <div className="space-y-8">
-        <header>
-          <p className="eyebrow">GOVERNANCE</p>
-          <h1 className="page-title">Audit aktivitas</h1>
-          <p className="page-description">
-            Jejak tindakan sensitif bersifat read-only dan diurutkan dari
-            aktivitas terbaru.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Governance"
+          title="Audit aktivitas"
+          description="Jejak tindakan sensitif bersifat read-only dan diurutkan dari aktivitas terbaru."
+          icon={ShieldCheck}
+        />
         <div className="grid gap-4 md:grid-cols-2">
           <label className="field-label">
             Action
@@ -51,9 +52,9 @@ export default function AuditPage() {
           />
         )}
         {events.data && events.data.data.length > 0 && (
-          <section className="panel overflow-hidden p-0">
+          <DataTableShell>
             <div className="overflow-x-auto">
-              <table className="data-table">
+              <DataTable>
                 <thead>
                   <tr>
                     <th>Waktu</th>
@@ -78,9 +79,9 @@ export default function AuditPage() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </DataTable>
             </div>
-          </section>
+          </DataTableShell>
         )}
       </div>
     </RoleBoundary>

@@ -2,23 +2,23 @@
 
 import { RoleBoundary } from "@/components/role-boundary";
 import { useStudentResults } from "@/features/results/use-results";
+import { PageHeader } from "@/components/ui/page-header";
+import { Trophy } from "lucide-react";
 
 export default function StudentResultsPage() {
   const results = useStudentResults();
   return (
     <RoleBoundary allow={["student"]}>
       <div className="space-y-8">
-        <header>
-          <p className="eyebrow">ASSESSMENT RESULTS</p>
-          <h1 className="page-title">Hasil saya</h1>
-          <p className="page-description">
-            Hanya hasil yang telah ditinjau dan dipublikasikan guru yang
-            ditampilkan.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Assessment results"
+          title="Hasil saya"
+          description="Hanya hasil yang telah ditinjau dan dipublikasikan guru yang ditampilkan."
+          icon={Trophy}
+        />
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {results.data?.data.map((result) => (
-            <article className="panel" key={result.id}>
+            <article className="panel panel-interactive" key={result.id}>
               <span className="status-badge status-active">Dipublikasikan</span>
               <h2 className="mt-4 text-lg font-semibold">
                 {result.exam_title}
