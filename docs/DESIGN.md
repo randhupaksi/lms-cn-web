@@ -10,6 +10,13 @@ academically trustworthy. Premium quality comes from hierarchy, alignment,
 typography, spacing, consistency, accessibility, and reliable feedback—not from
 decoration.
 
+The LMS is a sibling product of Citra Negara Attendance. Its interface adopts
+the same recognizable family DNA: deep emerald navigation, warm neutral canvas,
+soft green surfaces, rounded workspaces, compact role-aware top bars, clear data
+tables, and restrained tactile feedback. LMS compositions may vary to support
+learning and assessment, but must remain visibly related to the attendance
+product rather than introducing an unrelated visual language.
+
 Reference qualities: Linear and Vercel for clarity, Stripe Dashboard for
 information hierarchy, Notion for calm density, and serious academic portals
 for trust and focus.
@@ -119,7 +126,8 @@ Before adding a component, answer:
 ## 8. Visual review checklist
 
 - [ ] Values come from tokens; no raw visual values in JSX.
-- [ ] No decorative gradient, glow, glassmorphism, or excessive shadow.
+- [ ] Gradients are limited to approved shell and surface primitives; no glow,
+      excessive glassmorphism, or excessive shadow.
 - [ ] Layout has clear hierarchy and alignment.
 - [ ] Primary action is obvious and not duplicated.
 - [ ] Typography is restrained and readable.
