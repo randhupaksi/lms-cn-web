@@ -1,15 +1,18 @@
 import Link from "next/link";
+import { FileQuestion } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <main className="grid min-h-dvh place-items-center px-6 text-center">
-      <div className="space-y-4">
-        <p className="text-sm font-semibold tracking-[0.2em] text-sky-700">404</p>
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">Page not found.</h1>
-        <Link className="text-sm font-medium text-sky-700 underline-offset-4 hover:underline" href="/">
-          Return to home
-        </Link>
-      </div>
+    <main className="grid min-h-dvh place-items-center px-5 py-12">
+      <section className="panel w-full max-w-lg text-center">
+        <span className="metric-icon mx-auto size-14"><FileQuestion size={24} /></span>
+        <p className="eyebrow mt-5">Error 404</p>
+        <h1 className="page-title text-2xl">Halaman tidak ditemukan</h1>
+        <p className="page-description mx-auto">
+          Tautan mungkin sudah berubah atau halaman tersebut tidak tersedia untuk akun Anda.
+        </p>
+        <Link className="button-primary mt-6" href="/dashboard">Kembali ke dashboard</Link>
+      </section>
     </main>
   );
 }

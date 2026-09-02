@@ -4,6 +4,9 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { clearAccessToken } from "@/lib/auth-session";
 import { changePassword } from "@/services/auth.service";
+import { PageHeader } from "@/components/ui/page-header";
+import { Button } from "@/components/ui/button";
+import { KeyRound } from "lucide-react";
 
 export default function ChangePasswordPage() {
   const router = useRouter();
@@ -36,14 +39,14 @@ export default function ChangePasswordPage() {
   }
 
   return (
-    <section className="mx-auto max-w-lg panel">
-      <p className="eyebrow">ACCOUNT SECURITY</p>
-      <h1 className="page-title">Perbarui kata sandi</h1>
-      <p className="page-description">
-        Credential sementara harus diganti sebelum akun dapat menggunakan fitur
-        LMS.
-      </p>
-      <form className="mt-6 space-y-4" onSubmit={submit}>
+    <div className="mx-auto max-w-2xl space-y-6">
+      <PageHeader
+        eyebrow="Account security"
+        title="Perbarui kata sandi"
+        description="Credential sementara harus diganti sebelum akun dapat menggunakan fitur LMS."
+        icon={KeyRound}
+      />
+      <form className="panel space-y-4" onSubmit={submit}>
         <label className="field-label">
           Kata sandi saat ini
           <input
@@ -84,10 +87,10 @@ export default function ChangePasswordPage() {
             {error}
           </p>
         )}
-        <button className="button-primary w-full" disabled={loading}>
+        <Button type="submit" className="w-full" disabled={loading}>
           {loading ? "Memperbarui…" : "Perbarui kata sandi"}
-        </button>
+        </Button>
       </form>
-    </section>
+    </div>
   );
 }
