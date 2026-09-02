@@ -8,8 +8,11 @@ import {
   useAssignments,
   useSubmitAssignment,
 } from "@/features/assignments/use-assignments";
+import { PageHeader } from "@/components/ui/page-header";
+import { ClipboardList } from "lucide-react";
 
 export default function StudentAssignmentsPage() {
+  const [renderedAt] = useState(() => Date.now());
   const courses = useCourses();
   const [courseId, setCourseId] = useState("");
   const [activeId, setActiveId] = useState("");
@@ -20,14 +23,12 @@ export default function StudentAssignmentsPage() {
   return (
     <RoleBoundary allow={["student"]}>
       <div className="space-y-8">
-        <header>
-          <p className="eyebrow">COURSE SAYA</p>
-          <h1 className="page-title">Tugas</h1>
-          <p className="page-description">
-            Lihat instruksi, deadline, status pengumpulan, feedback, dan nilai
-            tugas.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Course saya"
+          title="Tugas"
+          description="Lihat instruksi, deadline, status pengumpulan, feedback, dan nilai tugas."
+          icon={ClipboardList}
+        />
         <label className="field-label max-w-lg">
           Course
           <select
@@ -57,7 +58,7 @@ export default function StudentAssignmentsPage() {
           />
         )}
         {assignments.data?.map((assignment) => (
-          <article className="panel" key={assignment.id}>
+          <article className="panel panel-interactive" key={assignment.id}>
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <span
@@ -142,7 +143,7 @@ export default function StudentAssignmentsPage() {
               <button
                 className="button-primary mt-5"
                 onClick={() => setActiveId(assignment.id)}
-                disabled={new Date(assignment.due_at).getTime() <= Date.now()}
+                disabled={new Date(assignment.due_at).getTime() <= renderedAt}
               >
                 Tulis jawaban
               </button>

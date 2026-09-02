@@ -10,6 +10,8 @@ import {
   useSaveMaterial,
 } from "@/features/materials/use-materials";
 import type { CourseMaterial } from "@/types/lms";
+import { PageHeader } from "@/components/ui/page-header";
+import { BookOpenText } from "lucide-react";
 
 const emptyForm = { title: "", description: "", content: "", position: 1 };
 
@@ -44,14 +46,12 @@ export default function TeacherMaterialsPage() {
   return (
     <RoleBoundary allow={["teacher"]}>
       <div className="space-y-8">
-        <header>
-          <p className="eyebrow">COURSE CONTENT</p>
-          <h1 className="page-title">Materi pembelajaran</h1>
-          <p className="page-description">
-            Susun materi sebagai draft, lalu publikasikan ketika kontennya siap
-            dipelajari siswa.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Course content"
+          title="Materi pembelajaran"
+          description="Susun materi sebagai draft, lalu publikasikan ketika kontennya siap dipelajari siswa."
+          icon={BookOpenText}
+        />
         <label className="field-label max-w-lg">
           Course
           <select
@@ -148,7 +148,7 @@ export default function TeacherMaterialsPage() {
                 />
               )}
               {materials.data?.map((material) => (
-                <article className="panel" key={material.id}>
+                <article className="panel panel-interactive" key={material.id}>
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <span

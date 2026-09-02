@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2 } from "lucide-react";
+import { BookOpenText, CheckCircle2 } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
 import { useCourses } from "@/features/academics/use-academics";
@@ -18,13 +19,12 @@ export default function StudentMaterialsPage() {
   return (
     <RoleBoundary allow={["student"]}>
       <div className="space-y-8">
-        <header>
-          <p className="eyebrow">COURSE SAYA</p>
-          <h1 className="page-title">Materi pembelajaran</h1>
-          <p className="page-description">
-            Pelajari materi yang telah dipublikasikan dan tandai ketika selesai.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Course saya"
+          title="Materi pembelajaran"
+          description="Pelajari materi yang telah dipublikasikan dan tandai ketika selesai."
+          icon={BookOpenText}
+        />
         <label className="field-label max-w-lg">
           Course
           <select
@@ -49,7 +49,7 @@ export default function StudentMaterialsPage() {
           />
         )}
         {materials.data?.map((material) => (
-          <article className="panel" key={material.id}>
+          <article className="panel panel-interactive" key={material.id}>
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-bold text-muted">

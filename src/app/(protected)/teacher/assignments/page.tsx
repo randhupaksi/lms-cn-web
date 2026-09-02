@@ -12,6 +12,9 @@ import {
   useSubmissions,
 } from "@/features/assignments/use-assignments";
 import type { AssignmentSubmission } from "@/types/lms";
+import { PageHeader } from "@/components/ui/page-header";
+import { ClipboardList } from "lucide-react";
+import { DataTable, DataTableShell } from "@/components/ui/data-table";
 
 const emptyForm = { title: "", instructions: "", due_at: "", max_score: 100 };
 
@@ -47,14 +50,12 @@ export default function TeacherAssignmentsPage() {
   return (
     <RoleBoundary allow={["teacher"]}>
       <div className="space-y-8">
-        <header>
-          <p className="eyebrow">COURSE ASSESSMENT</p>
-          <h1 className="page-title">Tugas</h1>
-          <p className="page-description">
-            Kelola tugas non-ujian, pengumpulan siswa, feedback, dan nilai dalam
-            scope course.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Course assessment"
+          title="Tugas"
+          description="Kelola tugas non-ujian, pengumpulan siswa, feedback, dan nilai dalam scope course."
+          icon={ClipboardList}
+        />
         <label className="field-label max-w-lg">
           Course
           <select
@@ -148,7 +149,7 @@ export default function TeacherAssignmentsPage() {
             )}
             <section className="grid gap-4 md:grid-cols-2">
               {assignments.data?.map((assignment) => (
-                <article className="panel" key={assignment.id}>
+                <article className="panel panel-interactive" key={assignment.id}>
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <span
@@ -190,7 +191,7 @@ export default function TeacherAssignmentsPage() {
           </>
         )}
         {assignmentId && (
-          <section className="panel overflow-hidden p-0">
+          <DataTableShell>
             <div className="border-b border-border p-5">
               <h2 className="section-title">Pengumpulan siswa</h2>
             </div>
@@ -208,7 +209,7 @@ export default function TeacherAssignmentsPage() {
               </div>
             )}
             <div className="overflow-x-auto">
-              <table className="data-table">
+              <DataTable>
                 <thead>
                   <tr>
                     <th>Siswa</th>
@@ -233,9 +234,9 @@ export default function TeacherAssignmentsPage() {
                     />
                   ))}
                 </tbody>
-              </table>
+              </DataTable>
             </div>
-          </section>
+          </DataTableShell>
         )}
       </div>
     </RoleBoundary>
