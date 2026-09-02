@@ -7,12 +7,23 @@ export type QuestionInput = {
   type: "single_choice";
   stem: string;
   default_points: number;
+  category: string;
+  tags: string[];
   options: { content: string; is_correct: boolean }[];
 };
-export async function listQuestions(courseId: string) {
+export type QuestionFilter = {
+  search?: string;
+  category?: string;
+  tag?: string;
+  status?: string;
+};
+export async function listQuestions(
+  courseId: string,
+  filter: QuestionFilter = {},
+) {
   const { data } = await apiClient.get<PaginatedEnvelope<Question>>(
     "/questions",
-    { params: { course_id: courseId } },
+    { params: { course_id: courseId, ...filter } },
   );
   return data;
 }

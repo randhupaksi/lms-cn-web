@@ -10,6 +10,8 @@ export type ExamInput = {
   ends_at: string;
   duration_minutes: number;
   allow_back_navigation: boolean;
+  randomize_questions: boolean;
+  randomize_options: boolean;
 };
 export async function listExams(courseId: string) {
   const { data } = await apiClient.get<PaginatedEnvelope<Exam>>("/exams", {

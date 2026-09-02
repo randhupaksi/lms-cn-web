@@ -18,23 +18,35 @@ const emptyOptions = () =>
 export default function QuestionsPage() {
   const academics = useAcademicData();
   const [courseId, setCourseId] = useState("");
-  const questions = useQuestions(courseId);
+  const [search, setSearch] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
+  const questions = useQuestions(courseId, {
+    search,
+    category: filterCategory,
+    status: "active",
+  });
   const save = useSaveQuestion(courseId);
   const archive = useArchiveQuestion(courseId);
   const [editingId, setEditingId] = useState<string>();
   const [stem, setStem] = useState("");
   const [points, setPoints] = useState(1);
+  const [category, setCategory] = useState("");
+  const [tags, setTags] = useState("");
   const [options, setOptions] = useState(emptyOptions);
   function reset() {
     setEditingId(undefined);
     setStem("");
     setPoints(1);
+    setCategory("");
+    setTags("");
     setOptions(emptyOptions());
   }
   function edit(question: Question) {
     setEditingId(question.id);
     setStem(question.stem);
     setPoints(question.default_points);
+    setCategory(question.category);
+    setTags(question.tags.join(", "));
     setOptions(
       question.options.map((item) => ({
         content: item.content,
@@ -52,6 +64,11 @@ export default function QuestionsPage() {
           type: "single_choice",
           stem,
           default_points: points,
+          category,
+          tags: tags
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter(Boolean),
           options,
         },
       },
@@ -122,6 +139,26 @@ export default function QuestionsPage() {
                     required
                   />
                 </label>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="field-label">
+                    Kategori
+                    <input
+                      className="field-input"
+                      value={category}
+                      onChange={(event) => setCategory(event.target.value)}
+                      placeholder="Contoh: Aljabar"
+                    />
+                  </label>
+                  <label className="field-label">
+                    Tag
+                    <input
+                      className="field-input"
+                      value={tags}
+                      onChange={(event) => setTags(event.target.value)}
+                      placeholder="bab-1, dasar"
+                    />
+                  </label>
+                </div>
                 <fieldset className="space-y-3">
                   <legend className="text-sm font-semibold">
                     Pilihan jawaban
@@ -176,6 +213,26 @@ export default function QuestionsPage() {
               </form>
             </section>
             <section className="space-y-3">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="field-label">
+                  Cari soal
+                  <input
+                    className="field-input"
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    placeholder="Cari isi pertanyaan"
+                  />
+                </label>
+                <label className="field-label">
+                  Filter kategori
+                  <input
+                    className="field-input"
+                    value={filterCategory}
+                    onChange={(event) => setFilterCategory(event.target.value)}
+                    placeholder="Semua kategori"
+                  />
+                </label>
+              </div>
               <h2 className="section-title">
                 Daftar soal ({questions.data?.meta.total ?? 0})
               </h2>
@@ -184,6 +241,13 @@ export default function QuestionsPage() {
                   <p className="text-xs font-bold text-muted">
                     SOAL {index + 1} · {question.default_points} POIN
                   </p>
+                  {(question.category || question.tags.length > 0) && (
+                    <p className="mt-2 text-xs text-muted">
+                      {[question.category, ...question.tags]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+                  )}
                   <p className="mt-2 font-semibold leading-6">
                     {question.stem}
                   </p>

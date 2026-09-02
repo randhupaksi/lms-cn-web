@@ -24,6 +24,8 @@ export default function ExamsPage() {
     ends_at: "",
     duration_minutes: 90,
     allow_back_navigation: true,
+    randomize_questions: false,
+    randomize_options: false,
   });
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -43,6 +45,8 @@ export default function ExamsPage() {
             ends_at: "",
             duration_minutes: 90,
             allow_back_navigation: true,
+            randomize_questions: false,
+            randomize_options: false,
           }),
       },
     );
@@ -148,6 +152,32 @@ export default function ExamsPage() {
                   }
                 />{" "}
                 Izinkan kembali ke soal sebelumnya
+              </label>
+              <label className="flex items-center gap-2 text-sm font-semibold">
+                <input
+                  type="checkbox"
+                  checked={form.randomize_questions}
+                  onChange={(event) =>
+                    setForm({
+                      ...form,
+                      randomize_questions: event.target.checked,
+                    })
+                  }
+                />{" "}
+                Acak urutan soal per attempt
+              </label>
+              <label className="flex items-center gap-2 text-sm font-semibold">
+                <input
+                  type="checkbox"
+                  checked={form.randomize_options}
+                  onChange={(event) =>
+                    setForm({
+                      ...form,
+                      randomize_options: event.target.checked,
+                    })
+                  }
+                />{" "}
+                Acak opsi jawaban per attempt
               </label>
               <button className="button-primary md:col-span-2">
                 Simpan draft
