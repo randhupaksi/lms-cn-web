@@ -13,7 +13,6 @@ import {
   GraduationCap,
   LayoutDashboard,
   LogOut,
-  Menu,
   School,
   ShieldCheck,
   UsersRound,
@@ -28,32 +27,33 @@ type NavigationItem = {
   href: Route;
   label: string;
   icon: typeof LayoutDashboard;
+  group: string;
 };
 
 const navigation: Record<UserRole, NavigationItem[]> = {
   admin: [
-    { href: "/dashboard", label: "Ringkasan", icon: LayoutDashboard },
-    { href: "/admin/users", label: "Pengguna", icon: UsersRound },
-    { href: "/admin/academics", label: "Akademik", icon: School },
-    { href: "/admin/monitoring", label: "Monitoring", icon: Activity },
-    { href: "/teacher/results", label: "Hasil ujian", icon: GraduationCap },
-    { href: "/admin/audit", label: "Audit aktivitas", icon: ShieldCheck },
+    { href: "/dashboard", label: "Ringkasan", icon: LayoutDashboard, group: "Workspace" },
+    { href: "/admin/users", label: "Pengguna", icon: UsersRound, group: "Data akademik" },
+    { href: "/admin/academics", label: "Akademik", icon: School, group: "Data akademik" },
+    { href: "/admin/monitoring", label: "Monitoring", icon: Activity, group: "Operasional" },
+    { href: "/teacher/results", label: "Hasil ujian", icon: GraduationCap, group: "Operasional" },
+    { href: "/admin/audit", label: "Audit aktivitas", icon: ShieldCheck, group: "Operasional" },
   ],
   teacher: [
-    { href: "/dashboard", label: "Ringkasan", icon: LayoutDashboard },
-    { href: "/teacher/questions", label: "Bank soal", icon: BookOpenCheck },
-    { href: "/teacher/materials", label: "Materi", icon: BookOpenText },
-    { href: "/teacher/assignments", label: "Tugas", icon: ClipboardList },
-    { href: "/teacher/exams", label: "Ujian", icon: GraduationCap },
-    { href: "/teacher/monitoring", label: "Monitoring", icon: Activity },
-    { href: "/teacher/results", label: "Hasil", icon: School },
+    { href: "/dashboard", label: "Ringkasan", icon: LayoutDashboard, group: "Workspace" },
+    { href: "/teacher/questions", label: "Bank soal", icon: BookOpenCheck, group: "Pembelajaran" },
+    { href: "/teacher/materials", label: "Materi", icon: BookOpenText, group: "Pembelajaran" },
+    { href: "/teacher/assignments", label: "Tugas", icon: ClipboardList, group: "Pembelajaran" },
+    { href: "/teacher/exams", label: "Ujian", icon: GraduationCap, group: "Pembelajaran" },
+    { href: "/teacher/monitoring", label: "Monitoring", icon: Activity, group: "Evaluasi" },
+    { href: "/teacher/results", label: "Hasil", icon: School, group: "Evaluasi" },
   ],
   student: [
-    { href: "/dashboard", label: "Ringkasan", icon: LayoutDashboard },
-    { href: "/student/materials", label: "Materi", icon: BookOpenText },
-    { href: "/student/assignments", label: "Tugas", icon: ClipboardList },
-    { href: "/student/exams", label: "Ujian saya", icon: GraduationCap },
-    { href: "/student/results", label: "Hasil belajar", icon: School },
+    { href: "/dashboard", label: "Ringkasan", icon: LayoutDashboard, group: "Workspace" },
+    { href: "/student/materials", label: "Materi", icon: BookOpenText, group: "Pembelajaran" },
+    { href: "/student/assignments", label: "Tugas", icon: ClipboardList, group: "Pembelajaran" },
+    { href: "/student/exams", label: "Ujian saya", icon: GraduationCap, group: "Pembelajaran" },
+    { href: "/student/results", label: "Hasil belajar", icon: School, group: "Pembelajaran" },
   ],
 };
 
@@ -161,32 +161,44 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
 
         <div className="mx-5 h-px bg-white/12" />
         <div className="workspace-sidebar-scroll">
-          <p className="workspace-nav-label">Portal {roleLabel}</p>
-          <nav className="space-y-1.5" aria-label="Menu utama">
-            {items.map(({ href, label, icon: Icon }) => {
-              const active = isNavigationActive(pathname, href);
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={() => setSidebarOpen(false)}
-                  aria-current={active ? "page" : undefined}
-                  className={cn("nav-link", active && "nav-link-active")}
-                >
-                  <span className="nav-icon"><Icon aria-hidden="true" size={17} /></span>
-                  <span>{label}</span>
-                </Link>
-              );
-            })}
+          <nav className="relative z-10" aria-label="Menu utama">
+            {Array.from(new Set(items.map((item) => item.group))).map((group) => (
+              <div className="workspace-nav-group" key={group}>
+                <p className="workspace-nav-group-label">{group}</p>
+                <div className="space-y-1.5">
+                  {items.filter((item) => item.group === group).map(({ href, label, icon: Icon }) => {
+                    const active = isNavigationActive(pathname, href);
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={() => setSidebarOpen(false)}
+                        aria-current={active ? "page" : undefined}
+                        className={cn("nav-link", active && "nav-link-active")}
+                      >
+                        <span className="nav-icon"><Icon aria-hidden="true" size={17} /></span>
+                        <span>{label}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
         </div>
 
-        <div className="p-4">
-          <div className="mb-4 h-px bg-white/12" />
+        <div className="workspace-sidebar-footer">
+          <div className="workspace-account-dock">
+            <span className="workspace-user-avatar">{getInitials(user.full_name)}</span>
+            <div className="min-w-0">
+              <p className="truncate text-xs font-bold text-white">{user.full_name}</p>
+              <p className="mt-0.5 text-[11px] text-white/62">Akun {roleLabel}</p>
+            </div>
+          </div>
           <button
             type="button"
             onClick={() => void handleLogout()}
-            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-danger-soft px-5 text-sm font-bold text-danger transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            className="workspace-sidebar-logout"
           >
             <LogOut size={17} /> Keluar
           </button>
@@ -196,17 +208,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
       <div className="workspace-main">
         <header className="workspace-topbar">
           <div className="flex min-w-0 items-center gap-3">
-            <Button
-              variant="secondary"
-              size="icon"
-              className="shrink-0 lg:hidden"
-              onClick={() => setSidebarOpen(true)}
-              aria-label="Buka menu"
-            >
-              <Menu size={18} />
-            </Button>
             <div className="min-w-0">
-              <p className="eyebrow">Portal {roleLabel}</p>
               <p className="mt-1 truncate text-lg font-bold tracking-tight text-foreground sm:text-xl">
                 {pageTitle}
               </p>

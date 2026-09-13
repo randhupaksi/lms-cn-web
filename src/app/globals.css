@@ -11,11 +11,11 @@
   --muted-soft: 211 18% 61%;
   --border: 154 22% 87%;
   --border-strong: 154 26% 78%;
-  --primary: 164 59% 30%;
-  --primary-hover: 164 62% 25%;
-  --primary-soft: 154 48% 93%;
+  --primary: 156 55% 28%;
+  --primary-hover: 157 58% 23%;
+  --primary-soft: 152 42% 93%;
   --primary-foreground: 0 0% 100%;
-  --success: 152 61% 31%;
+  --success: 149 62% 30%;
   --success-soft: 150 58% 94%;
   --warning: 37 88% 42%;
   --warning-soft: 42 92% 94%;
@@ -23,18 +23,18 @@
   --danger-soft: 5 75% 96%;
   --info: 202 72% 40%;
   --info-soft: 200 80% 95%;
-  --sidebar-start: 164 59% 30%;
-  --sidebar-end: 164 58% 20%;
-  --sidebar-text: 150 35% 93%;
-  --sidebar-muted: 150 24% 78%;
-  --focus: 155 62% 45%;
+  --sidebar-start: 151 46% 25%;
+  --sidebar-end: 158 52% 15%;
+  --sidebar-text: 145 32% 93%;
+  --sidebar-muted: 145 24% 76%;
+  --focus: 151 62% 45%;
   --radius-sm: 0.75rem;
   --radius-md: 1rem;
   --radius-lg: 1.4rem;
   --radius-xl: 1.875rem;
   --shadow-sm: 0 10px 24px hsl(211 37% 20% / 0.05);
-  --shadow-md: 0 18px 46px hsl(164 42% 20% / 0.09);
-  --shadow-lg: 0 28px 72px hsl(164 42% 16% / 0.14);
+  --shadow-md: 0 18px 46px hsl(151 42% 20% / 0.09);
+  --shadow-lg: 0 28px 72px hsl(151 42% 16% / 0.14);
   --workspace-background:
     radial-gradient(circle at 4% 0%, hsl(151 31% 83% / 0.42), transparent 28rem),
     radial-gradient(circle at 100% 3%, hsl(198 42% 86% / 0.32), transparent 25rem),
@@ -124,14 +124,24 @@ select:focus-visible, textarea:focus-visible {
   left: 0;
   z-index: 50;
   display: flex;
-  width: 17.25rem;
+  width: 18.5rem;
   flex-direction: column;
   overflow: hidden;
-  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
-  background: linear-gradient(180deg, hsl(var(--sidebar-start)), hsl(var(--sidebar-end)));
+  border: 1px solid hsl(0 0% 100% / 0.12);
+  border-radius: 0;
+  background: hsl(var(--sidebar-end));
   color: hsl(var(--sidebar-text));
   box-shadow: var(--shadow-lg);
   transition: transform 240ms ease;
+}
+
+.workspace-sidebar::before {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 100% 0%, hsl(145 54% 68% / 0.16), transparent 14rem),
+    linear-gradient(135deg, hsl(0 0% 100% / 0.04), transparent 38%);
+  content: "";
+  pointer-events: none;
 }
 
 .workspace-sidebar-scroll {
@@ -144,10 +154,12 @@ select:focus-visible, textarea:focus-visible {
 }
 
 .workspace-brand {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 0.85rem;
-  padding: 1.35rem 1.25rem 1rem;
+  padding: 1.1rem 1.1rem 1rem;
 }
 
 .workspace-brand-mark {
@@ -166,6 +178,8 @@ select:focus-visible, textarea:focus-visible {
 }
 
 .workspace-nav-label {
+  position: relative;
+  z-index: 1;
   padding: 0.5rem 0.8rem 0.35rem;
   color: hsl(var(--sidebar-muted));
   font-size: 0.65rem;
@@ -174,12 +188,38 @@ select:focus-visible, textarea:focus-visible {
   text-transform: uppercase;
 }
 
+.workspace-nav-group + .workspace-nav-group {
+  margin-top: 1.15rem;
+}
+
+.workspace-nav-group-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.8rem 0.45rem;
+  color: hsl(var(--sidebar-muted) / 0.72);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.workspace-nav-group-label::after {
+  width: 2.25rem;
+  height: 1px;
+  background: hsl(0 0% 100% / 0.14);
+  content: "";
+}
+
 .nav-link {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  border-radius: 1.2rem;
-  padding: 0.72rem 0.75rem;
+  min-height: 3.2rem;
+  border: 1px solid transparent;
+  border-radius: 1rem;
+  padding: 0.4rem 0.65rem;
   color: hsl(var(--sidebar-muted));
   font-size: 0.875rem;
   font-weight: 600;
@@ -193,23 +233,84 @@ select:focus-visible, textarea:focus-visible {
 }
 
 .nav-link-active {
-  background: hsl(0 0% 100% / 0.16);
+  border-color: hsl(0 0% 100% / 0.13);
+  background: hsl(0 0% 100% / 0.1);
   color: hsl(0 0% 100%);
   box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.09);
 }
 
+.nav-link-active::before {
+  position: absolute;
+  left: -0.65rem;
+  width: 0.2rem;
+  height: 1.7rem;
+  border-radius: 999px;
+  background: hsl(145 63% 72%);
+  box-shadow: 0 0 16px hsl(145 63% 72% / 0.45);
+  content: "";
+}
+
 .nav-icon {
   display: grid;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.35rem;
+  height: 2.35rem;
   flex: 0 0 auto;
   place-items: center;
-  border-radius: 0.95rem;
-  background: hsl(0 0% 100% / 0.08);
+  border: 1px solid hsl(0 0% 100% / 0.08);
+  border-radius: 0.8rem;
+  background: hsl(0 0% 100% / 0.07);
   transition: background-color 150ms ease;
 }
 
 .nav-link:hover .nav-icon, .nav-link-active .nav-icon { background: hsl(0 0% 100% / 0.16); }
+
+.workspace-sidebar-footer {
+  position: relative;
+  z-index: 1;
+  margin: 0.5rem 1rem 1rem;
+  border: 1px solid hsl(0 0% 100% / 0.12);
+  border-radius: 1.25rem;
+  background: hsl(0 0% 0% / 0.1);
+  padding: 0.75rem;
+}
+
+.workspace-account-dock {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  padding: 0.15rem 0.15rem 0.7rem;
+}
+
+.workspace-account-dock .workspace-user-avatar {
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 1px solid hsl(0 0% 100% / 0.18);
+  background: hsl(0 0% 100% / 0.13);
+  color: hsl(0 0% 100%);
+}
+
+.workspace-sidebar-logout {
+  display: flex;
+  width: 100%;
+  min-height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid hsl(0 0% 100% / 0.17);
+  border-radius: 0.85rem;
+  background: hsl(0 0% 100% / 0.08);
+  color: hsl(var(--sidebar-text));
+  font-size: 0.78rem;
+  font-weight: 750;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.workspace-sidebar-logout:hover {
+  border-color: hsl(0 0% 100% / 0.28);
+  background: hsl(var(--danger-soft) / 0.9);
+  color: hsl(var(--danger));
+}
 
 .workspace-topbar {
   position: sticky;
@@ -595,7 +696,7 @@ input[type="checkbox"], input[type="radio"] {
 @media (min-width: 768px) { .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 @media (min-width: 1024px) {
-  .workspace-main { margin-left: 17.25rem; padding: 1rem 1.25rem; }
+  .workspace-main { margin-left: 19.25rem; padding: 1rem 1.25rem; }
   .workspace-content { padding-inline: 0.25rem; }
   .login-canvas { grid-template-columns: minmax(22rem, 0.9fr) minmax(30rem, 1.1fr); }
   .login-brand-panel { display: flex; }
