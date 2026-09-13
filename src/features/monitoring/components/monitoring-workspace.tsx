@@ -9,6 +9,7 @@ import { useExamMonitoring } from "@/features/monitoring/use-monitoring";
 import { PageHeader } from "@/components/ui/page-header";
 import { Activity } from "lucide-react";
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
+import { RadixSelectField } from "@/components/ui/radix-select";
 
 const statusLabels: Record<string, string> = {
   not_started: "Belum mulai",
@@ -34,37 +35,25 @@ export function MonitoringWorkspace() {
       <div className="grid gap-4 md:grid-cols-2">
         <label className="field-label">
           Course
-          <select
-            className="field-input"
+          <RadixSelectField
             value={courseId}
-            onChange={(event) => {
-              setCourseId(event.target.value);
+            onValueChange={(value) => {
+              setCourseId(value);
               setExamId("");
             }}
-          >
-            <option value="">Pilih course</option>
-            {academics.courses.data?.data.map((course) => (
-              <option key={course.id} value={course.id}>
-                {course.name}
-              </option>
-            ))}
-          </select>
+            placeholder="Pilih course"
+            options={academics.courses.data?.data.map((course) => ({ value: course.id, label: course.name })) ?? []}
+          />
         </label>
         <label className="field-label">
           Ujian
-          <select
-            className="field-input"
+          <RadixSelectField
             value={examId}
-            onChange={(event) => setExamId(event.target.value)}
+            onValueChange={setExamId}
+            placeholder="Pilih ujian"
+            options={exams.data?.data.map((exam) => ({ value: exam.id, label: exam.title })) ?? []}
             disabled={!courseId}
-          >
-            <option value="">Pilih ujian</option>
-            {exams.data?.data.map((exam) => (
-              <option key={exam.id} value={exam.id}>
-                {exam.title}
-              </option>
-            ))}
-          </select>
+          />
         </label>
       </div>
       {monitoring.isLoading && <LoadingState label="Memuat status peserta…" />}

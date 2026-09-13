@@ -7,6 +7,7 @@ import {
   useUsers,
 } from "@/features/users/use-users";
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
+import { RadixSelectField } from "@/components/ui/radix-select";
 
 export function UserDirectory() {
   const [search, setSearch] = useState("");
@@ -52,18 +53,16 @@ export function UserDirectory() {
               setPage(1);
             }}
           />
-          <select
-            className="field-input w-36"
+          <RadixSelectField
             value={role}
-            onChange={(event) => {
-              setRole(event.target.value);
+            onValueChange={(value) => {
+              setRole(value);
               setPage(1);
             }}
-          >
-            <option value="">Semua peran</option>
-            <option value="teacher">Guru</option>
-            <option value="student">Siswa</option>
-          </select>
+            placeholder="Semua peran"
+            options={[{ value: "teacher", label: "Guru" }, { value: "student", label: "Siswa" }]}
+            className="w-36"
+          />
         </div>
       </div>
       <div className="overflow-x-auto">

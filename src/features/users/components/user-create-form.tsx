@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useCreateUser } from "@/features/users/use-users";
 import type { UserRole } from "@/types/api";
+import { RadixSelectField } from "@/components/ui/radix-select";
 
 const initialForm = {
   identifier: "",
@@ -48,19 +49,12 @@ export function UserCreateForm() {
         </label>
         <label className="field-label">
           Peran
-          <select
-            className="field-input"
+          <RadixSelectField
             value={form.role}
-            onChange={(event) =>
-              setForm({
-                ...form,
-                role: event.target.value as Exclude<UserRole, "admin">,
-              })
-            }
-          >
-            <option value="student">Siswa</option>
-            <option value="teacher">Guru</option>
-          </select>
+            onValueChange={(value) => setForm({ ...form, role: value as Exclude<UserRole, "admin"> })}
+            placeholder="Pilih peran"
+            options={[{ value: "student", label: "Siswa" }, { value: "teacher", label: "Guru" }]}
+          />
         </label>
         <label className="field-label">
           Kata sandi sementara
