@@ -11,6 +11,8 @@ import {
 import { publishExam, unpublishExam } from "@/services/exams.service";
 import { PageHeader } from "@/components/ui/page-header";
 import { GraduationCap } from "lucide-react";
+import { RadixSelectField } from "@/components/ui/radix-select";
+import { DateTimePickerField } from "@/components/ui/date-picker";
 
 export default function ExamsPage() {
   const academics = useAcademicData();
@@ -64,18 +66,12 @@ export default function ExamsPage() {
         />
         <label className="field-label max-w-lg">
           Course
-          <select
-            className="field-input"
+          <RadixSelectField
             value={courseId}
-            onChange={(e) => setCourseId(e.target.value)}
-          >
-            <option value="">Pilih course</option>
-            {academics.courses.data?.data.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
+            onValueChange={setCourseId}
+            placeholder="Pilih course"
+            options={academics.courses.data?.data.map((item) => ({ value: item.id, label: item.name })) ?? []}
+          />
         </label>
         {courseId && (
           <section className="panel">
@@ -102,25 +98,17 @@ export default function ExamsPage() {
               </label>
               <label className="field-label">
                 Mulai
-                <input
-                  className="field-input"
-                  type="datetime-local"
+                <DateTimePickerField
                   value={form.starts_at}
-                  onChange={(e) =>
-                    setForm({ ...form, starts_at: e.target.value })
-                  }
+                  onChange={(value) => setForm({ ...form, starts_at: value })}
                   required
                 />
               </label>
               <label className="field-label">
                 Selesai
-                <input
-                  className="field-input"
-                  type="datetime-local"
+                <DateTimePickerField
                   value={form.ends_at}
-                  onChange={(e) =>
-                    setForm({ ...form, ends_at: e.target.value })
-                  }
+                  onChange={(value) => setForm({ ...form, ends_at: value })}
                   required
                 />
               </label>

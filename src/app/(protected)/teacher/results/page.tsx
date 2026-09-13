@@ -14,6 +14,7 @@ import { exportExamResults } from "@/services/results.service";
 import { PageHeader } from "@/components/ui/page-header";
 import { ChartNoAxesCombined } from "lucide-react";
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
+import { RadixSelectField } from "@/components/ui/radix-select";
 
 export default function TeacherResultsPage() {
   const academics = useAcademicData();
@@ -44,36 +45,24 @@ export default function TeacherResultsPage() {
         <div className="grid gap-4 md:grid-cols-2">
           <label className="field-label">
             Course
-            <select
-              className="field-input"
+            <RadixSelectField
               value={courseId}
-              onChange={(e) => {
-                setCourseId(e.target.value);
+              onValueChange={(value) => {
+                setCourseId(value);
                 setExamId("");
               }}
-            >
-              <option value="">Pilih course</option>
-              {academics.courses.data?.data.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
+              placeholder="Pilih course"
+              options={academics.courses.data?.data.map((item) => ({ value: item.id, label: item.name })) ?? []}
+            />
           </label>
           <label className="field-label">
             Ujian
-            <select
-              className="field-input"
+            <RadixSelectField
               value={examId}
-              onChange={(e) => setExamId(e.target.value)}
-            >
-              <option value="">Pilih ujian</option>
-              {exams.data?.data.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.title}
-                </option>
-              ))}
-            </select>
+              onValueChange={setExamId}
+              placeholder="Pilih ujian"
+              options={exams.data?.data.map((item) => ({ value: item.id, label: item.title })) ?? []}
+            />
           </label>
         </div>
         {examId && (

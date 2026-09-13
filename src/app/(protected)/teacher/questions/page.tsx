@@ -11,6 +11,7 @@ import {
 import type { Question } from "@/types/lms";
 import { PageHeader } from "@/components/ui/page-header";
 import { BookOpenCheck } from "lucide-react";
+import { RadixSelectField } from "@/components/ui/radix-select";
 
 const emptyOptions = () =>
   Array.from({ length: 4 }, (_, index) => ({
@@ -88,21 +89,15 @@ export default function QuestionsPage() {
         />
         <label className="field-label max-w-lg">
           Course
-          <select
-            className="field-input"
+          <RadixSelectField
             value={courseId}
-            onChange={(e) => {
-              setCourseId(e.target.value);
+            onValueChange={(value) => {
+              setCourseId(value);
               reset();
             }}
-          >
-            <option value="">Pilih course</option>
-            {academics.courses.data?.data.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
+            placeholder="Pilih course"
+            options={academics.courses.data?.data.map((item) => ({ value: item.id, label: item.name })) ?? []}
+          />
         </label>
         {courseId && (
           <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,.75fr)]">

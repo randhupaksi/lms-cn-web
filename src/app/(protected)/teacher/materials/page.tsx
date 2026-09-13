@@ -12,6 +12,7 @@ import {
 import type { CourseMaterial } from "@/types/lms";
 import { PageHeader } from "@/components/ui/page-header";
 import { BookOpenText } from "lucide-react";
+import { RadixSelectField } from "@/components/ui/radix-select";
 
 const emptyForm = { title: "", description: "", content: "", position: 1 };
 
@@ -54,21 +55,15 @@ export default function TeacherMaterialsPage() {
         />
         <label className="field-label max-w-lg">
           Course
-          <select
-            className="field-input"
+          <RadixSelectField
             value={courseId}
-            onChange={(event) => {
-              setCourseId(event.target.value);
+            onValueChange={(value) => {
+              setCourseId(value);
               reset();
             }}
-          >
-            <option value="">Pilih course</option>
-            {academics.courses.data?.data.map((course) => (
-              <option key={course.id} value={course.id}>
-                {course.name}
-              </option>
-            ))}
-          </select>
+            placeholder="Pilih course"
+            options={academics.courses.data?.data.map((course) => ({ value: course.id, label: course.name })) ?? []}
+          />
         </label>
         {courseId && (
           <div className="grid gap-6 xl:grid-cols-[minmax(22rem,.8fr)_minmax(0,1.2fr)]">

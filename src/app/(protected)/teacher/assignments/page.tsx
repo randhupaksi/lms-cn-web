@@ -15,6 +15,8 @@ import type { AssignmentSubmission } from "@/types/lms";
 import { PageHeader } from "@/components/ui/page-header";
 import { ClipboardList } from "lucide-react";
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
+import { RadixSelectField } from "@/components/ui/radix-select";
+import { DateTimePickerField } from "@/components/ui/date-picker";
 
 const emptyForm = { title: "", instructions: "", due_at: "", max_score: 100 };
 
@@ -58,21 +60,15 @@ export default function TeacherAssignmentsPage() {
         />
         <label className="field-label max-w-lg">
           Course
-          <select
-            className="field-input"
+          <RadixSelectField
             value={courseId}
-            onChange={(event) => {
-              setCourseId(event.target.value);
+            onValueChange={(value) => {
+              setCourseId(value);
               setAssignmentId("");
             }}
-          >
-            <option value="">Pilih course</option>
-            {academics.courses.data?.data.map((course) => (
-              <option key={course.id} value={course.id}>
-                {course.name}
-              </option>
-            ))}
-          </select>
+            placeholder="Pilih course"
+            options={academics.courses.data?.data.map((course) => ({ value: course.id, label: course.name })) ?? []}
+          />
         </label>
         {courseId && (
           <>
@@ -103,13 +99,9 @@ export default function TeacherAssignmentsPage() {
                 </label>
                 <label className="field-label">
                   Batas pengumpulan
-                  <input
-                    className="field-input"
-                    type="datetime-local"
+                  <DateTimePickerField
                     value={form.due_at}
-                    onChange={(event) =>
-                      setForm({ ...form, due_at: event.target.value })
-                    }
+                    onChange={(value) => setForm({ ...form, due_at: value })}
                     required
                   />
                 </label>
