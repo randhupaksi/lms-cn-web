@@ -13,6 +13,7 @@ import {
   GraduationCap,
   LayoutDashboard,
   LogOut,
+  Menu,
   School,
   ShieldCheck,
   UsersRound,
@@ -123,6 +124,9 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
 
   return (
     <div className="workspace-shell">
+      <a href="#main-content" className="skip-link button-primary">
+        Langsung ke konten utama
+      </a>
       <button
         type="button"
         aria-label="Tutup navigasi"
@@ -136,6 +140,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
       />
 
       <aside
+        id="application-navigation"
         className={cn(
           "workspace-sidebar",
           sidebarOpen ? "workspace-sidebar-open" : "workspace-sidebar-closed",
@@ -208,8 +213,20 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
       <div className="workspace-main">
         <header className="workspace-topbar">
           <div className="flex min-w-0 items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Buka menu navigasi"
+              aria-expanded={sidebarOpen}
+              aria-controls="application-navigation"
+            >
+              <Menu size={19} />
+            </Button>
             <div className="min-w-0">
-              <p className="mt-1 truncate text-lg font-bold tracking-tight text-foreground sm:text-xl">
+              <p className="truncate text-xs font-semibold text-muted">{roleLabel}</p>
+              <p className="mt-0.5 truncate text-lg font-bold tracking-tight text-foreground sm:text-xl">
                 {pageTitle}
               </p>
             </div>
@@ -224,7 +241,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
           </div>
         </header>
 
-        <main className="workspace-content">{children}</main>
+        <main id="main-content" className="workspace-content" tabIndex={-1}>{children}</main>
       </div>
     </div>
   );
