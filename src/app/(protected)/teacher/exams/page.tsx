@@ -13,6 +13,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { GraduationCap } from "lucide-react";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { DateTimePickerField } from "@/components/ui/date-picker";
+import { EmptyState, ErrorState, LoadingState, SelectionState } from "@/components/data-state";
 
 export default function ExamsPage() {
   const academics = useAcademicData();
@@ -73,6 +74,7 @@ export default function ExamsPage() {
             options={academics.courses.data?.data.map((item) => ({ value: item.id, label: item.name })) ?? []}
           />
         </label>
+        {!courseId ? <SelectionState title="Pilih course untuk mengelola ujian" description="Pilih course agar Anda dapat menyiapkan draft, jadwal, dan publikasi ujian." /> : null}
         {courseId && (
           <section className="panel">
             <h2 className="section-title">Buat ujian</h2>
@@ -173,7 +175,10 @@ export default function ExamsPage() {
             </form>
           </section>
         )}
-        <section className="grid gap-4 md:grid-cols-2">
+        {courseId && exams.isLoading ? <LoadingState label="Memuat ujian…" /> : null}
+        {courseId && exams.isError ? <ErrorState label="Ujian belum dapat dimuat." onRetry={() => void exams.refetch()} /> : null}
+        {courseId && !exams.isLoading && !exams.isError && exams.data?.data.length === 0 ? <EmptyState title="Belum ada ujian" description="Buat draft ujian pertama untuk course ini." /> : null}
+        {courseId && exams.data?.data.length ? <section className="grid gap-4 md:grid-cols-2">
           {exams.data?.data.map((exam) => (
             <article className="panel panel-interactive" key={exam.id}>
               <div className="flex items-start justify-between gap-4">
@@ -225,7 +230,7 @@ export default function ExamsPage() {
               </div>
             </article>
           ))}
-        </section>
+        </section> : null}
       </div>
     </RoleBoundary>
   );

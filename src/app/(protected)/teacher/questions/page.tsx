@@ -12,6 +12,7 @@ import type { Question } from "@/types/lms";
 import { PageHeader } from "@/components/ui/page-header";
 import { BookOpenCheck } from "lucide-react";
 import { RadixSelectField } from "@/components/ui/radix-select";
+import { SelectionState } from "@/components/data-state";
 
 const emptyOptions = () =>
   Array.from({ length: 4 }, (_, index) => ({
@@ -99,6 +100,7 @@ export default function QuestionsPage() {
             options={academics.courses.data?.data.map((item) => ({ value: item.id, label: item.name })) ?? []}
           />
         </label>
+        {!courseId ? <SelectionState title="Pilih course untuk membuka bank soal" description="Soal dikelola terpisah per course agar dapat ditinjau dan digunakan dengan konteks yang tepat." /> : null}
         {courseId && (
           <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,.75fr)]">
             <section className="panel">

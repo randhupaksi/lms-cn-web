@@ -15,6 +15,7 @@ export function UserDirectory() {
   const [page, setPage] = useState(1);
   const [resetUserId, setResetUserId] = useState<string | null>(null);
   const [resetPassword, setResetPassword] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const users = useUsers({ search, role, page });
   const toggle = useToggleUser();
   const resetCredential = useResetCredential();
@@ -24,11 +25,12 @@ export function UserDirectory() {
     if (!resetUserId) return;
     resetCredential.mutate(
       { id: resetUserId, password: resetPassword },
-      {
-        onSuccess: () => {
-          setResetUserId(null);
-          setResetPassword("");
-        },
+        {
+          onSuccess: () => {
+            setResetUserId(null);
+            setResetPassword("");
+            setSuccessMessage("Kata sandi sementara berhasil diperbarui.");
+          },
       },
     );
   }
@@ -48,6 +50,7 @@ export function UserDirectory() {
             type="search"
             placeholder="Cari nama atau identitas…"
             value={search}
+            aria-label="Cari pengguna berdasarkan nama atau identitas"
             onChange={(event) => {
               setSearch(event.target.value);
               setPage(1);
@@ -61,6 +64,7 @@ export function UserDirectory() {
             }}
             placeholder="Semua peran"
             options={[{ value: "teacher", label: "Guru" }, { value: "student", label: "Siswa" }]}
+            ariaLabel="Filter pengguna berdasarkan peran"
             className="w-36"
           />
         </div>
@@ -96,9 +100,10 @@ export function UserDirectory() {
                       onClick={() => {
                         setResetUserId(user.id);
                         setResetPassword("");
+                        setSuccessMessage("");
                       }}
                     >
-                      Reset credential
+                      Reset kata sandi
                     </button>
                     <button
                       className="button-ghost"
@@ -107,7 +112,7 @@ export function UserDirectory() {
                           id: user.id,
                           status:
                             user.status === "active" ? "inactive" : "active",
-                        })
+                        }, { onSuccess: () => setSuccessMessage(`Status akun ${user.full_name} berhasil diperbarui.`) })
                       }
                     >
                       {user.status === "active" ? "Nonaktifkan" : "Aktifkan"}
@@ -130,6 +135,7 @@ export function UserDirectory() {
         <form
           className="flex flex-wrap items-end gap-3 border-t border-border bg-surface p-4"
           onSubmit={submitReset}
+          aria-label="Atur ulang kata sandi sementara"
         >
           <label className="field-label min-w-64 flex-1">
             Kata sandi sementara baru
@@ -139,8 +145,9 @@ export function UserDirectory() {
               minLength={8}
               value={resetPassword}
               onChange={(event) => setResetPassword(event.target.value)}
-              required
-            />
+            required
+          />
+            <span className="text-xs font-normal leading-5 text-muted">Sesi aktif pengguna akan dicabut saat kata sandi diperbarui.</span>
           </label>
           <button
             className="button-primary"
@@ -157,6 +164,7 @@ export function UserDirectory() {
           </button>
         </form>
       )}
+      {successMessage ? <p className="border-t border-border px-4 py-3 text-sm font-medium text-success" role="status">{successMessage}</p> : null}
       <div className="flex items-center justify-between border-t border-border p-4 text-sm">
         <p className="text-muted">
           Halaman {users.data?.meta.page ?? page} dari{" "}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
+import { EmptyState, ErrorState, LoadingState, SelectionState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
 import { useAcademicData } from "@/features/academics/use-academics";
 import {
@@ -65,6 +65,7 @@ export default function TeacherMaterialsPage() {
             options={academics.courses.data?.data.map((course) => ({ value: course.id, label: course.name })) ?? []}
           />
         </label>
+        {!courseId ? <SelectionState title="Pilih course untuk mengelola materi" description="Pilih course agar Anda dapat membuat, memperbarui, dan mempublikasikan materi." /> : null}
         {courseId && (
           <div className="grid gap-6 xl:grid-cols-[minmax(22rem,.8fr)_minmax(0,1.2fr)]">
             <section className="panel">
@@ -134,7 +135,7 @@ export default function TeacherMaterialsPage() {
             <section className="space-y-3">
               {materials.isLoading && <LoadingState />}
               {materials.isError && (
-                <ErrorState label="Materi belum dapat dimuat." />
+                <ErrorState label="Materi belum dapat dimuat." onRetry={() => void materials.refetch()} />
               )}
               {materials.data?.length === 0 && (
                 <EmptyState
