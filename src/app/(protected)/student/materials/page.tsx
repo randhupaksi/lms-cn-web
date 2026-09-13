@@ -10,6 +10,7 @@ import {
   useCompleteMaterial,
   useMaterials,
 } from "@/features/materials/use-materials";
+import { RadixSelectField } from "@/components/ui/radix-select";
 
 export default function StudentMaterialsPage() {
   const courses = useCourses();
@@ -27,18 +28,12 @@ export default function StudentMaterialsPage() {
         />
         <label className="field-label max-w-lg">
           Course
-          <select
-            className="field-input"
+          <RadixSelectField
             value={courseId}
-            onChange={(event) => setCourseId(event.target.value)}
-          >
-            <option value="">Pilih course</option>
-            {courses.data?.data.map((course) => (
-              <option key={course.id} value={course.id}>
-                {course.name}
-              </option>
-            ))}
-          </select>
+            onValueChange={setCourseId}
+            placeholder="Pilih course"
+            options={courses.data?.data.map((course) => ({ value: course.id, label: course.name })) ?? []}
+          />
         </label>
         {materials.isLoading && <LoadingState />}
         {materials.isError && <ErrorState label="Materi belum dapat dimuat." />}

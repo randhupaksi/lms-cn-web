@@ -10,6 +10,7 @@ import {
 } from "@/features/assignments/use-assignments";
 import { PageHeader } from "@/components/ui/page-header";
 import { ClipboardList } from "lucide-react";
+import { RadixSelectField } from "@/components/ui/radix-select";
 
 export default function StudentAssignmentsPage() {
   const [renderedAt] = useState(() => Date.now());
@@ -31,21 +32,15 @@ export default function StudentAssignmentsPage() {
         />
         <label className="field-label max-w-lg">
           Course
-          <select
-            className="field-input"
+          <RadixSelectField
             value={courseId}
-            onChange={(event) => {
-              setCourseId(event.target.value);
+            onValueChange={(value) => {
+              setCourseId(value);
               setActiveId("");
             }}
-          >
-            <option value="">Pilih course</option>
-            {courses.data?.data.map((course) => (
-              <option key={course.id} value={course.id}>
-                {course.name}
-              </option>
-            ))}
-          </select>
+            placeholder="Pilih course"
+            options={courses.data?.data.map((course) => ({ value: course.id, label: course.name })) ?? []}
+          />
         </label>
         {assignments.isLoading && <LoadingState />}
         {assignments.isError && (
