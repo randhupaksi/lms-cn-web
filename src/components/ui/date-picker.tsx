@@ -33,7 +33,7 @@ export function DatePickerField({ value, onChange, placeholder = "Pilih tanggal"
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>
         <PopoverPrimitive.Positioner side="bottom" align="start" sideOffset={8} className="isolate z-9999">
-          <PopoverPrimitive.Popup className="w-auto rounded-2xl border border-border bg-card p-2.5 text-sm text-foreground shadow-[0_24px_70px_hsl(151_42%_16%_/_0.18)] outline-none">
+          <PopoverPrimitive.Popup className="overlay-surface w-auto p-2.5 text-sm text-foreground outline-none">
             <Calendar
               mode="single"
               selected={selectedDate}
@@ -73,7 +73,7 @@ export function DateTimePickerField({ value, onChange, placeholder = "Pilih wakt
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>
         <PopoverPrimitive.Positioner side="bottom" align="start" sideOffset={8} className="isolate z-9999">
-          <PopoverPrimitive.Popup className="w-auto rounded-2xl border border-border bg-card p-2.5 text-sm text-foreground shadow-[0_24px_70px_hsl(151_42%_16%_/_0.18)] outline-none">
+          <PopoverPrimitive.Popup className="overlay-surface w-auto p-2.5 text-sm text-foreground outline-none">
             <Calendar mode="single" selected={parsed} onSelect={(date) => date && update(date)} />
             <div className="border-t border-border px-2 pt-3">
               <label className="field-label text-xs">

@@ -16,20 +16,21 @@ type RadixSelectProps = {
   contentClassName?: string;
   triggerClassName?: string;
   itemClassName?: string;
+  ariaLabel?: string;
 };
 
-export function RadixSelectField({ value, onValueChange, placeholder, options, disabled, className, contentClassName, triggerClassName, itemClassName }: RadixSelectProps) {
+export function RadixSelectField({ value, onValueChange, placeholder, options, disabled, className, contentClassName, triggerClassName, itemClassName, ariaLabel }: RadixSelectProps) {
   return (
     <Select.Root value={value} onValueChange={onValueChange} disabled={disabled}>
-      <Select.Trigger disabled={disabled} className={cn("group flex h-12 w-full items-center justify-between rounded-xl border border-border bg-card px-4 text-left text-sm font-medium text-foreground shadow-sm outline-none hover:border-primary/40 hover:bg-primary-soft focus:ring-4 focus:ring-primary/15 data-[placeholder]:text-muted-soft", triggerClassName, className)}>
+      <Select.Trigger disabled={disabled} aria-label={ariaLabel} className={cn("field-input group flex items-center justify-between text-left data-[placeholder]:text-muted-soft", triggerClassName, className)}>
         <Select.Value placeholder={placeholder} />
         <Select.Icon className="text-muted transition-transform group-data-[state=open]:rotate-180"><ChevronDown className="size-4" /></Select.Icon>
       </Select.Trigger>
       <Select.Portal>
-        <Select.Content position="popper" sideOffset={8} className={cn("z-9999 w-(--radix-select-trigger-width) overflow-hidden rounded-2xl border border-border bg-card p-2 shadow-[0_24px_80px_hsl(151_42%_16%_/_0.18)]", contentClassName)}>
+        <Select.Content position="popper" sideOffset={8} className={cn("overlay-surface z-9999 w-(--radix-select-trigger-width) overflow-hidden p-2", contentClassName)}>
           <Select.Viewport className="max-h-70 space-y-1 overscroll-contain">
             {options.map((option) => (
-              <Select.Item key={option.value} value={option.value} disabled={option.disabled} className={cn("group/item relative flex min-w-0 cursor-pointer select-none items-start gap-3 rounded-xl border border-transparent px-3 py-3 text-sm text-foreground outline-none hover:border-primary/20 hover:bg-primary-soft data-[highlighted]:bg-primary-soft data-[state=checked]:border-primary/20 data-[state=checked]:bg-primary-soft data-[disabled]:pointer-events-none data-[disabled]:opacity-40", itemClassName)}>
+              <Select.Item key={option.value} value={option.value} disabled={option.disabled} className={cn("group/item relative flex min-w-0 cursor-pointer select-none items-start gap-3 rounded-[var(--radius-sm)] border border-transparent px-3 py-3 text-sm text-foreground outline-none hover:border-primary/20 hover:bg-primary-soft data-[highlighted]:bg-primary-soft data-[state=checked]:border-primary/20 data-[state=checked]:bg-primary-soft data-[disabled]:pointer-events-none data-[disabled]:opacity-40", itemClassName)}>
                 <span className="flex size-5 shrink-0 items-center justify-center rounded-full border border-border bg-card text-primary"><Select.ItemIndicator><Check className="size-3.5" /></Select.ItemIndicator></span>
                 <div className="min-w-0 flex-1"><Select.ItemText asChild><span className="block truncate">{option.label}</span></Select.ItemText>{option.description ? <span className="mt-0.5 block truncate text-xs text-muted">{option.description}</span> : null}</div>
               </Select.Item>
