@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { CheckCircle2, Clock3, Cloud, CloudOff } from "lucide-react";
 import { RoleBoundary } from "@/components/role-boundary";
+import { ErrorState, LoadingState } from "@/components/data-state";
 import {
   useAttempt,
   useSaveAnswer,
@@ -54,6 +55,7 @@ export default function AttemptPage() {
   const submit = useSubmitAttempt(attemptId);
   const router = useRouter();
   const [index, setIndex] = useState(0);
+  const [confirmSubmit, setConfirmSubmit] = useState(false);
   const remaining = useRemainingSeconds(
     attempt.data?.deadline_at,
     attempt.data?.server_time,
@@ -79,12 +81,9 @@ export default function AttemptPage() {
         onSuccess: () => router.replace("/student/results"),
       });
   }, [remaining, attempt.data, submit, router]);
-  if (attempt.isLoading)
-    return <p className="text-sm text-muted">Menyiapkan lembar ujian…</p>;
+  if (attempt.isLoading) return <LoadingState label="Menyiapkan lembar ujian…" />;
   if (!attempt.data || !question)
-    return (
-      <p className="form-error">Attempt tidak tersedia atau sudah berakhir.</p>
-    );
+    return <ErrorState label="Attempt tidak tersedia atau sudah berakhir." onRetry={() => void attempt.refetch()} />;
   const answered = answerMap.size;
   return (
     <RoleBoundary allow={["student"]}>
@@ -173,6 +172,7 @@ export default function AttemptPage() {
                 <button
                   className={`question-number ${itemIndex === index ? "question-number-current" : ""} ${answerMap.has(item.id) ? "question-number-answered" : ""}`}
                   key={item.id}
+                  aria-label={`Buka soal ${itemIndex + 1}${answerMap.has(item.id) ? ", sudah dijawab" : ""}`}
                   onClick={() => setIndex(itemIndex)}
                   disabled={
                     !attempt.data.allow_back_navigation && itemIndex < index
@@ -182,23 +182,17 @@ export default function AttemptPage() {
                 </button>
               ))}
             </div>
-            <button
-              className="button-primary mt-6 w-full"
-              disabled={submit.isPending}
-              onClick={() => {
-                if (
-                  window.confirm(
-                    `Kumpulkan ujian sekarang? ${attempt.data.questions.length - answered} soal belum dijawab.`,
-                  )
-                )
-                  submit.mutate(undefined, {
-                    onSuccess: (receipt) =>
-                      router.replace(`/student/receipts/${receipt.attempt_id}`),
-                  });
-              }}
-            >
-              Kumpulkan ujian
-            </button>
+            {confirmSubmit ? (
+              <div className="mt-6 border-t border-border pt-4" role="alert">
+                <p className="text-sm font-semibold text-foreground">Akhiri dan kumpulkan ujian?</p>
+                <p className="mt-1 text-xs leading-5 text-muted">{attempt.data.questions.length - answered} soal belum dijawab. Jawaban tidak dapat diubah setelah dikumpulkan.</p>
+                <div className="mt-4 flex gap-2">
+                  <button className="button-ghost" onClick={() => setConfirmSubmit(false)} disabled={submit.isPending}>Kembali</button>
+                  <button className="button-primary" onClick={() => submit.mutate(undefined, { onSuccess: (receipt) => router.replace(`/student/receipts/${receipt.attempt_id}`) })} disabled={submit.isPending}>{submit.isPending ? "Mengumpulkan…" : "Ya, kumpulkan"}</button>
+                </div>
+                {submit.isError ? <p className="form-error" role="alert">Ujian belum dapat dikumpulkan. Periksa koneksi dan coba lagi.</p> : null}
+              </div>
+            ) : <button className="button-primary mt-6 w-full" disabled={submit.isPending} onClick={() => setConfirmSubmit(true)}>Kumpulkan ujian</button>}
           </aside>
         </div>
       </div>

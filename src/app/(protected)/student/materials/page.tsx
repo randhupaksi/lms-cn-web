@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { BookOpenText, CheckCircle2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
-import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
+import { EmptyState, ErrorState, LoadingState, SelectionState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
 import { useCourses } from "@/features/academics/use-academics";
 import {
@@ -35,15 +35,21 @@ export default function StudentMaterialsPage() {
             options={courses.data?.data.map((course) => ({ value: course.id, label: course.name })) ?? []}
           />
         </label>
-        {materials.isLoading && <LoadingState />}
-        {materials.isError && <ErrorState label="Materi belum dapat dimuat." />}
-        {materials.data?.length === 0 && (
+        {courses.isLoading && <LoadingState label="Memuat daftar course…" />}
+        {courses.isError && <ErrorState label="Course belum dapat dimuat." onRetry={() => void courses.refetch()} />}
+        {!courses.isLoading && !courses.isError && courses.data?.data.length === 0 && (
+          <EmptyState title="Belum ada course" description="Anda belum terdaftar pada course yang memiliki materi." />
+        )}
+        {!courseId && courses.data?.data.length ? <SelectionState /> : null}
+        {courseId && materials.isLoading && <LoadingState label="Memuat materi…" />}
+        {courseId && materials.isError && <ErrorState label="Materi belum dapat dimuat." onRetry={() => void materials.refetch()} />}
+        {courseId && materials.data?.length === 0 && (
           <EmptyState
             title="Belum ada materi"
             description="Guru belum mempublikasikan materi pada course ini."
           />
         )}
-        {materials.data?.map((material) => (
+        {courseId && materials.data?.map((material) => (
           <article className="panel panel-interactive" key={material.id}>
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
@@ -70,7 +76,7 @@ export default function StudentMaterialsPage() {
                 onClick={() => complete.mutate(material.id)}
                 disabled={complete.isPending}
               >
-                Tandai selesai
+                {complete.isPending ? "Menyimpan…" : "Tandai selesai"}
               </button>
             )}
           </article>

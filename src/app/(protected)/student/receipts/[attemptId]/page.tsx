@@ -4,9 +4,12 @@ import { useParams } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 import { RoleBoundary } from "@/components/role-boundary";
 import { useAttempt } from "@/features/attempts/use-attempts";
+import { ErrorState, LoadingState } from "@/components/data-state";
 export default function ReceiptPage() {
   const id = useParams<{ attemptId: string }>().attemptId;
   const attempt = useAttempt(id);
+  if (attempt.isLoading) return <LoadingState label="Memuat bukti pengumpulan…" />;
+  if (!attempt.data || attempt.isError) return <ErrorState label="Bukti pengumpulan belum dapat dimuat." onRetry={() => void attempt.refetch()} />;
   return (
     <RoleBoundary allow={["student"]}>
       <section className="mx-auto max-w-lg panel text-center">

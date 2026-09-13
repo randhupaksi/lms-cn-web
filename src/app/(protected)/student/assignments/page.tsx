@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
+import { EmptyState, ErrorState, LoadingState, SelectionState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
 import { useCourses } from "@/features/academics/use-academics";
 import {
@@ -42,17 +42,23 @@ export default function StudentAssignmentsPage() {
             options={courses.data?.data.map((course) => ({ value: course.id, label: course.name })) ?? []}
           />
         </label>
-        {assignments.isLoading && <LoadingState />}
-        {assignments.isError && (
-          <ErrorState label="Tugas belum dapat dimuat." />
+        {courses.isLoading && <LoadingState label="Memuat daftar course…" />}
+        {courses.isError && <ErrorState label="Course belum dapat dimuat." onRetry={() => void courses.refetch()} />}
+        {!courses.isLoading && !courses.isError && courses.data?.data.length === 0 && (
+          <EmptyState title="Belum ada course" description="Anda belum terdaftar pada course yang memiliki tugas." />
         )}
-        {assignments.data?.length === 0 && (
+        {!courseId && courses.data?.data.length ? <SelectionState /> : null}
+        {courseId && assignments.isLoading && <LoadingState label="Memuat tugas…" />}
+        {courseId && assignments.isError && (
+          <ErrorState label="Tugas belum dapat dimuat." onRetry={() => void assignments.refetch()} />
+        )}
+        {courseId && assignments.data?.length === 0 && (
           <EmptyState
             title="Belum ada tugas"
             description="Guru belum mempublikasikan tugas pada course ini."
           />
         )}
-        {assignments.data?.map((assignment) => (
+        {courseId && assignments.data?.map((assignment) => (
           <article className="panel panel-interactive" key={assignment.id}>
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
@@ -133,6 +139,7 @@ export default function StudentAssignmentsPage() {
                 <button className="button-primary" disabled={submit.isPending}>
                   Kumpulkan tugas
                 </button>
+                {submit.isError ? <p className="form-error" role="alert">Tugas belum dapat dikumpulkan. Periksa jawaban dan coba lagi.</p> : null}
               </form>
             ) : (
               <button
@@ -140,7 +147,7 @@ export default function StudentAssignmentsPage() {
                 onClick={() => setActiveId(assignment.id)}
                 disabled={new Date(assignment.due_at).getTime() <= renderedAt}
               >
-                Tulis jawaban
+                {new Date(assignment.due_at).getTime() <= renderedAt ? "Deadline terlewati" : "Tulis jawaban"}
               </button>
             )}
           </article>

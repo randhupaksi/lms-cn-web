@@ -7,6 +7,7 @@ import {
   useStartExam,
 } from "@/features/attempts/use-attempts";
 import { PageHeader } from "@/components/ui/page-header";
+import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
 import { GraduationCap } from "lucide-react";
 
 export default function StudentExamsPage() {
@@ -22,7 +23,12 @@ export default function StudentExamsPage() {
           description="Waktu ujian dihitung oleh server. Pastikan koneksi stabil sebelum mulai."
           icon={GraduationCap}
         />
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {exams.isLoading ? <LoadingState label="Memuat ujian yang tersedia…" /> : null}
+        {exams.isError ? <ErrorState label="Daftar ujian belum dapat dimuat." onRetry={() => void exams.refetch()} /> : null}
+        {!exams.isLoading && !exams.isError && exams.data?.length === 0 ? (
+          <EmptyState title="Belum ada ujian tersedia" description="Ujian yang telah dibuka untuk Anda akan muncul di halaman ini." />
+        ) : null}
+        {exams.data?.length ? <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {exams.data?.map((exam) => (
             <article className="panel panel-interactive" key={exam.id}>
               <span className="status-badge">
@@ -66,12 +72,7 @@ export default function StudentExamsPage() {
               </button>
             </article>
           ))}
-          {!exams.isLoading && exams.data?.length === 0 && (
-            <div className="panel text-sm text-muted">
-              Belum ada ujian yang tersedia.
-            </div>
-          )}
-        </section>
+        </section> : null}
       </div>
     </RoleBoundary>
   );
