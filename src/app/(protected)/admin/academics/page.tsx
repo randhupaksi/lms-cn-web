@@ -13,6 +13,8 @@ import { CourseAssignments } from "@/features/academics/components/course-assign
 import { CourseTable } from "@/features/academics/components/course-table";
 import { PageHeader } from "@/components/ui/page-header";
 import { School } from "lucide-react";
+import { DatePickerField } from "@/components/ui/date-picker";
+import { RadixSelectField } from "@/components/ui/radix-select";
 
 export default function AcademicsPage() {
   const data = useAcademicData();
@@ -69,25 +71,17 @@ export default function AcademicsPage() {
               </label>
               <label className="field-label">
                 Mulai
-                <input
-                  className="field-input"
-                  type="date"
+                <DatePickerField
                   value={year.starts_on}
-                  onChange={(e) =>
-                    setYear({ ...year, starts_on: e.target.value })
-                  }
+                  onChange={(value) => setYear({ ...year, starts_on: value })}
                   required
                 />
               </label>
               <label className="field-label">
                 Selesai
-                <input
-                  className="field-input"
-                  type="date"
+                <DatePickerField
                   value={year.ends_on}
-                  onChange={(e) =>
-                    setYear({ ...year, ends_on: e.target.value })
-                  }
+                  onChange={(value) => setYear({ ...year, ends_on: value })}
                   required
                 />
               </label>
@@ -104,21 +98,12 @@ export default function AcademicsPage() {
             >
               <label className="field-label md:col-span-2">
                 Tahun ajaran
-                <select
-                  className="field-input"
+                <RadixSelectField
                   value={group.academic_year_id}
-                  onChange={(e) =>
-                    setGroup({ ...group, academic_year_id: e.target.value })
-                  }
-                  required
-                >
-                  <option value="">Pilih tahun ajaran</option>
-                  {data.years.data?.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.name}
-                    </option>
-                  ))}
-                </select>
+                  onValueChange={(value) => setGroup({ ...group, academic_year_id: value })}
+                  placeholder="Pilih tahun ajaran"
+                  options={data.years.data?.map((item) => ({ value: item.id, label: item.name })) ?? []}
+                />
               </label>
               <label className="field-label">
                 Nama kelas
@@ -200,57 +185,30 @@ export default function AcademicsPage() {
               </label>
               <label className="field-label">
                 Tahun ajaran
-                <select
-                  className="field-input"
+                <RadixSelectField
                   value={course.academic_year_id}
-                  onChange={(e) =>
-                    setCourse({ ...course, academic_year_id: e.target.value })
-                  }
-                  required
-                >
-                  <option value="">Pilih</option>
-                  {data.years.data?.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.name}
-                    </option>
-                  ))}
-                </select>
+                  onValueChange={(value) => setCourse({ ...course, academic_year_id: value })}
+                  placeholder="Pilih tahun ajaran"
+                  options={data.years.data?.map((item) => ({ value: item.id, label: item.name })) ?? []}
+                />
               </label>
               <label className="field-label">
                 Kelas
-                <select
-                  className="field-input"
+                <RadixSelectField
                   value={course.class_group_id}
-                  onChange={(e) =>
-                    setCourse({ ...course, class_group_id: e.target.value })
-                  }
-                  required
-                >
-                  <option value="">Pilih</option>
-                  {data.classes.data?.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.name}
-                    </option>
-                  ))}
-                </select>
+                  onValueChange={(value) => setCourse({ ...course, class_group_id: value })}
+                  placeholder="Pilih kelas"
+                  options={data.classes.data?.map((item) => ({ value: item.id, label: item.name })) ?? []}
+                />
               </label>
               <label className="field-label md:col-span-2">
                 Mata pelajaran
-                <select
-                  className="field-input"
+                <RadixSelectField
                   value={course.subject_id}
-                  onChange={(e) =>
-                    setCourse({ ...course, subject_id: e.target.value })
-                  }
-                  required
-                >
-                  <option value="">Pilih</option>
-                  {data.subjects.data?.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.code} — {item.name}
-                    </option>
-                  ))}
-                </select>
+                  onValueChange={(value) => setCourse({ ...course, subject_id: value })}
+                  placeholder="Pilih mata pelajaran"
+                  options={data.subjects.data?.map((item) => ({ value: item.id, label: `${item.code} — ${item.name}` })) ?? []}
+                />
               </label>
               <button className="button-primary md:col-span-2">
                 Simpan course

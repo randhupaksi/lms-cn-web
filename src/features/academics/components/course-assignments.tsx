@@ -7,6 +7,7 @@ import {
   useCourseMembers,
 } from "@/features/academics/use-academics";
 import { useUsers } from "@/features/users/use-users";
+import { RadixSelectField } from "@/components/ui/radix-select";
 
 export function CourseAssignments() {
   const data = useAcademicData();
@@ -41,22 +42,16 @@ export function CourseAssignments() {
       </p>
       <label className="field-label mt-5 max-w-lg">
         Course
-        <select
-          className="field-input"
+        <RadixSelectField
           value={courseId}
-          onChange={(event) => {
-            setCourseId(event.target.value);
+          onValueChange={(value) => {
+            setCourseId(value);
             setTeacherChanges(null);
             setStudentChanges(null);
           }}
-        >
-          <option value="">Pilih course</option>
-          {data.courses.data?.data.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
-          ))}
-        </select>
+          placeholder="Pilih course"
+          options={data.courses.data?.data.map((item) => ({ value: item.id, label: item.name })) ?? []}
+        />
       </label>
       {courseId && (
         <div className="mt-6 grid gap-6 xl:grid-cols-2">
