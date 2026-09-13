@@ -10,7 +10,7 @@ export function MetricGrid({ metrics }: { metrics: DashboardMetric[] }) {
         const Icon = icons[index % icons.length];
         return (
           <div className="metric-card" key={metric.key}>
-            <div className="relative z-10 flex items-start justify-between gap-4">
+            <div className="flex items-start justify-between gap-4">
               <div>
                 <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
                   {metric.label}

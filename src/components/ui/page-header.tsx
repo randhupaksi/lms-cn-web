@@ -12,7 +12,7 @@ type PageHeaderProps = {
 export function PageHeader({ eyebrow, title, description, icon: Icon, actions }: PageHeaderProps) {
   return (
     <header className="page-header">
-      <div className="relative z-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
           <p className="eyebrow">
             {Icon ? <Icon aria-hidden="true" size={14} /> : null}

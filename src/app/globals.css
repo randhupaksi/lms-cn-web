@@ -30,15 +30,12 @@
   --focus: 151 62% 45%;
   --radius-sm: 0.75rem;
   --radius-md: 1rem;
-  --radius-lg: 1.4rem;
-  --radius-xl: 1.875rem;
-  --shadow-sm: 0 10px 24px hsl(211 37% 20% / 0.05);
-  --shadow-md: 0 18px 46px hsl(151 42% 20% / 0.09);
-  --shadow-lg: 0 28px 72px hsl(151 42% 16% / 0.14);
-  --workspace-background:
-    radial-gradient(circle at 4% 0%, hsl(151 31% 83% / 0.42), transparent 28rem),
-    radial-gradient(circle at 100% 3%, hsl(198 42% 86% / 0.32), transparent 25rem),
-    linear-gradient(180deg, hsl(45 31% 97%) 0%, hsl(45 25% 94%) 100%);
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.5rem;
+  --shadow-sm: 0 2px 8px hsl(211 37% 20% / 0.05);
+  --shadow-md: 0 10px 28px hsl(211 37% 20% / 0.08);
+  --shadow-lg: 0 18px 48px hsl(211 37% 20% / 0.14);
+  --workspace-background: hsl(var(--background));
   color: hsl(var(--foreground));
   background: hsl(var(--background));
   font-family: "Plus Jakarta Sans", Inter, ui-sans-serif, system-ui, -apple-system,
@@ -127,21 +124,12 @@ select:focus-visible, textarea:focus-visible {
   width: 18.5rem;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid hsl(0 0% 100% / 0.12);
+  border: 0;
   border-radius: 0;
   background: hsl(var(--sidebar-end));
   color: hsl(var(--sidebar-text));
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-md);
   transition: transform 240ms ease;
-}
-
-.workspace-sidebar::before {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 100% 0%, hsl(145 54% 68% / 0.16), transparent 14rem),
-    linear-gradient(135deg, hsl(0 0% 100% / 0.04), transparent 38%);
-  content: "";
-  pointer-events: none;
 }
 
 .workspace-sidebar-scroll {
@@ -169,7 +157,7 @@ select:focus-visible, textarea:focus-visible {
   flex: 0 0 auto;
   place-items: center;
   border: 1px solid hsl(0 0% 100% / 0.2);
-  border-radius: 1.15rem;
+  border-radius: var(--radius-md);
   background: hsl(0 0% 100% / 0.14);
   box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.14);
   font-size: 0.9rem;
@@ -218,7 +206,7 @@ select:focus-visible, textarea:focus-visible {
   gap: 0.8rem;
   min-height: 3.2rem;
   border: 1px solid transparent;
-  border-radius: 1rem;
+  border-radius: var(--radius-sm);
   padding: 0.4rem 0.65rem;
   color: hsl(var(--sidebar-muted));
   font-size: 0.875rem;
@@ -229,7 +217,6 @@ select:focus-visible, textarea:focus-visible {
 .nav-link:hover {
   background: hsl(0 0% 100% / 0.09);
   color: hsl(0 0% 100%);
-  transform: translateX(2px);
 }
 
 .nav-link-active {
@@ -246,7 +233,6 @@ select:focus-visible, textarea:focus-visible {
   height: 1.7rem;
   border-radius: 999px;
   background: hsl(145 63% 72%);
-  box-shadow: 0 0 16px hsl(145 63% 72% / 0.45);
   content: "";
 }
 
@@ -269,7 +255,7 @@ select:focus-visible, textarea:focus-visible {
   z-index: 1;
   margin: 0.5rem 1rem 1rem;
   border: 1px solid hsl(0 0% 100% / 0.12);
-  border-radius: 1.25rem;
+  border-radius: var(--radius-md);
   background: hsl(0 0% 0% / 0.1);
   padding: 0.75rem;
 }
@@ -322,12 +308,11 @@ select:focus-visible, textarea:focus-visible {
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 1.25rem;
-  border: 1px solid hsl(0 0% 100% / 0.75);
-  border-radius: var(--radius-lg);
-  background: hsl(var(--card) / 0.91);
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-md);
+  background: hsl(var(--card));
   padding: 0.75rem 0.9rem;
-  box-shadow: var(--shadow-md);
-  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow-sm);
 }
 
 .workspace-user {
@@ -335,7 +320,7 @@ select:focus-visible, textarea:focus-visible {
   align-items: center;
   gap: 0.7rem;
   border: 1px solid hsl(var(--border));
-  border-radius: 999px;
+  border-radius: var(--radius-sm);
   background: hsl(var(--card));
   padding: 0.35rem 0.65rem 0.35rem 0.35rem;
   box-shadow: var(--shadow-sm);
@@ -375,32 +360,14 @@ select:focus-visible, textarea:focus-visible {
 }
 
 .page-header {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid hsl(0 0% 100% / 0.8);
-  border-radius: var(--radius-xl);
-  background: linear-gradient(145deg, hsl(var(--card) / 0.98), hsl(var(--card-soft) / 0.95));
-  padding: clamp(1.25rem, 3vw, 2rem);
-  box-shadow: var(--shadow-md);
-}
-
-.page-header::after {
-  position: absolute;
-  right: -3rem;
-  bottom: -5rem;
-  width: 13rem;
-  height: 13rem;
-  border-radius: 999px;
-  background: hsl(var(--primary) / 0.07);
-  content: "";
-  filter: blur(4px);
-  pointer-events: none;
+  border-bottom: 1px solid hsl(var(--border));
+  padding: 0 0 1.5rem;
 }
 
 .page-title {
   margin-top: 0.55rem;
   color: hsl(var(--foreground));
-  font-size: clamp(1.65rem, 4vw, 2.35rem);
+  font-size: clamp(1.5rem, 3vw, 2rem);
   font-weight: 750;
   letter-spacing: -0.045em;
   line-height: 1.15;
@@ -417,7 +384,7 @@ select:focus-visible, textarea:focus-visible {
 .panel {
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius-lg);
-  background: linear-gradient(180deg, hsl(var(--card)), hsl(var(--card-soft) / 0.72));
+  background: hsl(var(--card));
   padding: 1.25rem;
   box-shadow: var(--shadow-sm);
 }
@@ -428,8 +395,7 @@ select:focus-visible, textarea:focus-visible {
 
 .panel-interactive:hover {
   border-color: hsl(var(--border-strong));
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
 .section-title {
@@ -513,14 +479,13 @@ input[type="checkbox"], input[type="radio"] {
 
 .button-primary {
   border: 1px solid hsl(var(--primary));
-  background: linear-gradient(180deg, hsl(var(--primary)), hsl(var(--primary-hover)));
+  background: hsl(var(--primary));
   color: hsl(var(--primary-foreground));
-  box-shadow: 0 12px 24px hsl(var(--primary) / 0.18), inset 0 1px 0 hsl(0 0% 100% / 0.18);
+  box-shadow: none;
 }
 
 .button-primary:hover:not(:disabled) {
-  box-shadow: 0 16px 30px hsl(var(--primary) / 0.25), inset 0 1px 0 hsl(0 0% 100% / 0.2);
-  transform: translateY(-1px);
+  background: hsl(var(--primary-hover));
 }
 
 .button-secondary {
@@ -598,25 +563,12 @@ input[type="checkbox"], input[type="radio"] {
 }
 
 .metric-card {
-  position: relative;
-  overflow: hidden;
-  min-height: 8.5rem;
+  min-height: 7.25rem;
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius-lg);
-  background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--primary-soft) / 0.55));
+  background: hsl(var(--card));
   padding: 1.1rem;
   box-shadow: var(--shadow-sm);
-}
-
-.metric-card::after {
-  position: absolute;
-  right: -2rem;
-  bottom: -2.5rem;
-  width: 7rem;
-  height: 7rem;
-  border-radius: 999px;
-  background: hsl(var(--primary) / 0.08);
-  content: "";
 }
 
 .metric-icon {
@@ -693,6 +645,49 @@ input[type="checkbox"], input[type="radio"] {
   backdrop-filter: blur(18px);
 }
 
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-200%);
+}
+.skip-link:focus { transform: translateY(0); }
+
+.workspace-section {
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-lg);
+  background: hsl(var(--card));
+  box-shadow: var(--shadow-sm);
+}
+.workspace-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid hsl(var(--border));
+  padding: 1.125rem 1.25rem;
+}
+.workspace-section-body { padding: 1.25rem; }
+.action-list { display: grid; gap: 0; }
+.action-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid hsl(var(--border));
+  padding: 1rem 0;
+}
+.action-list-item:first-child { padding-top: 0; }
+.action-list-item:last-child { border-bottom: 0; padding-bottom: 0; }
+.selection-prompt { border-style: dashed; background: hsl(var(--card-soft)); }
+.overlay-surface {
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-md);
+  background: hsl(var(--card));
+  box-shadow: var(--shadow-lg);
+}
+
 @media (min-width: 768px) { .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 @media (min-width: 1024px) {
@@ -711,7 +706,8 @@ input[type="checkbox"], input[type="radio"] {
   .workspace-main { padding: 0.5rem; }
   .workspace-topbar { top: 0.5rem; min-height: 4rem; margin-bottom: 1rem; border-radius: var(--radius-md); }
   .workspace-content { padding-inline: 0; }
-  .page-header, .panel { border-radius: var(--radius-md); }
+  .panel, .workspace-section { border-radius: var(--radius-md); }
+  .workspace-section-header, .workspace-section-body { padding: 1rem; }
   .data-table th, .data-table td { padding: 0.8rem; }
 }
 
