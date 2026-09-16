@@ -83,6 +83,7 @@ export default function TeacherAssignmentsPage() {
                     onChange={(event) =>
                       setForm({ ...form, title: event.target.value })
                     }
+                    placeholder="Contoh: Esai refleksi Bab 1"
                     required
                   />
                 </label>
@@ -94,6 +95,7 @@ export default function TeacherAssignmentsPage() {
                     onChange={(event) =>
                       setForm({ ...form, instructions: event.target.value })
                     }
+                    placeholder="Jelaskan tugas, kriteria, dan berkas yang perlu dikumpulkan…"
                     required
                   />
                 </label>
@@ -118,6 +120,7 @@ export default function TeacherAssignmentsPage() {
                         max_score: Number(event.target.value),
                       })
                     }
+                    placeholder="Contoh: 100"
                     required
                   />
                 </label>
@@ -259,6 +262,7 @@ function SubmissionRow({
           max={maxScore}
           value={score}
           onChange={(event) => setScore(Number(event.target.value))}
+          placeholder={`Maks. ${maxScore}`}
         />
       </td>
       <td>
@@ -267,6 +271,7 @@ function SubmissionRow({
           className="field-input min-w-56"
           value={feedback}
           onChange={(event) => setFeedback(event.target.value)}
+          placeholder="Tulis feedback untuk siswa…"
         />
       </td>
       <td>
