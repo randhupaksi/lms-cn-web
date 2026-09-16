@@ -124,6 +124,7 @@ export default function StudentAssignmentsPage() {
                     className="field-input min-h-32"
                     value={content}
                     onChange={(event) => setContent(event.target.value)}
+                    placeholder="Tulis jawaban Anda berdasarkan instruksi tugas…"
                     required
                   />
                 </label>
@@ -134,6 +135,7 @@ export default function StudentAssignmentsPage() {
                     type="url"
                     value={attachmentUrl}
                     onChange={(event) => setAttachmentUrl(event.target.value)}
+                    placeholder="https://drive.google.com/..."
                   />
                 </label>
                 <button className="button-primary" disabled={submit.isPending}>
