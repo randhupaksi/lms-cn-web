@@ -85,6 +85,7 @@ export default function ExamsPage() {
                   className="field-input"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  placeholder="Contoh: Ujian Akhir Semester Matematika"
                   required
                 />
               </label>
@@ -96,6 +97,7 @@ export default function ExamsPage() {
                   onChange={(e) =>
                     setForm({ ...form, description: e.target.value })
                   }
+                  placeholder="Jelaskan cakupan materi dan instruksi ujian…"
                 />
               </label>
               <label className="field-label">
@@ -127,6 +129,7 @@ export default function ExamsPage() {
                       duration_minutes: Number(e.target.value),
                     })
                   }
+                  placeholder="Contoh: 90"
                   required
                 />
               </label>

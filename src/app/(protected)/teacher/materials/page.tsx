@@ -88,6 +88,7 @@ export default function TeacherMaterialsPage() {
                     onChange={(event) =>
                       setForm({ ...form, title: event.target.value })
                     }
+                    placeholder="Contoh: Persamaan Kuadrat"
                     required
                   />
                 </label>
@@ -99,6 +100,7 @@ export default function TeacherMaterialsPage() {
                     onChange={(event) =>
                       setForm({ ...form, description: event.target.value })
                     }
+                    placeholder="Ringkasan singkat materi untuk siswa…"
                   />
                 </label>
                 <label className="field-label">
@@ -109,6 +111,7 @@ export default function TeacherMaterialsPage() {
                     onChange={(event) =>
                       setForm({ ...form, content: event.target.value })
                     }
+                    placeholder="Tulis materi pembelajaran, contoh, dan penjelasan utama…"
                     required
                   />
                 </label>
@@ -122,6 +125,7 @@ export default function TeacherMaterialsPage() {
                     onChange={(event) =>
                       setForm({ ...form, position: Number(event.target.value) })
                     }
+                    placeholder="Contoh: 1"
                   />
                 </label>
                 <button className="button-primary" disabled={save.isPending}>

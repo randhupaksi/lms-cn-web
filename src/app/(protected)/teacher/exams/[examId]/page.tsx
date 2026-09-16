@@ -92,6 +92,7 @@ export default function ConfigureExamPage() {
                           [question.id]: Number(event.target.value),
                         })
                       }
+                      placeholder={`Default ${question.default_points}`}
                     />
                   )}
                 </label>

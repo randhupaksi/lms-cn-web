@@ -121,6 +121,7 @@ export default function QuestionsPage() {
                     className="field-input min-h-32 resize-y"
                     value={stem}
                     onChange={(e) => setStem(e.target.value)}
+                    placeholder="Tulis pertanyaan yang ingin diberikan kepada siswa…"
                     required
                   />
                 </label>
@@ -133,6 +134,7 @@ export default function QuestionsPage() {
                     step={0.1}
                     value={points}
                     onChange={(e) => setPoints(Number(e.target.value))}
+                    placeholder="Contoh: 1"
                     required
                   />
                 </label>
