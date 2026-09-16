@@ -76,7 +76,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <p className="text-xs text-white/52">Sistem internal Sekolah Citra Negara</p>
         </div>
       </section>
 
@@ -105,8 +104,8 @@ export default function LoginPage() {
                 className="field-input"
                 value={identifier}
                 onChange={(event) => setIdentifier(event.target.value)}
+                placeholder="Contoh: 20240017 atau guru.matematika"
                 autoComplete="username"
-                placeholder="NIS, NIP, atau username"
                 required
               />
             </label>
@@ -119,8 +118,8 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
+                  placeholder="Masukkan kata sandi akun Anda"
                   autoComplete="current-password"
-                  placeholder="Masukkan kata sandi"
                   required
                 />
                 <button

@@ -53,6 +53,7 @@ export default function ChangePasswordPage() {
             className="field-input"
             type="password"
             autoComplete="current-password"
+            placeholder="Masukkan kata sandi saat ini"
             value={currentPassword}
             onChange={(event) => setCurrentPassword(event.target.value)}
             required
@@ -65,6 +66,7 @@ export default function ChangePasswordPage() {
             type="password"
             minLength={8}
             autoComplete="new-password"
+            placeholder="Gunakan minimal 8 karakter"
             value={newPassword}
             onChange={(event) => setNewPassword(event.target.value)}
             required
@@ -77,6 +79,7 @@ export default function ChangePasswordPage() {
             type="password"
             minLength={8}
             autoComplete="new-password"
+            placeholder="Ketik ulang kata sandi baru"
             value={confirmation}
             onChange={(event) => setConfirmation(event.target.value)}
             required
