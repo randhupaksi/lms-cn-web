@@ -144,6 +144,7 @@ export function UserDirectory() {
               type="password"
               minLength={8}
               value={resetPassword}
+              placeholder="Masukkan kata sandi sementara baru"
               onChange={(event) => setResetPassword(event.target.value)}
             required
           />

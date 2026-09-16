@@ -28,6 +28,9 @@
   --sidebar-text: 145 32% 93%;
   --sidebar-muted: 145 24% 76%;
   --focus: 151 62% 45%;
+  --scrollbar-track: 150 18% 91%;
+  --scrollbar-thumb: 151 46% 40%;
+  --scrollbar-thumb-hover: 151 52% 31%;
   --radius-sm: 0.75rem;
   --radius-md: 1rem;
   --radius-lg: 1.25rem;
@@ -72,6 +75,27 @@ html {
   min-width: 320px;
   background: hsl(var(--background));
   scroll-behavior: smooth;
+  scrollbar-color: hsl(var(--scrollbar-thumb)) hsl(var(--scrollbar-track));
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 0.65rem;
+  height: 0.65rem;
+}
+
+*::-webkit-scrollbar-track {
+  background: hsl(var(--scrollbar-track));
+}
+
+*::-webkit-scrollbar-thumb {
+  border: 2px solid hsl(var(--scrollbar-track));
+  border-radius: 999px;
+  background: hsl(var(--scrollbar-thumb));
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--scrollbar-thumb-hover));
 }
 
 body {
@@ -137,7 +161,7 @@ select:focus-visible, textarea:focus-visible {
   flex: 1;
   overflow-y: auto;
   padding: 0.75rem 1rem;
-  scrollbar-color: hsl(151 52% 72% / 0.5) transparent;
+  scrollbar-color: hsl(var(--scrollbar-thumb) / 0.72) transparent;
   scrollbar-width: thin;
 }
 
@@ -626,14 +650,6 @@ input[type="checkbox"], input[type="radio"] {
   background: linear-gradient(155deg, hsl(var(--sidebar-start)), hsl(var(--sidebar-end)));
   color: hsl(var(--primary-foreground));
 }
-.login-brand-panel::before, .login-brand-panel::after {
-  position: absolute;
-  border: 1px solid hsl(0 0% 100% / 0.12);
-  border-radius: 999px;
-  content: "";
-}
-.login-brand-panel::before { right: -11rem; bottom: -8rem; width: 29rem; height: 29rem; }
-.login-brand-panel::after { right: -3rem; bottom: 1rem; width: 18rem; height: 18rem; }
 .login-form-panel { display: grid; place-items: center; padding: 1.25rem; }
 .login-card {
   width: min(100%, 29rem);

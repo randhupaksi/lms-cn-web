@@ -30,6 +30,7 @@ export function UserCreateForm() {
           <input
             className="field-input"
             value={form.identifier}
+            placeholder="Contoh: 20240017 atau NIP guru"
             onChange={(event) =>
               setForm({ ...form, identifier: event.target.value })
             }
@@ -41,6 +42,7 @@ export function UserCreateForm() {
           <input
             className="field-input"
             value={form.full_name}
+            placeholder="Contoh: Siti Rahmawati"
             onChange={(event) =>
               setForm({ ...form, full_name: event.target.value })
             }
@@ -63,6 +65,7 @@ export function UserCreateForm() {
             type="password"
             minLength={8}
             value={form.temporary_password}
+            placeholder="Minimal 8 karakter"
             onChange={(event) =>
               setForm({ ...form, temporary_password: event.target.value })
             }
