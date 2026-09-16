@@ -28,7 +28,7 @@ export default function AuditPage() {
               className="field-input"
               value={action}
               onChange={(event) => setAction(event.target.value)}
-              placeholder="contoh: exam.published"
+              placeholder="Contoh: exam.published"
             />
           </label>
           <label className="field-label">
@@ -37,7 +37,7 @@ export default function AuditPage() {
               className="field-input"
               value={entityType}
               onChange={(event) => setEntityType(event.target.value)}
-              placeholder="contoh: exam"
+              placeholder="Contoh: exam atau assignment"
             />
           </label>
         </div>

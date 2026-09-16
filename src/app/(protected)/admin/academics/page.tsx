@@ -66,6 +66,7 @@ export default function AcademicsPage() {
                   className="field-input"
                   value={year.name}
                   onChange={(e) => setYear({ ...year, name: e.target.value })}
+                  placeholder="Contoh: Tahun Ajaran 2026/2027"
                   required
                 />
               </label>
@@ -111,6 +112,7 @@ export default function AcademicsPage() {
                   className="field-input"
                   value={group.name}
                   onChange={(e) => setGroup({ ...group, name: e.target.value })}
+                  placeholder="Contoh: XII IPA 1"
                   required
                 />
               </label>
@@ -125,6 +127,7 @@ export default function AcademicsPage() {
                   onChange={(e) =>
                     setGroup({ ...group, grade_level: Number(e.target.value) })
                   }
+                  placeholder="Contoh: 12"
                   required
                 />
               </label>
@@ -147,6 +150,7 @@ export default function AcademicsPage() {
                   onChange={(e) =>
                     setSubject({ ...subject, code: e.target.value })
                   }
+                  placeholder="Contoh: MAT-XII"
                   required
                 />
               </label>
@@ -158,6 +162,7 @@ export default function AcademicsPage() {
                   onChange={(e) =>
                     setSubject({ ...subject, name: e.target.value })
                   }
+                  placeholder="Contoh: Matematika"
                   required
                 />
               </label>
@@ -180,6 +185,7 @@ export default function AcademicsPage() {
                   onChange={(e) =>
                     setCourse({ ...course, name: e.target.value })
                   }
+                  placeholder="Contoh: Matematika XII IPA 1"
                   required
                 />
               </label>
