@@ -8,6 +8,7 @@ import {
 } from "@/features/academics/use-academics";
 import { useUsers } from "@/features/users/use-users";
 import { RadixSelectField } from "@/components/ui/radix-select";
+import { AsyncFeedback } from "@/components/async-feedback";
 
 export function CourseAssignments() {
   const data = useAcademicData();
@@ -76,25 +77,43 @@ export function CourseAssignments() {
         </div>
       )}
       {courseId && (
-        <div className="mt-5 flex flex-wrap gap-3">
-          <button
-            className="button-primary"
-            disabled={
-              assignments.teachers.isPending || selectedTeachers.length === 0
-            }
-            onClick={() => assignments.teachers.mutate(selectedTeachers)}
-          >
-            Simpan guru
-          </button>
-          <button
-            className="button-primary"
-            disabled={
-              assignments.students.isPending || selectedStudents.length === 0
-            }
-            onClick={() => assignments.students.mutate(selectedStudents)}
-          >
-            Simpan siswa
-          </button>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div>
+            <button
+              className="button-primary"
+              disabled={
+                assignments.teachers.isPending || selectedTeachers.length === 0
+              }
+              onClick={() => assignments.teachers.mutate(selectedTeachers)}
+            >
+              {assignments.teachers.isPending ? "Menyimpan…" : "Simpan guru"}
+            </button>
+            <AsyncFeedback
+              error={assignments.teachers.error}
+              isError={assignments.teachers.isError}
+              isSuccess={assignments.teachers.isSuccess}
+              errorMessage="Assignment guru belum dapat disimpan."
+              successMessage="Guru pengelola berhasil diperbarui."
+            />
+          </div>
+          <div>
+            <button
+              className="button-primary"
+              disabled={
+                assignments.students.isPending || selectedStudents.length === 0
+              }
+              onClick={() => assignments.students.mutate(selectedStudents)}
+            >
+              {assignments.students.isPending ? "Menyimpan…" : "Simpan siswa"}
+            </button>
+            <AsyncFeedback
+              error={assignments.students.error}
+              isError={assignments.students.isError}
+              isSuccess={assignments.students.isSuccess}
+              errorMessage="Assignment siswa belum dapat disimpan."
+              successMessage="Daftar siswa berhasil diperbarui."
+            />
+          </div>
         </div>
       )}
     </section>
