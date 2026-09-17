@@ -11,6 +11,7 @@ import {
   useMaterials,
 } from "@/features/materials/use-materials";
 import { RadixSelectField } from "@/components/ui/radix-select";
+import { AsyncFeedback } from "@/components/async-feedback";
 
 export default function StudentMaterialsPage() {
   const courses = useCourses();
@@ -71,13 +72,26 @@ export default function StudentMaterialsPage() {
               {material.content}
             </div>
             {!material.completed_at && (
-              <button
-                className="button-primary mt-5"
-                onClick={() => complete.mutate(material.id)}
-                disabled={complete.isPending}
-              >
-                {complete.isPending ? "Menyimpan…" : "Tandai selesai"}
-              </button>
+              <div>
+                <button
+                  className="button-primary mt-5"
+                  onClick={() => complete.mutate(material.id)}
+                  disabled={complete.isPending}
+                >
+                  {complete.isPending && complete.variables === material.id
+                    ? "Menyimpan…"
+                    : "Tandai selesai"}
+                </button>
+                {complete.variables === material.id ? (
+                  <AsyncFeedback
+                    error={complete.error}
+                    isError={complete.isError}
+                    isSuccess={false}
+                    errorMessage="Progres materi belum dapat disimpan."
+                    successMessage=""
+                  />
+                ) : null}
+              </div>
             )}
           </article>
         ))}

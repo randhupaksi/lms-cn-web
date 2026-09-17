@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EmptyState, ErrorState, LoadingState, SelectionState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
 import { useCourses } from "@/features/academics/use-academics";
@@ -11,9 +11,17 @@ import {
 import { PageHeader } from "@/components/ui/page-header";
 import { ClipboardList } from "lucide-react";
 import { RadixSelectField } from "@/components/ui/radix-select";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { AsyncFeedback } from "@/components/async-feedback";
+
+const submissionLabel = {
+  submitted: "Menunggu penilaian",
+  graded: "Sudah dinilai",
+  returned: "Dikembalikan",
+} as const;
 
 export default function StudentAssignmentsPage() {
-  const [renderedAt] = useState(() => Date.now());
+  const [now, setNow] = useState(() => Date.now());
   const courses = useCourses();
   const [courseId, setCourseId] = useState("");
   const [activeId, setActiveId] = useState("");
@@ -21,6 +29,10 @@ export default function StudentAssignmentsPage() {
   const [attachmentUrl, setAttachmentUrl] = useState("");
   const assignments = useAssignments(courseId);
   const submit = useSubmitAssignment(courseId);
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
   return (
     <RoleBoundary allow={["student"]}>
       <div className="space-y-8">
@@ -58,15 +70,27 @@ export default function StudentAssignmentsPage() {
             description="Guru belum mempublikasikan tugas pada course ini."
           />
         )}
-        {courseId && assignments.data?.map((assignment) => (
+        {courseId && assignments.data?.map((assignment) => {
+          const overdue =
+            !assignment.submission &&
+            new Date(assignment.due_at).getTime() <= now;
+          const status = assignment.submission
+            ? submissionLabel[assignment.submission.status]
+            : overdue
+              ? "Terlambat"
+              : "Belum dikumpulkan";
+          const tone = assignment.submission
+            ? assignment.submission.status === "graded"
+              ? "success"
+              : "warning"
+            : overdue
+              ? "danger"
+              : "warning";
+          return (
           <article className="panel panel-interactive" key={assignment.id}>
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <span
-                  className={`status-badge ${assignment.submission ? "status-active" : ""}`}
-                >
-                  {assignment.submission?.status ?? "Belum dikumpulkan"}
-                </span>
+                <StatusBadge tone={tone}>{status}</StatusBadge>
                 <h2 className="mt-3 text-lg font-semibold">
                   {assignment.title}
                 </h2>
@@ -141,19 +165,26 @@ export default function StudentAssignmentsPage() {
                 <button className="button-primary" disabled={submit.isPending}>
                   Kumpulkan tugas
                 </button>
-                {submit.isError ? <p className="form-error" role="alert">Tugas belum dapat dikumpulkan. Periksa jawaban dan coba lagi.</p> : null}
+                <AsyncFeedback
+                  error={submit.error}
+                  isError={submit.isError}
+                  isSuccess={false}
+                  errorMessage="Tugas belum dapat dikumpulkan. Periksa jawaban dan coba lagi."
+                  successMessage=""
+                />
               </form>
             ) : (
               <button
                 className="button-primary mt-5"
                 onClick={() => setActiveId(assignment.id)}
-                disabled={new Date(assignment.due_at).getTime() <= renderedAt}
+                disabled={overdue}
               >
-                {new Date(assignment.due_at).getTime() <= renderedAt ? "Deadline terlewati" : "Tulis jawaban"}
+                {overdue ? "Deadline terlewati" : "Tulis jawaban"}
               </button>
             )}
           </article>
-        ))}
+          );
+        })}
       </div>
     </RoleBoundary>
   );

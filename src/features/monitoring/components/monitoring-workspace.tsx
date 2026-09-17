@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
+import { EmptyState, ErrorState, LoadingState, SelectionState } from "@/components/data-state";
 import { MetricGrid } from "@/components/metric-grid";
 import { useAcademicData } from "@/features/academics/use-academics";
 import { useExams } from "@/features/exams/use-exams";
@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Activity } from "lucide-react";
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
 import { RadixSelectField } from "@/components/ui/radix-select";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 const statusLabels: Record<string, string> = {
   not_started: "Belum mulai",
@@ -17,6 +18,13 @@ const statusLabels: Record<string, string> = {
   submitted: "Submitted",
   expired: "Kedaluwarsa",
 };
+
+const statusTones = {
+  not_started: "neutral",
+  in_progress: "warning",
+  submitted: "success",
+  expired: "danger",
+} as const;
 
 export function MonitoringWorkspace() {
   const academics = useAcademicData();
@@ -56,9 +64,25 @@ export function MonitoringWorkspace() {
           />
         </label>
       </div>
+      {!courseId ? (
+        <SelectionState
+          title="Pilih course untuk memulai monitoring"
+          description="Daftar ujian akan tersedia setelah course dipilih."
+        />
+      ) : null}
+      {courseId && exams.isLoading ? <LoadingState label="Memuat daftar ujian…" /> : null}
+      {courseId && exams.isError ? (
+        <ErrorState label="Daftar ujian belum dapat dimuat." onRetry={() => void exams.refetch()} />
+      ) : null}
+      {courseId && !examId && exams.data?.data.length ? (
+        <SelectionState
+          title="Pilih ujian yang ingin dipantau"
+          description="Status peserta dan aktivitas terakhir akan muncul di sini."
+        />
+      ) : null}
       {monitoring.isLoading && <LoadingState label="Memuat status peserta…" />}
       {monitoring.isError && (
-        <ErrorState label="Monitoring ujian belum dapat dimuat." />
+        <ErrorState label="Monitoring ujian belum dapat dimuat." onRetry={() => void monitoring.refetch()} />
       )}
       {monitoring.data && (
         <>
@@ -112,12 +136,10 @@ export function MonitoringWorkspace() {
                         </td>
                         <td>{participant.identifier}</td>
                         <td>
-                          <span
-                            className={`status-badge ${participant.status === "submitted" || participant.status === "in_progress" ? "status-active" : ""}`}
-                          >
+                          <StatusBadge tone={statusTones[participant.status]}>
                             {statusLabels[participant.status] ??
                               participant.status}
-                          </span>
+                          </StatusBadge>
                         </td>
                         <td>{participant.answered_count}</td>
                         <td>
