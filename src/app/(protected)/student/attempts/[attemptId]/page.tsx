@@ -15,9 +15,11 @@ function useRemainingSeconds(deadline?: string, serverTime?: string) {
   const anchor = useRef<{ server: number; client: number } | undefined>(
     undefined,
   );
-  const [remaining, setRemaining] = useState(0);
+  const [remaining, setRemaining] = useState<number | null>(null);
   useEffect(() => {
-    if (!deadline || !serverTime) return;
+    if (!deadline || !serverTime) {
+      return;
+    }
     anchor.current = {
       server: new Date(serverTime).getTime(),
       client: performance.now(),
@@ -37,7 +39,7 @@ function useRemainingSeconds(deadline?: string, serverTime?: string) {
     const timer = window.setInterval(update, 1000);
     return () => window.clearInterval(timer);
   }, [deadline, serverTime]);
-  return remaining;
+  return deadline && serverTime ? remaining : null;
 }
 function formatTime(seconds: number) {
   const hours = Math.floor(seconds / 3600);
@@ -56,6 +58,7 @@ export default function AttemptPage() {
   const router = useRouter();
   const [index, setIndex] = useState(0);
   const [confirmSubmit, setConfirmSubmit] = useState(false);
+  const autoSubmitStarted = useRef(false);
   const remaining = useRemainingSeconds(
     attempt.data?.deadline_at,
     attempt.data?.server_time,
@@ -75,16 +78,21 @@ export default function AttemptPage() {
     if (
       attempt.data &&
       remaining === 0 &&
-      attempt.data.status === "in_progress"
-    )
+      attempt.data.status === "in_progress" &&
+      !autoSubmitStarted.current
+    ) {
+      autoSubmitStarted.current = true;
       submit.mutate(undefined, {
-        onSuccess: () => router.replace("/student/results"),
+        onSuccess: (receipt) =>
+          router.replace(`/student/receipts/${receipt.attempt_id}`),
       });
+    }
   }, [remaining, attempt.data, submit, router]);
   if (attempt.isLoading) return <LoadingState label="Menyiapkan lembar ujian…" />;
   if (!attempt.data || !question)
     return <ErrorState label="Attempt tidak tersedia atau sudah berakhir." onRetry={() => void attempt.refetch()} />;
   const answered = answerMap.size;
+  const timeExpired = remaining === 0;
   return (
     <RoleBoundary allow={["student"]}>
       <div className="mx-auto max-w-6xl space-y-5">
@@ -100,7 +108,7 @@ export default function AttemptPage() {
             aria-live="polite"
           >
             <Clock3 size={18} />
-            {formatTime(remaining)}
+            {remaining === null ? "--:--:--" : formatTime(remaining)}
           </div>
         </header>
         <div className="grid gap-5 lg:grid-cols-[1fr_17rem]">
@@ -122,6 +130,7 @@ export default function AttemptPage() {
                     type="radio"
                     name={question.id}
                     checked={answerMap.get(question.id) === option.id}
+                    disabled={timeExpired || submit.isPending}
                     onChange={() =>
                       save.mutate({
                         exam_question_id: question.id,
@@ -192,7 +201,7 @@ export default function AttemptPage() {
                 </div>
                 {submit.isError ? <p className="form-error" role="alert">Ujian belum dapat dikumpulkan. Periksa koneksi dan coba lagi.</p> : null}
               </div>
-            ) : <button className="button-primary mt-6 w-full" disabled={submit.isPending} onClick={() => setConfirmSubmit(true)}>Kumpulkan ujian</button>}
+            ) : <button className="button-primary mt-6 w-full" disabled={submit.isPending} onClick={() => setConfirmSubmit(true)}>{timeExpired ? "Coba kumpulkan kembali" : "Kumpulkan ujian"}</button>}
           </aside>
         </div>
       </div>

@@ -30,6 +30,7 @@ export function useAttempt(id: string) {
 export function useSaveAnswer(id: string) {
   const client = useQueryClient();
   return useMutation({
+    scope: { id: `attempt-${id}-answer-save` },
     mutationFn: (input: {
       exam_question_id: string;
       selected_option_id: string;
@@ -59,5 +60,8 @@ export function useSaveAnswer(id: string) {
   });
 }
 export function useSubmitAttempt(id: string) {
-  return useMutation({ mutationFn: () => service.submitAttempt(id) });
+  return useMutation({
+    scope: { id: `attempt-${id}-submission` },
+    mutationFn: () => service.submitAttempt(id),
+  });
 }
