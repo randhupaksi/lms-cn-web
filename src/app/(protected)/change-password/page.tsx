@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { clearAccessToken } from "@/lib/auth-session";
+import { invalidateSession } from "@/lib/auth-session";
 import { changePassword } from "@/services/auth.service";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,9 @@ export default function ChangePasswordPage() {
         current_password: currentPassword,
         new_password: newPassword,
       });
-      clearAccessToken();
+      invalidateSession(
+        "Kata sandi berhasil diperbarui. Silakan masuk kembali dengan kata sandi baru.",
+      );
       router.replace("/login");
     } catch {
       setError(

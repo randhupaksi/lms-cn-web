@@ -1,8 +1,8 @@
 import axios from "axios";
 import { publicEnv } from "@/config/public-env";
 import {
-  clearAccessToken,
   getAccessToken,
+  invalidateSession,
   setAccessToken,
 } from "@/lib/auth-session";
 
@@ -39,7 +39,7 @@ apiClient.interceptors.response.use(undefined, async (error) => {
       return token;
     })
     .catch(() => {
-      clearAccessToken();
+      invalidateSession();
       return null;
     })
     .finally(() => {

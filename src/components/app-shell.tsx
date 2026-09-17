@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Route } from "next";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -90,6 +90,49 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isLoggingOut, setLoggingOut] = useState(false);
+  const sidebarRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const focusableSelector =
+      'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const focusables = () =>
+      Array.from(
+        sidebarRef.current?.querySelectorAll<HTMLElement>(focusableSelector) ??
+          [],
+      );
+    focusables()[0]?.focus();
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const items = focusables();
+      if (!items.length) return;
+      const first = items[0];
+      const last = items.at(-1)!;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      previousFocus?.focus();
+    };
+  }, [sidebarOpen]);
 
   if (!user) return null;
 
@@ -118,8 +161,13 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
   const pageTitle = resolvePageTitle(pathname, items);
 
   async function handleLogout() {
-    await logout();
-    router.replace("/login");
+    setLoggingOut(true);
+    try {
+      await logout();
+      router.replace("/login");
+    } finally {
+      setLoggingOut(false);
+    }
   }
 
   return (
@@ -140,6 +188,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
       />
 
       <aside
+        ref={sidebarRef}
         id="application-navigation"
         className={cn(
           "workspace-sidebar",
@@ -204,8 +253,9 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
             type="button"
             onClick={() => void handleLogout()}
             className="workspace-sidebar-logout"
+            disabled={isLoggingOut}
           >
-            <LogOut size={17} /> Keluar
+            <LogOut size={17} /> {isLoggingOut ? "Mengakhiri sesi…" : "Keluar"}
           </button>
         </div>
       </aside>

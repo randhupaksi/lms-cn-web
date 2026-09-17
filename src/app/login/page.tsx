@@ -22,7 +22,7 @@ const benefits = [
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, sessionMessage } = useAuth();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -133,10 +133,10 @@ export default function LoginPage() {
               </span>
             </label>
 
-            {error ? (
+            {error || sessionMessage ? (
               <div className="flex items-start gap-3 rounded-2xl border border-danger/20 bg-danger-soft px-4 py-3 text-sm text-danger" role="alert">
                 <LockKeyhole className="mt-0.5 shrink-0" size={17} />
-                <p>{error}</p>
+                <p>{error ?? sessionMessage}</p>
               </div>
             ) : null}
 
