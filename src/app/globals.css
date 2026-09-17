@@ -530,7 +530,8 @@ input[type="checkbox"], input[type="radio"] {
 }
 
 .data-table-shell {
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius-lg);
   background: hsl(var(--card));
@@ -573,6 +574,20 @@ input[type="checkbox"], input[type="radio"] {
 
 .empty-cell { color: hsl(var(--muted)); text-align: center; }
 .form-error { margin-top: 1rem; color: hsl(var(--danger)); font-size: 0.82rem; line-height: 1.6; }
+.feedback-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.8rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.5;
+}
+.feedback-message svg { margin-top: 0.1rem; flex: 0 0 auto; }
+.feedback-message-error { background: hsl(var(--danger-soft)); color: hsl(var(--danger)); }
+.feedback-message-success { background: hsl(var(--success-soft)); color: hsl(var(--success)); }
 
 .state-panel {
   display: flex;
@@ -696,6 +711,17 @@ input[type="checkbox"], input[type="radio"] {
 }
 .action-list-item:first-child { padding-top: 0; }
 .action-list-item:last-child { border-bottom: 0; padding-bottom: 0; }
+.task-list { display: grid; padding-block: 0; }
+.task-list-item {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.85rem;
+  border-bottom: 1px solid hsl(var(--border));
+  padding-block: 1rem;
+}
+.task-list-item:last-child { border-bottom: 0; }
+.task-list-item:hover .metric-icon { background: hsl(var(--surface)); }
 .selection-prompt { border-style: dashed; background: hsl(var(--card-soft)); }
 .overlay-surface {
   border: 1px solid hsl(var(--border));
