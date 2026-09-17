@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useCreateUser } from "@/features/users/use-users";
 import type { UserRole } from "@/types/api";
 import { RadixSelectField } from "@/components/ui/radix-select";
+import { AsyncFeedback } from "@/components/async-feedback";
 
 const initialForm = {
   identifier: "",
@@ -78,11 +79,13 @@ export function UserCreateForm() {
           </button>
         </div>
       </form>
-      {create.isError && (
-        <p className="form-error">
-          Pengguna belum dapat dibuat. Periksa kembali data.
-        </p>
-      )}
+      <AsyncFeedback
+        error={create.error}
+        isError={create.isError}
+        isSuccess={create.isSuccess}
+        errorMessage="Pengguna belum dapat dibuat. Periksa kembali data."
+        successMessage="Pengguna berhasil ditambahkan dan siap menerima credential sementara."
+      />
     </section>
   );
 }

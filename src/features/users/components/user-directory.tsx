@@ -8,6 +8,8 @@ import {
 } from "@/features/users/use-users";
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
 import { RadixSelectField } from "@/components/ui/radix-select";
+import { Pagination } from "@/components/ui/pagination";
+import { AsyncFeedback } from "@/components/async-feedback";
 
 export function UserDirectory() {
   const [search, setSearch] = useState("");
@@ -128,6 +130,23 @@ export function UserDirectory() {
                 </td>
               </tr>
             )}
+            {users.isLoading ? (
+              <tr>
+                <td colSpan={5} className="empty-cell" role="status">
+                  Memuat daftar pengguna…
+                </td>
+              </tr>
+            ) : null}
+            {users.isError ? (
+              <tr>
+                <td colSpan={5} className="empty-cell text-danger" role="alert">
+                  Daftar pengguna belum dapat dimuat.{' '}
+                  <button className="font-semibold underline" onClick={() => void users.refetch()}>
+                    Coba lagi
+                  </button>
+                </td>
+              </tr>
+            ) : null}
           </tbody>
         </DataTable>
       </div>
@@ -166,28 +185,29 @@ export function UserDirectory() {
         </form>
       )}
       {successMessage ? <p className="border-t border-border px-4 py-3 text-sm font-medium text-success" role="status">{successMessage}</p> : null}
-      <div className="flex items-center justify-between border-t border-border p-4 text-sm">
-        <p className="text-muted">
-          Halaman {users.data?.meta.page ?? page} dari{" "}
-          {Math.max(users.data?.meta.total_pages ?? 1, 1)}
-        </p>
-        <div className="flex gap-2">
-          <button
-            className="button-ghost"
-            disabled={page <= 1}
-            onClick={() => setPage((value) => value - 1)}
-          >
-            Sebelumnya
-          </button>
-          <button
-            className="button-ghost"
-            disabled={page >= (users.data?.meta.total_pages ?? 1)}
-            onClick={() => setPage((value) => value + 1)}
-          >
-            Berikutnya
-          </button>
-        </div>
+      <div className="px-4">
+        <AsyncFeedback
+          error={resetCredential.error}
+          isError={resetCredential.isError}
+          isSuccess={false}
+          errorMessage="Kata sandi sementara belum dapat diperbarui."
+          successMessage=""
+        />
+        <AsyncFeedback
+          error={toggle.error}
+          isError={toggle.isError}
+          isSuccess={false}
+          errorMessage="Status akun belum dapat diperbarui."
+          successMessage=""
+        />
       </div>
+      <Pagination
+        page={users.data?.meta.page ?? page}
+        totalPages={users.data?.meta.total_pages ?? 1}
+        onPageChange={setPage}
+        disabled={users.isFetching}
+        label="Navigasi halaman pengguna"
+      />
     </DataTableShell>
   );
 }
