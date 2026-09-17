@@ -206,7 +206,27 @@ export type AuditEvent = {
 };
 
 export type DashboardMetric = { key: string; label: string; value: number };
-export type DashboardSummary = { role: string; metrics: DashboardMetric[] };
+export type DashboardTask = {
+  id: string;
+  kind: "assignment" | "exam" | "grading" | "results" | "monitoring";
+  title: string;
+  context: string;
+  status:
+    | "pending"
+    | "overdue"
+    | "upcoming"
+    | "available"
+    | "in_progress"
+    | "needs_grading"
+    | "needs_publish";
+  count: number;
+  attention_at: string | null;
+};
+export type DashboardSummary = {
+  role: string;
+  metrics: DashboardMetric[];
+  tasks: DashboardTask[];
+};
 
 export type ExamItemAnalysis = {
   question_id: string;

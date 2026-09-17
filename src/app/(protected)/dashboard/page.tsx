@@ -20,7 +20,13 @@ export default function DashboardPage() {
       />
       {summary.isLoading && <LoadingState label="Menyiapkan ringkasan…" />}
       {summary.isError && <ErrorState label="Ringkasan belum dapat dimuat." onRetry={() => void summary.refetch()} />}
-      {summary.data && user ? <DashboardWorkspace role={user.role} metrics={summary.data.metrics} /> : null}
+      {summary.data && user ? (
+        <DashboardWorkspace
+          role={user.role}
+          metrics={summary.data.metrics}
+          tasks={summary.data.tasks ?? []}
+        />
+      ) : null}
     </section>
   );
 }

@@ -1,8 +1,22 @@
 import type { Route } from "next";
 import Link from "next/link";
-import { ArrowRight, BookOpenText, ClipboardList, GraduationCap, School, UsersRound } from "lucide-react";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
+import {
+  ArrowRight,
+  BookOpenText,
+  CheckCircle2,
+  ClipboardCheck,
+  ClipboardList,
+  GraduationCap,
+  Radar,
+  School,
+  UsersRound,
+} from "lucide-react";
+import { EmptyState } from "@/components/data-state";
 import { MetricGrid } from "@/components/metric-grid";
-import type { DashboardMetric } from "@/types/lms";
+import { StatusBadge } from "@/components/ui/status-badge";
+import type { DashboardMetric, DashboardTask } from "@/types/lms";
 import type { UserRole } from "@/types/api";
 
 type Action = {
@@ -45,12 +59,123 @@ const dashboardCopy: Record<UserRole, { title: string; description: string }> = 
   },
 };
 
-export function DashboardWorkspace({ role, metrics }: { role: UserRole; metrics: DashboardMetric[] }) {
+const taskConfig: Record<
+  DashboardTask["kind"],
+  { href: Route; label: string; icon: typeof ClipboardList }
+> = {
+  assignment: {
+    href: "/student/assignments",
+    label: "Tugas",
+    icon: ClipboardList,
+  },
+  exam: { href: "/student/exams", label: "Ujian", icon: GraduationCap },
+  grading: {
+    href: "/teacher/assignments",
+    label: "Penilaian",
+    icon: ClipboardCheck,
+  },
+  results: {
+    href: "/teacher/results",
+    label: "Hasil ujian",
+    icon: CheckCircle2,
+  },
+  monitoring: {
+    href: "/admin/monitoring",
+    label: "Monitoring",
+    icon: Radar,
+  },
+};
+
+const statusConfig: Record<
+  DashboardTask["status"],
+  { label: string; tone: "neutral" | "success" | "warning" | "danger" }
+> = {
+  pending: { label: "Belum dikumpulkan", tone: "warning" },
+  overdue: { label: "Terlambat", tone: "danger" },
+  upcoming: { label: "Akan datang", tone: "neutral" },
+  available: { label: "Tersedia", tone: "success" },
+  in_progress: { label: "Berlangsung", tone: "success" },
+  needs_grading: { label: "Perlu dinilai", tone: "warning" },
+  needs_publish: { label: "Perlu dipublikasikan", tone: "warning" },
+};
+
+function taskTimeLabel(task: DashboardTask) {
+  if (!task.attention_at) return null;
+  const prefix =
+    task.status === "upcoming"
+      ? "Mulai"
+      : task.status === "overdue"
+        ? "Tenggat"
+        : task.kind === "grading" || task.kind === "results"
+          ? "Aktivitas terakhir"
+          : "Berakhir";
+  return `${prefix} ${format(new Date(task.attention_at), "d MMM, HH.mm", { locale: id })}`;
+}
+
+function taskCountLabel(task: DashboardTask) {
+  if (!task.count) return null;
+  if (task.kind === "grading") return `${task.count} pengumpulan`;
+  if (task.kind === "results") return `${task.count} hasil`;
+  return `${task.count} attempt aktif`;
+}
+
+export function DashboardWorkspace({
+  role,
+  metrics,
+  tasks,
+}: {
+  role: UserRole;
+  metrics: DashboardMetric[];
+  tasks: DashboardTask[];
+}) {
   const copy = dashboardCopy[role];
   const actions = actionByRole[role];
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(19rem,.65fr)]">
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(20rem,.8fr)]">
+      <section className="workspace-section" aria-labelledby="priority-work-title">
+        <div className="workspace-section-header">
+          <div>
+            <h2 id="priority-work-title" className="section-title">Prioritas kerja</h2>
+            <p className="section-description">Hal yang paling dekat waktunya atau masih memerlukan tindakan Anda.</p>
+          </div>
+        </div>
+        <div className="workspace-section-body task-list">
+          {tasks.length ? (
+            tasks.map((task) => {
+              const config = taskConfig[task.kind];
+              const status = statusConfig[task.status];
+              const Icon = config.icon;
+              const timeLabel = taskTimeLabel(task);
+              const countLabel = taskCountLabel(task);
+              return (
+                <Link key={`${task.kind}-${task.id}`} href={config.href} className="task-list-item group">
+                  <span className="metric-icon size-10 rounded-[var(--radius-sm)]">
+                    <Icon aria-hidden="true" size={18} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex flex-wrap items-center gap-2">
+                      <span className="text-xs font-semibold text-muted">{config.label}</span>
+                      <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
+                    </span>
+                    <span className="mt-1 block truncate text-sm font-semibold text-foreground">{task.title}</span>
+                    <span className="mt-1 block text-xs leading-5 text-muted">
+                      {[task.context, countLabel, timeLabel].filter(Boolean).join(" · ")}
+                    </span>
+                  </span>
+                  <ArrowRight className="shrink-0 text-muted transition-transform group-hover:translate-x-1" aria-hidden="true" size={17} />
+                </Link>
+              );
+            })
+          ) : (
+            <EmptyState
+              title="Tidak ada pekerjaan mendesak"
+              description="Antrean prioritas Anda sedang bersih. Gunakan akses cepat untuk membuka area kerja lainnya."
+            />
+          )}
+        </div>
+      </section>
+
       <section className="workspace-section" aria-labelledby="dashboard-summary-title">
         <div className="workspace-section-header">
           <div>
@@ -63,16 +188,16 @@ export function DashboardWorkspace({ role, metrics }: { role: UserRole; metrics:
         </div>
       </section>
 
-      <section className="workspace-section" aria-labelledby="next-actions-title">
+      <section className="workspace-section xl:col-span-2" aria-labelledby="next-actions-title">
         <div className="workspace-section-header">
           <div>
-            <h2 id="next-actions-title" className="section-title">Lanjutkan pekerjaan</h2>
-            <p className="section-description">Pintasan ke aktivitas utama sesuai peran Anda.</p>
+            <h2 id="next-actions-title" className="section-title">Akses cepat</h2>
+            <p className="section-description">Buka area kerja utama sesuai tanggung jawab akun Anda.</p>
           </div>
         </div>
-        <div className="workspace-section-body action-list">
+        <div className="grid divide-y divide-border md:grid-cols-3 md:divide-x md:divide-y-0">
           {actions.map(({ href, label, description, icon: Icon }) => (
-            <Link key={href} href={href} className="action-list-item group">
+            <Link key={href} href={href} className="group flex items-center justify-between gap-4 p-5">
               <span className="flex min-w-0 items-center gap-3">
                 <span className="metric-icon size-10 rounded-[var(--radius-sm)]"><Icon aria-hidden="true" size={18} /></span>
                 <span className="min-w-0">
