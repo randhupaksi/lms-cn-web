@@ -6,9 +6,10 @@ import {
   useAssignCourseMembers,
   useCourseMembers,
 } from "@/features/academics/use-academics";
-import { useUsers } from "@/features/users/use-users";
+import { useUsers } from "@/features/users";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { AsyncFeedback } from "@/components/async-feedback";
+import { Button } from "@/components/ui/button";
 
 export function CourseAssignments() {
   const data = useAcademicData();
@@ -79,15 +80,14 @@ export function CourseAssignments() {
       {courseId && (
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <div>
-            <button
-              className="button-primary"
+            <Button
               disabled={
                 assignments.teachers.isPending || selectedTeachers.length === 0
               }
               onClick={() => assignments.teachers.mutate(selectedTeachers)}
             >
               {assignments.teachers.isPending ? "Menyimpan…" : "Simpan guru"}
-            </button>
+            </Button>
             <AsyncFeedback
               error={assignments.teachers.error}
               isError={assignments.teachers.isError}
@@ -97,15 +97,14 @@ export function CourseAssignments() {
             />
           </div>
           <div>
-            <button
-              className="button-primary"
+            <Button
               disabled={
                 assignments.students.isPending || selectedStudents.length === 0
               }
               onClick={() => assignments.students.mutate(selectedStudents)}
             >
               {assignments.students.isPending ? "Menyimpan…" : "Simpan siswa"}
-            </button>
+            </Button>
             <AsyncFeedback
               error={assignments.students.error}
               isError={assignments.students.isError}

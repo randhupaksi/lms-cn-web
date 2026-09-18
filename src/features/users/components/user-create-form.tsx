@@ -5,6 +5,7 @@ import { useCreateUser } from "@/features/users/use-users";
 import type { UserRole } from "@/types/api";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { AsyncFeedback } from "@/components/async-feedback";
+import { Button } from "@/components/ui/button";
 
 const initialForm = {
   identifier: "",
@@ -74,9 +75,9 @@ export function UserCreateForm() {
           />
         </label>
         <div className="md:col-span-2">
-          <button className="button-primary" disabled={create.isPending}>
+          <Button type="submit" disabled={create.isPending}>
             {create.isPending ? "Menyimpan…" : "Tambah pengguna"}
-          </button>
+          </Button>
         </div>
       </form>
       <AsyncFeedback

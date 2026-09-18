@@ -16,6 +16,7 @@ import { School } from "lucide-react";
 import { DatePickerField } from "@/components/ui/date-picker";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { AsyncFeedback } from "@/components/async-feedback";
+import { Button } from "@/components/ui/button";
 
 export function AcademicsWorkspace() {
   const data = useAcademicData();
@@ -87,8 +88,9 @@ export function AcademicsWorkspace() {
                   required
                 />
               </label>
-              <button
-                className="button-primary md:col-span-2"
+              <Button
+                type="submit"
+                className="md:col-span-2"
                 disabled={
                   createYear.isPending ||
                   !year.name ||
@@ -97,7 +99,7 @@ export function AcademicsWorkspace() {
                 }
               >
                 {createYear.isPending ? "Menyimpan…" : "Simpan tahun ajaran"}
-              </button>
+              </Button>
               <div className="md:col-span-2">
                 <AsyncFeedback
                   error={createYear.error}
@@ -149,8 +151,9 @@ export function AcademicsWorkspace() {
                   required
                 />
               </label>
-              <button
-                className="button-primary md:col-span-2"
+              <Button
+                type="submit"
+                className="md:col-span-2"
                 disabled={
                   createClass.isPending ||
                   !group.academic_year_id ||
@@ -158,7 +161,7 @@ export function AcademicsWorkspace() {
                 }
               >
                 {createClass.isPending ? "Menyimpan…" : "Simpan kelas"}
-              </button>
+              </Button>
               <div className="md:col-span-2">
                 <AsyncFeedback
                   error={createClass.error}
@@ -200,12 +203,13 @@ export function AcademicsWorkspace() {
                   required
                 />
               </label>
-              <button
-                className="button-primary md:col-span-2"
+              <Button
+                type="submit"
+                className="md:col-span-2"
                 disabled={createSubject.isPending || !subject.code || !subject.name}
               >
                 {createSubject.isPending ? "Menyimpan…" : "Simpan mata pelajaran"}
-              </button>
+              </Button>
               <div className="md:col-span-2">
                 <AsyncFeedback
                   error={createSubject.error}
@@ -262,8 +266,9 @@ export function AcademicsWorkspace() {
                   options={data.subjects.data?.map((item) => ({ value: item.id, label: `${item.code} — ${item.name}` })) ?? []}
                 />
               </label>
-              <button
-                className="button-primary md:col-span-2"
+              <Button
+                type="submit"
+                className="md:col-span-2"
                 disabled={
                   createCourse.isPending ||
                   !course.name ||
@@ -273,7 +278,7 @@ export function AcademicsWorkspace() {
                 }
               >
                 {createCourse.isPending ? "Menyimpan…" : "Simpan course"}
-              </button>
+              </Button>
               <div className="md:col-span-2">
                 <AsyncFeedback
                   error={createCourse.error}

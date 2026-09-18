@@ -20,6 +20,7 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { cn } from "@/lib/cn";
 import { useAuth } from "@/providers/auth-provider";
 import type { UserRole } from "@/types/api";
@@ -147,7 +148,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
               <p className="text-sm font-bold text-foreground">Citra Negara LMS</p>
             </div>
           </div>
-          <span className="status-badge status-active">Sesi terlindungi</span>
+          <StatusBadge tone="success">Sesi terlindungi</StatusBadge>
         </header>
         <main className="mx-auto w-full max-w-7xl px-3 pb-8 sm:px-5 lg:px-8">
           {children}

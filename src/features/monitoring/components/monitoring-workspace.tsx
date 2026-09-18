@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { EmptyState, ErrorState, LoadingState, SelectionState } from "@/components/data-state";
 import { MetricGrid } from "@/components/metric-grid";
-import { useAcademicData } from "@/features/academics/use-academics";
-import { useExams } from "@/features/exams/use-exams";
+import { useAcademicData } from "@/features/academics";
+import { useExams } from "@/features/exams";
 import { useExamMonitoring } from "@/features/monitoring/use-monitoring";
 import { PageHeader } from "@/components/ui/page-header";
 import { Activity } from "lucide-react";

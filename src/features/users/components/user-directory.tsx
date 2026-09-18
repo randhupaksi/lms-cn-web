@@ -10,6 +10,7 @@ import { DataTable, DataTableShell } from "@/components/ui/data-table";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { Pagination } from "@/components/ui/pagination";
 import { AsyncFeedback } from "@/components/async-feedback";
+import { Button } from "@/components/ui/button";
 
 export function UserDirectory() {
   const [search, setSearch] = useState("");
@@ -97,8 +98,9 @@ export function UserDirectory() {
                 </td>
                 <td>
                   <div className="flex justify-end gap-1">
-                    <button
-                      className="button-ghost"
+                    <Button
+                      variant="ghost"
+                      size="compact"
                       onClick={() => {
                         setResetUserId(user.id);
                         setResetPassword("");
@@ -106,9 +108,10 @@ export function UserDirectory() {
                       }}
                     >
                       Reset kata sandi
-                    </button>
-                    <button
-                      className="button-ghost"
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="compact"
                       onClick={() =>
                         toggle.mutate({
                           id: user.id,
@@ -118,7 +121,7 @@ export function UserDirectory() {
                       }
                     >
                       {user.status === "active" ? "Nonaktifkan" : "Aktifkan"}
-                    </button>
+                    </Button>
                   </div>
                 </td>
               </tr>
@@ -141,9 +144,9 @@ export function UserDirectory() {
               <tr>
                 <td colSpan={5} className="empty-cell text-danger" role="alert">
                   Daftar pengguna belum dapat dimuat.{' '}
-                  <button className="font-semibold underline" onClick={() => void users.refetch()}>
+                  <Button variant="ghost" size="compact" onClick={() => void users.refetch()}>
                     Coba lagi
-                  </button>
+                  </Button>
                 </td>
               </tr>
             ) : null}
@@ -169,19 +172,19 @@ export function UserDirectory() {
           />
             <span className="text-xs font-normal leading-5 text-muted">Sesi aktif pengguna akan dicabut saat kata sandi diperbarui.</span>
           </label>
-          <button
-            className="button-primary"
+          <Button
+            type="submit"
             disabled={resetCredential.isPending}
           >
             Simpan reset
-          </button>
-          <button
-            className="button-ghost"
+          </Button>
+          <Button
+            variant="ghost"
             type="button"
             onClick={() => setResetUserId(null)}
           >
             Batal
-          </button>
+          </Button>
         </form>
       )}
       {successMessage ? <p className="border-t border-border px-4 py-3 text-sm font-medium text-success" role="status">{successMessage}</p> : null}
