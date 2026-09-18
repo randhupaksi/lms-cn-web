@@ -23,7 +23,9 @@ src/
 
 - `app` owns route segments and route-level composition only.
 - A feature owns its domain components, hooks, schemas, services, and types.
-- Features must not import another feature directly.
+- Cross-domain workspaces may import another feature only through its public
+  `index.ts` entrypoint. Private components, hooks, and implementation files
+  must not be imported across feature boundaries.
 - Shared components and hooks remain business-agnostic.
 - API calls go through `services/api`; pages do not call Axios directly.
 - Runtime configuration is read through `config` and uses `NEXT_PUBLIC_` only

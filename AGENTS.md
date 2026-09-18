@@ -17,9 +17,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## 1. Product scope
 
 This is the Citra Negara LMS frontend, initially for the school's graduation
-examination workflow. The project is currently a foundation; do not invent
-login, dashboard, exam, CRUD, or other business features unless the task asks
-for them.
+examination workflow. It currently implements role-aware authentication,
+academic administration, examination, grading/results, monitoring, materials,
+assignments, and dashboard workflows. Preserve those contracts and consult
+`../docs/IMPLEMENTATION_STATUS.md` before extending product scope; do not invent
+unconfirmed business features.
 
 Do not add multi-tenant, SaaS, white-label, client-selector, or platform
 superadmin abstractions. Keep product copy and visible branding aligned with
@@ -34,7 +36,7 @@ Citra Negara LMS.
 | Styling | Tailwind CSS v4 + CSS design tokens |
 | Server state | TanStack Query when client-side server state is needed |
 | HTTP | Axios through `src/services/api/` |
-| Validation | Zod and React Hook Form where forms require them |
+| Validation | Explicit typed validation; introduce a schema/form library only when justified by form complexity |
 | Icons | `lucide-react` or the repository-approved icon library |
 | Formatting/utilities | Existing `src/lib/` and shared components |
 
@@ -139,7 +141,7 @@ are UX only; the API must enforce authentication and authorization.
 - Do not remove the generated Next.js instruction block at the top of this file.
 - Do not add a Pages Router route or revive Vite/React Router configuration.
 - Do not bypass the centralized API client, design tokens, or shared UI layer.
-- Do not add business features to the foundation scaffold as a side effect.
+- Do not expand implemented business scope as a side effect of maintenance.
 - Do not commit or push.
 
 ## 9. Frontend handoff checklist
