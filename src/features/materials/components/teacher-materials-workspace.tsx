@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { EmptyState, ErrorState, LoadingState, SelectionState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
-import { useAcademicData } from "@/features/academics/use-academics";
+import { useAcademicData } from "@/features/academics";
 import {
   useMaterials,
   usePublishMaterial,
@@ -14,6 +14,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { BookOpenText } from "lucide-react";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { AsyncFeedback } from "@/components/async-feedback";
+import { Button } from "@/components/ui/button";
 
 const emptyForm = { title: "", description: "", content: "", position: 1 };
 
@@ -75,9 +76,9 @@ export function TeacherMaterialsWorkspace() {
                   {editingId ? "Perbarui materi" : "Buat materi"}
                 </h2>
                 {editingId && (
-                  <button className="button-ghost" onClick={reset}>
+                  <Button variant="ghost" onClick={reset}>
                     Batal
-                  </button>
+                  </Button>
                 )}
               </div>
               <form className="mt-5 space-y-4" onSubmit={submit}>
@@ -129,9 +130,9 @@ export function TeacherMaterialsWorkspace() {
                     placeholder="Contoh: 1"
                   />
                 </label>
-                <button className="button-primary" disabled={save.isPending}>
+                <Button type="submit" disabled={save.isPending}>
                   {save.isPending ? "Menyimpan…" : "Simpan draft"}
-                </button>
+                </Button>
                 <AsyncFeedback
                   error={save.error}
                   isError={save.isError}
@@ -170,21 +171,20 @@ export function TeacherMaterialsWorkspace() {
                     </div>
                   </div>
                   <div className="mt-4 flex gap-2">
-                    <button
-                      className="button-ghost"
+                    <Button
+                      variant="ghost"
                       onClick={() => edit(material)}
                       disabled={material.status !== "draft"}
                     >
                       Edit
-                    </button>
+                    </Button>
                     {material.status === "draft" && (
-                      <button
-                        className="button-primary"
+                      <Button
                         onClick={() => publish.mutate(material.id)}
                         disabled={publish.isPending}
                       >
                         Publikasikan
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </article>

@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { RoleBoundary } from "@/components/role-boundary";
-import { useAcademicData } from "@/features/academics/use-academics";
+import { useAcademicData } from "@/features/academics";
 import {
   useArchiveQuestion,
   useQuestions,
@@ -14,6 +14,7 @@ import { BookOpenCheck } from "lucide-react";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { EmptyState, ErrorState, LoadingState, SelectionState } from "@/components/data-state";
 import { AsyncFeedback } from "@/components/async-feedback";
+import { Button } from "@/components/ui/button";
 
 const emptyOptions = () =>
   Array.from({ length: 4 }, (_, index) => ({
@@ -110,9 +111,9 @@ export function QuestionBankWorkspace() {
                   {editingId ? "Perbarui soal" : "Buat soal"}
                 </h2>
                 {editingId && (
-                  <button className="button-ghost" onClick={reset}>
+                  <Button variant="ghost" onClick={reset}>
                     Batal edit
-                  </button>
+                  </Button>
                 )}
               </div>
               <form className="mt-5 space-y-4" onSubmit={submit}>
@@ -197,13 +198,13 @@ export function QuestionBankWorkspace() {
                     </div>
                   ))}
                 </fieldset>
-                <button className="button-primary" disabled={save.isPending}>
+                <Button type="submit" disabled={save.isPending}>
                   {save.isPending
                     ? "Menyimpan…"
                     : editingId
                       ? "Simpan perubahan"
                       : "Tambah soal"}
-                </button>
+                </Button>
                 <AsyncFeedback
                   error={save.error}
                   isError={save.isError}
@@ -257,18 +258,18 @@ export function QuestionBankWorkspace() {
                     {question.stem}
                   </p>
                   <div className="mt-4 flex gap-2">
-                    <button
-                      className="button-ghost"
+                    <Button
+                      variant="ghost"
                       onClick={() => edit(question)}
                     >
                       Edit
-                    </button>
-                    <button
-                      className="button-ghost text-danger"
+                    </Button>
+                    <Button
+                      variant="danger"
                       onClick={() => archive.mutate(question.id)}
                     >
                       Arsipkan
-                    </button>
+                    </Button>
                   </div>
                 </article>
               ))}

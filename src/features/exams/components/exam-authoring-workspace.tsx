@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Link from "next/link";
 import { RoleBoundary } from "@/components/role-boundary";
-import { useAcademicData } from "@/features/academics/use-academics";
+import { useAcademicData } from "@/features/academics";
 import {
   useCreateExam,
   useExamAction,
@@ -15,6 +16,7 @@ import { RadixSelectField } from "@/components/ui/radix-select";
 import { DateTimePickerField } from "@/components/ui/date-picker";
 import { EmptyState, ErrorState, LoadingState, SelectionState } from "@/components/data-state";
 import { AsyncFeedback } from "@/components/async-feedback";
+import { Button } from "@/components/ui/button";
 
 export function ExamAuthoringWorkspace() {
   const academics = useAcademicData();
@@ -176,8 +178,9 @@ export function ExamAuthoringWorkspace() {
                 />{" "}
                 Acak opsi jawaban per attempt
               </label>
-              <button
-                className="button-primary md:col-span-2"
+              <Button
+                type="submit"
+                className="md:col-span-2"
                 disabled={
                   create.isPending ||
                   !form.starts_at ||
@@ -186,7 +189,7 @@ export function ExamAuthoringWorkspace() {
                 }
               >
                 {create.isPending ? "Menyimpan…" : "Simpan draft"}
-              </button>
+              </Button>
               {scheduleInvalid ? (
                 <p className="form-error md:col-span-2" role="alert">
                   Waktu selesai harus setelah waktu mulai.
@@ -238,23 +241,22 @@ export function ExamAuthoringWorkspace() {
                 </div>
               </dl>
               <div className="mt-5 flex flex-wrap gap-2">
-                <a className="button-ghost" href={`/teacher/exams/${exam.id}`}>
+                <Link className="button-ghost" href={`/teacher/exams/${exam.id}`}>
                   Atur ujian
-                </a>
+                </Link>
                 {exam.status === "draft" ? (
-                  <button
-                    className="button-primary"
+                  <Button
                     onClick={() => publish.mutate(exam.id)}
                   >
                     Publikasikan
-                  </button>
+                  </Button>
                 ) : (
-                  <button
-                    className="button-ghost"
+                  <Button
+                    variant="ghost"
                     onClick={() => unpublish.mutate(exam.id)}
                   >
                     Batalkan publikasi
-                  </button>
+                  </Button>
                 )}
               </div>
             </article>

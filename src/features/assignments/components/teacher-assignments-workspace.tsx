@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
-import { useAcademicData } from "@/features/academics/use-academics";
+import { useAcademicData } from "@/features/academics";
 import {
   useAssignments,
   useGradeSubmission,
@@ -18,6 +18,7 @@ import { DataTable, DataTableShell } from "@/components/ui/data-table";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { DateTimePickerField } from "@/components/ui/date-picker";
 import { AsyncFeedback } from "@/components/async-feedback";
+import { Button } from "@/components/ui/button";
 
 const emptyForm = { title: "", instructions: "", due_at: "", max_score: 100 };
 
@@ -125,12 +126,13 @@ export function TeacherAssignmentsWorkspace() {
                     required
                   />
                 </label>
-                <button
-                  className="button-primary md:col-span-2"
+                <Button
+                  type="submit"
+                  className="md:col-span-2"
                   disabled={save.isPending || !form.due_at}
                 >
                   {save.isPending ? "Menyimpan…" : "Simpan draft"}
-                </button>
+                </Button>
                 <div className="md:col-span-2">
                   <AsyncFeedback
                     error={save.error}
@@ -176,19 +178,18 @@ export function TeacherAssignmentsWorkspace() {
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {assignment.status === "draft" && (
-                      <button
-                        className="button-primary"
+                      <Button
                         onClick={() => publish.mutate(assignment.id)}
                       >
                         Publikasikan
-                      </button>
+                      </Button>
                     )}
-                    <button
-                      className="button-ghost"
+                    <Button
+                      variant="ghost"
                       onClick={() => setAssignmentId(assignment.id)}
                     >
                       Lihat pengumpulan
-                    </button>
+                    </Button>
                   </div>
                 </article>
               ))}
@@ -285,12 +286,11 @@ function SubmissionRow({
         />
       </td>
       <td>
-        <button
-          className="button-primary"
+        <Button
           onClick={() => onGrade(score, feedback)}
         >
           Simpan nilai
-        </button>
+        </Button>
       </td>
     </tr>
   );
