@@ -2,15 +2,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as service from "@/services/materials.service";
 
-const keys = { course: (id: string) => ["materials", id] as const };
-export function useMaterials(courseId: string) {
+const keys = { all: ["materials"] as const };
+export function useMaterials(courseId?: string, filter: service.MaterialFilter = {}) {
   return useQuery({
-    queryKey: keys.course(courseId),
-    queryFn: () => service.listMaterials(courseId),
-    enabled: Boolean(courseId),
+    queryKey: [...keys.all, courseId ?? "all", filter],
+    queryFn: () => service.listMaterials(courseId, filter),
   });
 }
-export function useSaveMaterial(courseId: string) {
+export function useSaveMaterial() {
   const client = useQueryClient();
   return useMutation({
     mutationFn: ({
@@ -22,22 +21,22 @@ export function useSaveMaterial(courseId: string) {
     }) =>
       id ? service.updateMaterial(id, input) : service.createMaterial(input),
     onSuccess: () =>
-      client.invalidateQueries({ queryKey: keys.course(courseId) }),
+      client.invalidateQueries({ queryKey: keys.all }),
   });
 }
-export function usePublishMaterial(courseId: string) {
+export function usePublishMaterial() {
   const client = useQueryClient();
   return useMutation({
     mutationFn: service.publishMaterial,
     onSuccess: () =>
-      client.invalidateQueries({ queryKey: keys.course(courseId) }),
+      client.invalidateQueries({ queryKey: keys.all }),
   });
 }
-export function useCompleteMaterial(courseId: string) {
+export function useCompleteMaterial() {
   const client = useQueryClient();
   return useMutation({
     mutationFn: service.completeMaterial,
     onSuccess: () =>
-      client.invalidateQueries({ queryKey: keys.course(courseId) }),
+      client.invalidateQueries({ queryKey: keys.all }),
   });
 }

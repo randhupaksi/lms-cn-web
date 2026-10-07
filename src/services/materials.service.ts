@@ -1,5 +1,5 @@
 import { apiClient } from "@/services/api/client";
-import type { ApiEnvelope } from "@/types/api";
+import type { ApiEnvelope, PaginatedEnvelope } from "@/types/api";
 import type { CourseMaterial } from "@/types/lms";
 
 export type MaterialInput = {
@@ -10,12 +10,14 @@ export type MaterialInput = {
   position: number;
 };
 
-export async function listMaterials(courseId: string) {
-  const { data } = await apiClient.get<ApiEnvelope<CourseMaterial[]>>(
+export type MaterialFilter = { search?: string; status?: string; page?: number; per_page?: number };
+
+export async function listMaterials(courseId?: string, filter: MaterialFilter = {}) {
+  const { data } = await apiClient.get<PaginatedEnvelope<CourseMaterial>>(
     "/materials",
-    { params: { course_id: courseId } },
+    { params: { course_id: courseId || undefined, ...filter } },
   );
-  return data.data;
+  return data;
 }
 export async function createMaterial(input: MaterialInput) {
   const { data } = await apiClient.post<ApiEnvelope<CourseMaterial>>(
