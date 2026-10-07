@@ -13,9 +13,10 @@ export type ExamInput = {
   randomize_questions: boolean;
   randomize_options: boolean;
 };
-export async function listExams(courseId: string) {
+export type ExamFilter = { search?: string; status?: string; page?: number; per_page?: number };
+export async function listExams(courseId?: string, filter: ExamFilter = {}) {
   const { data } = await apiClient.get<PaginatedEnvelope<Exam>>("/exams", {
-    params: { course_id: courseId },
+    params: { course_id: courseId || undefined, ...filter },
   });
   return data;
 }

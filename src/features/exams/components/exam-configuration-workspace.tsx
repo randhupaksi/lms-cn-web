@@ -8,6 +8,7 @@ import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
+import { Pagination } from "@/components/ui/pagination";
 import { useCourseMembers } from "@/features/academics";
 import { useConfigureExam, useExam } from "@/features/exams/use-exams";
 import { useQuestions } from "@/features/questions";
@@ -15,7 +16,16 @@ import { useQuestions } from "@/features/questions";
 export function ExamConfigurationWorkspace({ examId }: { examId: string }) {
   const exam = useExam(examId);
   const configuration = useConfigureExam(examId);
-  const questions = useQuestions(exam.data?.course_id ?? "");
+  const [questionSearch, setQuestionSearch] = useState("");
+  const [questionPage, setQuestionPage] = useState(1);
+  const [participantSearch, setParticipantSearch] = useState("");
+  const [participantPage, setParticipantPage] = useState(1);
+  const questions = useQuestions(exam.data?.course_id ?? "", {
+    search: questionSearch,
+    status: "active",
+    page: questionPage,
+    per_page: 20,
+  });
   const members = useCourseMembers(exam.data?.course_id ?? "");
   const [questionChanges, setQuestionChanges] = useState<Record<string, number> | null>(null);
   const [participantChanges, setParticipantChanges] = useState<string[] | null>(null);
@@ -24,7 +34,12 @@ export function ExamConfigurationWorkspace({ examId }: { examId: string }) {
     (exam.data?.questions ?? []).map((item) => [item.source_question_id, item.points]),
   );
   const participantSelection = participantChanges ?? exam.data?.participant_ids ?? [];
-  const students = members.data?.students ?? [];
+  const matchingStudents = (members.data?.students ?? []).filter((student) =>
+    `${student.full_name} ${student.identifier}`
+      .toLocaleLowerCase()
+      .includes(participantSearch.toLocaleLowerCase()),
+  );
+  const students = matchingStudents.slice((participantPage - 1) * 20, participantPage * 20);
 
   if (exam.isLoading) return <LoadingState label="Memuat konfigurasi ujian…" />;
   if (exam.isError || !exam.data) {
@@ -45,6 +60,9 @@ export function ExamConfigurationWorkspace({ examId }: { examId: string }) {
         <div className="grid gap-6 xl:grid-cols-2">
           <section className="panel" aria-labelledby="exam-question-heading">
             <h2 id="exam-question-heading" className="section-title">Pilih soal</h2>
+            <label className="field-label mt-4">Cari soal
+              <input className="field-input" type="search" value={questionSearch} onChange={(event) => { setQuestionSearch(event.target.value); setQuestionPage(1); }} placeholder="Cari isi pertanyaan" />
+            </label>
             {questions.isLoading ? <LoadingState label="Memuat bank soal…" /> : null}
             {questions.isError ? (
               <ErrorState label="Bank soal belum dapat dimuat." onRetry={() => void questions.refetch()} />
@@ -88,6 +106,7 @@ export function ExamConfigurationWorkspace({ examId }: { examId: string }) {
                 </label>
               ))}
             </div>
+            {questions.data ? <Pagination page={questionPage} totalPages={questions.data.meta.total_pages} onPageChange={setQuestionPage} /> : null}
             <Button
               className="mt-5"
               onClick={() => configuration.questions.mutate(
@@ -108,6 +127,9 @@ export function ExamConfigurationWorkspace({ examId }: { examId: string }) {
 
           <section className="panel" aria-labelledby="exam-participant-heading">
             <h2 id="exam-participant-heading" className="section-title">Pilih peserta</h2>
+            <label className="field-label mt-4">Cari siswa
+              <input className="field-input" type="search" value={participantSearch} onChange={(event) => { setParticipantSearch(event.target.value); setParticipantPage(1); }} placeholder="Nama atau identifier" />
+            </label>
             {members.isLoading ? <LoadingState label="Memuat peserta course…" /> : null}
             {members.isError ? (
               <ErrorState label="Peserta course belum dapat dimuat." onRetry={() => void members.refetch()} />
@@ -137,6 +159,7 @@ export function ExamConfigurationWorkspace({ examId }: { examId: string }) {
                 </label>
               ))}
             </div>
+            <Pagination page={participantPage} totalPages={Math.ceil(matchingStudents.length / 20)} onPageChange={setParticipantPage} />
             <Button
               className="mt-5"
               onClick={() => configuration.participants.mutate(participantSelection)}

@@ -5,11 +5,10 @@ export const examKeys = {
   byCourse: (courseId: string) => ["exams", courseId] as const,
   detail: (id: string) => ["exam", id] as const,
 };
-export function useExams(courseId: string) {
+export function useExams(courseId?: string, filter: service.ExamFilter = {}) {
   return useQuery({
-    queryKey: examKeys.byCourse(courseId),
-    queryFn: () => service.listExams(courseId),
-    enabled: Boolean(courseId),
+    queryKey: [...examKeys.byCourse(courseId ?? "all"), filter],
+    queryFn: () => service.listExams(courseId, filter),
   });
 }
 export function useExam(id: string) {
@@ -19,23 +18,22 @@ export function useExam(id: string) {
     enabled: Boolean(id),
   });
 }
-export function useCreateExam(courseId: string) {
+export function useCreateExam() {
   const client = useQueryClient();
   return useMutation({
     mutationFn: service.createExam,
     onSuccess: () =>
-      client.invalidateQueries({ queryKey: examKeys.byCourse(courseId) }),
+      client.invalidateQueries({ queryKey: ["exams"] }),
   });
 }
 export function useExamAction(
-  courseId: string,
   action: (id: string) => Promise<unknown>,
 ) {
   const client = useQueryClient();
   return useMutation({
     mutationFn: action,
     onSuccess: () =>
-      client.invalidateQueries({ queryKey: examKeys.byCourse(courseId) }),
+      client.invalidateQueries({ queryKey: ["exams"] }),
   });
 }
 export function useConfigureExam(examId: string) {
