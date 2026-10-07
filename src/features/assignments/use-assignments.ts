@@ -3,17 +3,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as service from "@/services/assignments.service";
 
 const keys = {
-  course: (id: string) => ["assignments", id] as const,
+  all: ["assignments"] as const,
   submissions: (id: string) => ["assignment-submissions", id] as const,
 };
-export function useAssignments(courseId: string) {
+export function useAssignments(courseId?: string, filter: service.AssignmentFilter = {}) {
   return useQuery({
-    queryKey: keys.course(courseId),
-    queryFn: () => service.listAssignments(courseId),
-    enabled: Boolean(courseId),
+    queryKey: [...keys.all, courseId ?? "all", filter],
+    queryFn: () => service.listAssignments(courseId, filter),
   });
 }
-export function useSaveAssignment(courseId: string) {
+export function useSaveAssignment() {
   const client = useQueryClient();
   return useMutation({
     mutationFn: ({
@@ -27,18 +26,18 @@ export function useSaveAssignment(courseId: string) {
         ? service.updateAssignment(id, input)
         : service.createAssignment(input),
     onSuccess: () =>
-      client.invalidateQueries({ queryKey: keys.course(courseId) }),
+      client.invalidateQueries({ queryKey: keys.all }),
   });
 }
-export function usePublishAssignment(courseId: string) {
+export function usePublishAssignment() {
   const client = useQueryClient();
   return useMutation({
     mutationFn: service.publishAssignment,
     onSuccess: () =>
-      client.invalidateQueries({ queryKey: keys.course(courseId) }),
+      client.invalidateQueries({ queryKey: keys.all }),
   });
 }
-export function useSubmitAssignment(courseId: string) {
+export function useSubmitAssignment() {
   const client = useQueryClient();
   return useMutation({
     mutationFn: ({
@@ -49,13 +48,13 @@ export function useSubmitAssignment(courseId: string) {
       input: service.SubmissionInput;
     }) => service.submitAssignment(id, input),
     onSuccess: () =>
-      client.invalidateQueries({ queryKey: keys.course(courseId) }),
+      client.invalidateQueries({ queryKey: keys.all }),
   });
 }
-export function useSubmissions(assignmentId: string) {
+export function useSubmissions(assignmentId: string, filter: { search?: string; page?: number; per_page?: number } = {}) {
   return useQuery({
-    queryKey: keys.submissions(assignmentId),
-    queryFn: () => service.listSubmissions(assignmentId),
+    queryKey: [...keys.submissions(assignmentId), filter],
+    queryFn: () => service.listSubmissions(assignmentId, filter),
     enabled: Boolean(assignmentId),
   });
 }
