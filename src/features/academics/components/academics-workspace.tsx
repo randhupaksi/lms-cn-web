@@ -292,7 +292,7 @@ export function AcademicsWorkspace() {
           </section>
         </div>
         <CourseAssignments />
-        <CourseTable courses={data.courses.data?.data ?? []} />
+        <CourseTable />
       </div>
     </RoleBoundary>
   );

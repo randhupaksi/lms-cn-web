@@ -55,6 +55,7 @@ export type ExamQuestion = {
 export type Exam = {
   id: string;
   course_id: string;
+  course_name?: string;
   author_id: string;
   title: string;
   description: string;
@@ -115,6 +116,8 @@ export type ExamResult = {
   attempt_id: string;
   exam_id: string;
   exam_title: string;
+  course_id?: string;
+  course_name?: string;
   student_id: string;
   student_name?: string;
   identifier?: string;
@@ -129,6 +132,7 @@ export type ExamResult = {
 export type CourseMaterial = {
   id: string;
   course_id: string;
+  course_name?: string;
   author_id: string;
   title: string;
   description: string;
@@ -159,6 +163,7 @@ export type AssignmentSubmission = {
 export type Assignment = {
   id: string;
   course_id: string;
+  course_name?: string;
   author_id: string;
   title: string;
   instructions: string;

@@ -49,8 +49,11 @@ export async function createSubject(input: { code: string; name: string }) {
   );
   return data.data;
 }
-export async function listCourses() {
-  const { data } = await apiClient.get<PaginatedEnvelope<Course>>("/courses");
+export type CourseListFilter = { page?: number; per_page?: number; search?: string };
+export async function listCourses(filter: CourseListFilter = {}) {
+  const { data } = await apiClient.get<PaginatedEnvelope<Course>>("/courses", {
+    params: filter,
+  });
   return data;
 }
 export async function createCourse(input: {

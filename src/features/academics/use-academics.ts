@@ -1,6 +1,7 @@
 "use client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as service from "@/services/academics.service";
+import type { Course } from "@/types/lms";
 export const academicKeys = {
   years: ["academic-years"] as const,
   classes: ["class-groups"] as const,
@@ -23,15 +24,32 @@ export function useAcademicData() {
       queryFn: service.listSubjects,
     }),
     courses: useQuery({
-      queryKey: academicKeys.courses,
-      queryFn: service.listCourses,
+      queryKey: [...academicKeys.courses, { page: 1, per_page: 20 }],
+      queryFn: () => service.listCourses({ page: 1, per_page: 20 }),
     }),
   };
 }
-export function useCourses() {
+export function useCourses(params: service.CourseListFilter = {}) {
   return useQuery({
-    queryKey: academicKeys.courses,
-    queryFn: service.listCourses,
+    queryKey: [...academicKeys.courses, params],
+    queryFn: () => service.listCourses(params),
+  });
+}
+export function useAllCourses() {
+  return useQuery({
+    queryKey: [...academicKeys.courses, "all"],
+    queryFn: async () => {
+      const courses: Course[] = [];
+      let page = 1;
+      let totalPages = 1;
+      do {
+        const result = await service.listCourses({ page, per_page: 100 });
+        courses.push(...result.data);
+        totalPages = result.meta.total_pages;
+        page += 1;
+      } while (page <= totalPages);
+      return courses;
+    },
   });
 }
 function useInvalidatingMutation<T>(
