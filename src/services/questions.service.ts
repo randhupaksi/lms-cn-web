@@ -16,14 +16,16 @@ export type QuestionFilter = {
   category?: string;
   tag?: string;
   status?: string;
+  page?: number;
+  per_page?: number;
 };
 export async function listQuestions(
-  courseId: string,
+  courseId: string | undefined,
   filter: QuestionFilter = {},
 ) {
   const { data } = await apiClient.get<PaginatedEnvelope<Question>>(
     "/questions",
-    { params: { course_id: courseId, ...filter } },
+    { params: { course_id: courseId || undefined, ...filter } },
   );
   return data;
 }
