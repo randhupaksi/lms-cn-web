@@ -8,6 +8,13 @@ export async function listExamResults(examId: string) {
   );
   return data;
 }
+export type ResultFilter = { exam_id?: string; course_id?: string; search?: string; page?: number; per_page?: number };
+export async function listResults(filter: ResultFilter = {}) {
+  const { data } = await apiClient.get<PaginatedEnvelope<ExamResult>>("/results", {
+    params: filter,
+  });
+  return data;
+}
 export async function publishResults(examId: string) {
   const { data } = await apiClient.post<
     ApiEnvelope<{ published_count: number }>
@@ -21,9 +28,10 @@ export async function exportExamResults(examId: string) {
   });
   return data;
 }
-export async function listStudentResults() {
-  const { data } =
-    await apiClient.get<PaginatedEnvelope<ExamResult>>("/student/results");
+export async function listStudentResults(filter: { search?: string; page?: number; per_page?: number } = {}) {
+  const { data } = await apiClient.get<PaginatedEnvelope<ExamResult>>("/student/results", {
+    params: filter,
+  });
   return data;
 }
 export async function getStudentResult(id: string) {

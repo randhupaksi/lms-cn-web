@@ -12,17 +12,22 @@ export function useExamResults(id: string) {
     enabled: Boolean(id),
   });
 }
+export function useResults(filter: service.ResultFilter = {}) {
+  return useQuery({
+    queryKey: ["results", "staff", filter],
+    queryFn: () => service.listResults(filter),
+  });
+}
 export function usePublishResults(id: string) {
   const client = useQueryClient();
   return useMutation({
     mutationFn: () => service.publishResults(id),
-    onSuccess: () =>
-      client.invalidateQueries({ queryKey: resultKeys.exam(id) }),
+    onSuccess: () => client.invalidateQueries({ queryKey: ["results"] }),
   });
 }
-export function useStudentResults() {
+export function useStudentResults(filter: { search?: string; page?: number; per_page?: number } = {}) {
   return useQuery({
-    queryKey: resultKeys.student,
-    queryFn: service.listStudentResults,
+    queryKey: [...resultKeys.student, filter],
+    queryFn: () => service.listStudentResults(filter),
   });
 }
