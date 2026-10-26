@@ -21,6 +21,46 @@ Reference qualities: Linear and Vercel for clarity, Stripe Dashboard for
 information hierarchy, Notion for calm density, and serious academic portals
 for trust and focus.
 
+### Role and task compositions
+
+The UI refresh applies the task hierarchy principles from the Matik dashboard
+guide while retaining Citra Negara's emerald identity. Variation comes from
+layout, useful density, and emphasis rather than additional brand colors.
+
+The dashboard welcome header uses a narrow emerald rule, a role-specific
+greeting and context, and a direct role-specific workspace action. Refresh is
+a compact secondary icon action. KPI groups have their own section heading;
+their cards use content-driven height, compact padding, and a short label/value
+gap. Do not reserve a tall blank label area or use a minimum card height.
+
+- Admin: featured KPI tiles, quick-action cards, a 14-day collection chart,
+  exam lifecycle distribution, and an operational priority queue.
+- Teacher: teaching KPI tiles, quick-action cards, course-scoped activity and
+  exam lifecycle charts, then an assessment queue. Authoring starts from the
+  collection; long forms open in
+  an inline editor with a focused heading and a return action.
+- Student: learning KPI tiles and next actions precede quick-action cards,
+  personal activity, material completion, assignment status, and published
+  result bars. A zero-material denominator shows a dash, not an invented rate.
+- Materials: a selectable index and one reading surface. On narrower screens,
+  the index precedes the reader; selecting a material focuses its heading.
+- Operational comparisons: tables for exams and results; continuous record
+  lists for questions, materials, and assignments.
+- Examination: a dedicated shell, sticky time/progress toolbar, readable
+  question area, and question navigation. Starting and final submission use
+  the shared confirmation dialog; the server remains authoritative for time,
+  saves, and finalization.
+
+Do not add simulated trends, percentages, or aggregated statistics from one
+page of results. Dashboard metrics come from the summary and insights contracts.
+The chart endpoint aggregates complete server-side data in WIB. A separate
+failure state prevents missing chart data from becoming fabricated zero values.
+Day columns expose keyboard/hover tooltips and an expandable data table;
+donut charts retain labeled category counts. Chart geometry may use numeric
+inline values derived from API data; colors and dimensions remain token-based.
+Selection counts in exam configuration describe the current local selection.
+An unavailable collection count is shown as a dash until data arrives.
+
 The interface is a work tool for students, teachers, and administrators. It
 must reduce cognitive load during preparation and examination, not compete for
 attention.
@@ -41,6 +81,12 @@ Token families:
 - radius and elevation;
 - focus, motion, and breakpoint values.
 
+Composition tokens also define sidebar/content widths, control height,
+reading width, dialog width, and examination toolbar/rail dimensions. Ordinary
+controls use the small radius; larger radii are reserved for workspaces.
+Shadows are reserved mainly for overlays. Semantic warning, information, and
+secondary text colors must remain readable on their matching soft surfaces.
+
 If a value is missing, add a named token first and document why. Never place
 raw hex, RGB, arbitrary colors, random spacing, or one-off shadows in product
 components or page JSX.
@@ -60,6 +106,10 @@ components or page JSX.
   excessive bold and avoid display typography inside dense workflows.
 - Icons come from the approved icon library and always have an accessible
   label when the action is icon-only. Never use emoji as interface icons.
+- Repeated row actions use compact `ActionButton`/`ActionLink` controls with
+  relevant icons, stable accessible names, and Base UI tooltips on focus/hover.
+  Keep primary form and page actions explicit. Pending row actions are disabled
+  and show progress without changing their accessible purpose.
 - Motion is short and functional: color, opacity, border, or small transforms;
   respect `prefers-reduced-motion`.
 
@@ -104,6 +154,10 @@ Do not use a centered spinner as the only loading design for a full page.
 - Every input has a visible label or an equivalent accessible name.
 - Focus states are visible and consistent.
 - Keyboard users can complete important flows, including examination actions.
+- A closed mobile sidebar is hidden from keyboard navigation. Opening it
+  traps focus; closing it restores focus. Resize to desktop releases the trap.
+- Confirmation dialogs use Base UI's focus trap and restoration, put initial
+  focus on cancel, and stay open while their mutation is pending.
 - Status is communicated with text or icon plus color, never color alone.
 - Touch targets are comfortable on mobile.
 - Test at approximately 360px, tablet, laptop, and wide desktop widths.

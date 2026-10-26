@@ -9,19 +9,29 @@ type PageHeaderProps = {
   actions?: ReactNode;
 };
 
-export function PageHeader({ eyebrow, title, description, icon: Icon, actions }: PageHeaderProps) {
+export function PageHeader({
+  eyebrow,
+  title,
+  description,
+  icon: Icon,
+  actions,
+}: PageHeaderProps) {
   return (
     <header className="page-header">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <p className="eyebrow">
-            {Icon ? <Icon aria-hidden="true" size={14} /> : null}
-            {eyebrow}
-          </p>
+          <p className="eyebrow">{eyebrow}</p>
           <h1 className="page-title">{title}</h1>
           <p className="page-description">{description}</p>
         </div>
-        {actions ? <div className="shrink-0">{actions}</div> : null}
+        <div className="page-header-actions">
+          {actions ??
+            (Icon ? (
+              <span className="page-header-icon">
+                <Icon aria-hidden="true" size={25} />
+              </span>
+            ) : null)}
+        </div>
       </div>
     </header>
   );

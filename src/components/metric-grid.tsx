@@ -23,23 +23,31 @@ const iconByMetric: Record<string, typeof Activity> = {
   completed_materials: CheckCircle2,
 };
 
-export function MetricGrid({ metrics }: { metrics: DashboardMetric[] }) {
+export function MetricGrid({
+  metrics,
+  layout = "grid",
+}: {
+  metrics: DashboardMetric[];
+  layout?: "grid" | "strip";
+}) {
   return (
-    <dl className="grid gap-3 sm:grid-cols-2">
+    <dl className={layout === "strip" ? "metric-strip" : "metric-grid"}>
       {metrics.map((metric) => {
         const Icon = iconByMetric[metric.key] ?? Activity;
         return (
           <div className="metric-card" key={metric.key}>
             <div className="flex items-start justify-between gap-4">
               <div>
-                <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+                <dt className="text-xs font-medium text-muted">
                   {metric.label}
                 </dt>
-                <dd className="mt-3 text-3xl font-bold tracking-[-0.05em] text-foreground">
+                <dd className="metric-value">
                   {metric.value.toLocaleString("id-ID")}
                 </dd>
               </div>
-              <span className="metric-icon"><Icon aria-hidden="true" size={18} /></span>
+              <span className="metric-icon">
+                <Icon aria-hidden="true" size={18} />
+              </span>
             </div>
           </div>
         );

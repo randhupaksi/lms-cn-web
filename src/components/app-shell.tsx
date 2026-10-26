@@ -10,8 +10,10 @@ import {
   BookOpenCheck,
   BookOpenText,
   ClipboardList,
+  ChevronRight,
   GraduationCap,
   LayoutDashboard,
+  KeyRound,
   LogOut,
   Menu,
   School,
@@ -34,28 +36,118 @@ type NavigationItem = {
 
 const navigation: Record<UserRole, NavigationItem[]> = {
   admin: [
-    { href: "/dashboard", label: "Ringkasan", icon: LayoutDashboard, group: "Workspace" },
-    { href: "/admin/users", label: "Pengguna", icon: UsersRound, group: "Data akademik" },
-    { href: "/admin/academics", label: "Akademik", icon: School, group: "Data akademik" },
-    { href: "/admin/monitoring", label: "Monitoring", icon: Activity, group: "Operasional" },
-    { href: "/teacher/results", label: "Hasil ujian", icon: GraduationCap, group: "Operasional" },
-    { href: "/admin/audit", label: "Audit aktivitas", icon: ShieldCheck, group: "Operasional" },
+    {
+      href: "/dashboard",
+      label: "Ringkasan",
+      icon: LayoutDashboard,
+      group: "Workspace",
+    },
+    {
+      href: "/admin/users",
+      label: "Pengguna",
+      icon: UsersRound,
+      group: "Data akademik",
+    },
+    {
+      href: "/admin/academics",
+      label: "Akademik",
+      icon: School,
+      group: "Data akademik",
+    },
+    {
+      href: "/admin/monitoring",
+      label: "Monitoring",
+      icon: Activity,
+      group: "Operasional",
+    },
+    {
+      href: "/teacher/results",
+      label: "Hasil ujian",
+      icon: GraduationCap,
+      group: "Operasional",
+    },
+    {
+      href: "/admin/audit",
+      label: "Audit aktivitas",
+      icon: ShieldCheck,
+      group: "Operasional",
+    },
   ],
   teacher: [
-    { href: "/dashboard", label: "Ringkasan", icon: LayoutDashboard, group: "Workspace" },
-    { href: "/teacher/questions", label: "Bank soal", icon: BookOpenCheck, group: "Pembelajaran" },
-    { href: "/teacher/materials", label: "Materi", icon: BookOpenText, group: "Pembelajaran" },
-    { href: "/teacher/assignments", label: "Tugas", icon: ClipboardList, group: "Pembelajaran" },
-    { href: "/teacher/exams", label: "Ujian", icon: GraduationCap, group: "Pembelajaran" },
-    { href: "/teacher/monitoring", label: "Monitoring", icon: Activity, group: "Evaluasi" },
-    { href: "/teacher/results", label: "Hasil", icon: School, group: "Evaluasi" },
+    {
+      href: "/dashboard",
+      label: "Ringkasan",
+      icon: LayoutDashboard,
+      group: "Workspace",
+    },
+    {
+      href: "/teacher/questions",
+      label: "Bank soal",
+      icon: BookOpenCheck,
+      group: "Pembelajaran",
+    },
+    {
+      href: "/teacher/materials",
+      label: "Materi",
+      icon: BookOpenText,
+      group: "Pembelajaran",
+    },
+    {
+      href: "/teacher/assignments",
+      label: "Tugas",
+      icon: ClipboardList,
+      group: "Pembelajaran",
+    },
+    {
+      href: "/teacher/exams",
+      label: "Ujian",
+      icon: GraduationCap,
+      group: "Pembelajaran",
+    },
+    {
+      href: "/teacher/monitoring",
+      label: "Monitoring",
+      icon: Activity,
+      group: "Evaluasi",
+    },
+    {
+      href: "/teacher/results",
+      label: "Hasil",
+      icon: School,
+      group: "Evaluasi",
+    },
   ],
   student: [
-    { href: "/dashboard", label: "Ringkasan", icon: LayoutDashboard, group: "Workspace" },
-    { href: "/student/materials", label: "Materi", icon: BookOpenText, group: "Pembelajaran" },
-    { href: "/student/assignments", label: "Tugas", icon: ClipboardList, group: "Pembelajaran" },
-    { href: "/student/exams", label: "Ujian saya", icon: GraduationCap, group: "Pembelajaran" },
-    { href: "/student/results", label: "Hasil belajar", icon: School, group: "Pembelajaran" },
+    {
+      href: "/dashboard",
+      label: "Ringkasan",
+      icon: LayoutDashboard,
+      group: "Workspace",
+    },
+    {
+      href: "/student/materials",
+      label: "Materi",
+      icon: BookOpenText,
+      group: "Pembelajaran",
+    },
+    {
+      href: "/student/assignments",
+      label: "Tugas",
+      icon: ClipboardList,
+      group: "Pembelajaran",
+    },
+    {
+      href: "/student/exams",
+      label: "Ujian saya",
+      icon: GraduationCap,
+      group: "Pembelajaran",
+    },
+    {
+      href: "/student/results",
+      label: "Hasil belajar",
+      icon: School,
+      group: "Pembelajaran",
+    },
   ],
 };
 
@@ -127,9 +219,15 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
       }
     }
 
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const closeOnDesktop = () => {
+      if (desktop.matches) setSidebarOpen(false);
+    };
+    desktop.addEventListener("change", closeOnDesktop);
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
+      desktop.removeEventListener("change", closeOnDesktop);
       document.body.style.overflow = previousOverflow;
       previousFocus?.focus();
     };
@@ -140,17 +238,26 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
   if (pathname.startsWith("/student/attempts/")) {
     return (
       <div className="workspace-shell">
-        <header className="workspace-topbar mx-2 lg:mx-auto lg:max-w-7xl">
+        <a href="#exam-content" className="skip-link button-primary">
+          Langsung ke soal ujian
+        </a>
+        <header className="workspace-topbar">
           <div className="flex items-center gap-3">
             <span className="workspace-user-avatar">CN</span>
             <div>
               <p className="eyebrow">Mode ujian</p>
-              <p className="text-sm font-bold text-foreground">Citra Negara LMS</p>
+              <p className="text-sm font-bold text-foreground">
+                Citra Negara LMS
+              </p>
             </div>
           </div>
-          <StatusBadge tone="success">Sesi terlindungi</StatusBadge>
+          <StatusBadge tone="neutral">Mode fokus</StatusBadge>
         </header>
-        <main className="mx-auto w-full max-w-7xl px-3 pb-8 sm:px-5 lg:px-8">
+        <main
+          id="exam-content"
+          tabIndex={-1}
+          className="mx-auto w-full max-w-7xl px-3 pb-8 sm:px-5 lg:px-8"
+        >
           {children}
         </main>
       </div>
@@ -184,7 +291,9 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
         onClick={() => setSidebarOpen(false)}
         className={cn(
           "sidebar-overlay lg:hidden",
-          sidebarOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0",
+          sidebarOpen
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0",
         )}
       />
 
@@ -196,12 +305,16 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
           sidebarOpen ? "workspace-sidebar-open" : "workspace-sidebar-closed",
         )}
         aria-label="Navigasi aplikasi"
+        role={sidebarOpen ? "dialog" : undefined}
+        aria-modal={sidebarOpen ? true : undefined}
       >
         <div className="workspace-brand">
           <div className="workspace-brand-mark">CN</div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold text-white">Citra Negara LMS</p>
-            <p className="mt-1 text-xs leading-5 text-white/70">Ruang belajar dan evaluasi sekolah</p>
+            <p className="truncate text-sm font-bold text-white">
+              Citra Negara LMS
+            </p>
+            <p className="workspace-role-label mt-1">Portal {roleLabel}</p>
           </div>
           <Button
             variant="ghost"
@@ -217,39 +330,61 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
         <div className="mx-5 h-px bg-white/12" />
         <div className="workspace-sidebar-scroll">
           <nav className="relative z-10" aria-label="Menu utama">
-            {Array.from(new Set(items.map((item) => item.group))).map((group) => (
-              <div className="workspace-nav-group" key={group}>
-                <p className="workspace-nav-group-label">{group}</p>
-                <div className="space-y-1.5">
-                  {items.filter((item) => item.group === group).map(({ href, label, icon: Icon }) => {
-                    const active = isNavigationActive(pathname, href);
-                    return (
-                      <Link
-                        key={href}
-                        href={href}
-                        onClick={() => setSidebarOpen(false)}
-                        aria-current={active ? "page" : undefined}
-                        className={cn("nav-link", active && "nav-link-active")}
-                      >
-                        <span className="nav-icon"><Icon aria-hidden="true" size={17} /></span>
-                        <span>{label}</span>
-                      </Link>
-                    );
-                  })}
+            {Array.from(new Set(items.map((item) => item.group))).map(
+              (group) => (
+                <div className="workspace-nav-group" key={group}>
+                  <p className="workspace-nav-group-label">{group}</p>
+                  <div className="space-y-1.5">
+                    {items
+                      .filter((item) => item.group === group)
+                      .map(({ href, label, icon: Icon }) => {
+                        const active = isNavigationActive(pathname, href);
+                        return (
+                          <Link
+                            key={href}
+                            href={href}
+                            onClick={() => setSidebarOpen(false)}
+                            aria-current={active ? "page" : undefined}
+                            className={cn(
+                              "nav-link",
+                              active && "nav-link-active",
+                            )}
+                          >
+                            <span className="nav-icon">
+                              <Icon aria-hidden="true" size={17} />
+                            </span>
+                            <span>{label}</span>
+                          </Link>
+                        );
+                      })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ),
+            )}
           </nav>
         </div>
 
         <div className="workspace-sidebar-footer">
           <div className="workspace-account-dock">
-            <span className="workspace-user-avatar">{getInitials(user.full_name)}</span>
+            <span className="workspace-user-avatar">
+              {getInitials(user.full_name)}
+            </span>
             <div className="min-w-0">
-              <p className="truncate text-xs font-bold text-white">{user.full_name}</p>
-              <p className="mt-0.5 text-[11px] text-white/62">Akun {roleLabel}</p>
+              <p className="truncate text-xs font-bold text-white">
+                {user.full_name}
+              </p>
+              <p className="workspace-role-label mt-0.5">{roleLabel}</p>
             </div>
           </div>
+          <Link
+            href="/change-password"
+            onClick={() => setSidebarOpen(false)}
+            className="workspace-account-link mb-2"
+          >
+            <span className="flex items-center gap-2">
+              <KeyRound aria-hidden="true" size={14} /> Ubah kata sandi
+            </span>
+          </Link>
           <button
             type="button"
             onClick={() => void handleLogout()}
@@ -275,24 +410,45 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
             >
               <Menu size={19} />
             </Button>
-            <div className="min-w-0">
-              <p className="truncate text-xs font-semibold text-muted">{roleLabel}</p>
-              <p className="mt-0.5 truncate text-lg font-bold tracking-tight text-foreground sm:text-xl">
-                {pageTitle}
-              </p>
-            </div>
+            <nav
+              aria-label="Lokasi halaman"
+              className="workspace-breadcrumb min-w-0"
+            >
+              <Link href="/dashboard" className="hidden shrink-0 sm:inline">
+                Portal {roleLabel}
+              </Link>
+              <ChevronRight
+                className="hidden shrink-0 sm:block"
+                size={14}
+                aria-hidden="true"
+              />
+              <span
+                aria-current="page"
+                className="truncate font-semibold text-foreground"
+              >
+                {pathname === "/change-password"
+                  ? "Ubah kata sandi"
+                  : pageTitle}
+              </span>
+            </nav>
           </div>
 
           <div className="workspace-user">
-            <span className="workspace-user-avatar">{getInitials(user.full_name)}</span>
+            <span className="workspace-user-avatar">
+              {getInitials(user.full_name)}
+            </span>
             <div className="hidden min-w-0 pr-2 sm:block">
-              <p className="max-w-44 truncate text-xs font-bold text-foreground">{user.full_name}</p>
+              <p className="max-w-44 truncate text-xs font-bold text-foreground">
+                {user.full_name}
+              </p>
               <p className="mt-0.5 text-xs text-muted">{roleLabel}</p>
             </div>
           </div>
         </header>
 
-        <main id="main-content" className="workspace-content" tabIndex={-1}>{children}</main>
+        <main id="main-content" className="workspace-content" tabIndex={-1}>
+          {children}
+        </main>
       </div>
     </div>
   );
