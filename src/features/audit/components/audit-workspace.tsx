@@ -1,4 +1,5 @@
 "use client";
+import { FilterBar } from "@/components/ui/filter-bar";
 
 import { useState } from "react";
 import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
@@ -18,14 +19,14 @@ export function AuditWorkspace() {
     <RoleBoundary allow={["admin"]}>
       <div className="space-y-8">
         <PageHeader
-          eyebrow="Governance"
+          eyebrow="Administrasi · Jejak aktivitas"
           title="Audit aktivitas"
-          description="Jejak tindakan sensitif bersifat read-only dan diurutkan dari aktivitas terbaru."
+          description="Tinjau catatan tindakan penting, diurutkan dari aktivitas terbaru. Data audit hanya dapat dibaca."
           icon={ShieldCheck}
         />
-        <div className="grid gap-4 md:grid-cols-2">
+        <FilterBar>
           <label className="field-label">
-            Action
+            Jenis tindakan
             <input
               className="field-input"
               value={action}
@@ -48,10 +49,13 @@ export function AuditWorkspace() {
               placeholder="Contoh: exam atau assignment"
             />
           </label>
-        </div>
+        </FilterBar>
         {events.isLoading && <LoadingState />}
         {events.isError && (
-          <ErrorState label="Audit aktivitas belum dapat dimuat." onRetry={() => void events.refetch()} />
+          <ErrorState
+            label="Audit aktivitas belum dapat dimuat."
+            onRetry={() => void events.refetch()}
+          />
         )}
         {events.data?.data.length === 0 && (
           <EmptyState
@@ -62,30 +66,30 @@ export function AuditWorkspace() {
         {events.data && events.data.data.length > 0 && (
           <DataTableShell>
             <DataTable>
-                <thead>
-                  <tr>
-                    <th>Waktu</th>
-                    <th>Aktor</th>
-                    <th>Action</th>
-                    <th>Entitas</th>
-                    <th>ID</th>
+              <thead>
+                <tr>
+                  <th>Waktu</th>
+                  <th>Aktor</th>
+                  <th>Action</th>
+                  <th>Entitas</th>
+                  <th>ID</th>
+                </tr>
+              </thead>
+              <tbody>
+                {events.data.data.map((event) => (
+                  <tr key={event.id}>
+                    <td>
+                      {new Date(event.created_at).toLocaleString("id-ID")}
+                    </td>
+                    <td>{event.actor_name || "Sistem"}</td>
+                    <td className="font-semibold">{event.action}</td>
+                    <td>{event.entity_type}</td>
+                    <td className="font-mono text-xs">
+                      {event.entity_id ?? "—"}
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {events.data.data.map((event) => (
-                    <tr key={event.id}>
-                      <td>
-                        {new Date(event.created_at).toLocaleString("id-ID")}
-                      </td>
-                      <td>{event.actor_name || "Sistem"}</td>
-                      <td className="font-semibold">{event.action}</td>
-                      <td>{event.entity_type}</td>
-                      <td className="font-mono text-xs">
-                        {event.entity_id ?? "—"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+                ))}
+              </tbody>
             </DataTable>
             <Pagination
               page={events.data.meta.page}
