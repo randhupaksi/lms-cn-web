@@ -1,6 +1,10 @@
 import { apiClient } from "@/services/api/client";
 import type { ApiEnvelope } from "@/types/api";
-import type { DashboardSummary, ExamAnalytics } from "@/types/lms";
+import type {
+  DashboardSummary,
+  DashboardInsights,
+  ExamAnalytics,
+} from "@/types/lms";
 
 export async function getDashboardSummary() {
   const { data } = await apiClient.get<ApiEnvelope<DashboardSummary>>(
@@ -11,6 +15,13 @@ export async function getDashboardSummary() {
 export async function getExamAnalytics(examId: string) {
   const { data } = await apiClient.get<ApiEnvelope<ExamAnalytics>>(
     `/analytics/exams/${examId}`,
+  );
+  return data.data;
+}
+
+export async function getDashboardInsights() {
+  const { data } = await apiClient.get<ApiEnvelope<DashboardInsights>>(
+    "/analytics/dashboard/insights",
   );
   return data.data;
 }

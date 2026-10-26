@@ -14,6 +14,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { EmptyState } from "@/components/data-state";
+import { DashboardInsightsWorkspace } from "./dashboard-insights";
 import { MetricGrid } from "@/components/metric-grid";
 import { StatusBadge } from "@/components/ui/status-badge";
 import type { DashboardMetric, DashboardTask } from "@/types/lms";
@@ -28,35 +29,65 @@ type Action = {
 
 const actionByRole: Record<UserRole, Action[]> = {
   student: [
-    { href: "/student/assignments", label: "Lihat tugas", description: "Periksa instruksi, deadline, dan status pengumpulan.", icon: ClipboardList },
-    { href: "/student/exams", label: "Buka ujian", description: "Lihat assessment yang tersedia dan status attempt.", icon: GraduationCap },
-    { href: "/student/materials", label: "Lanjutkan materi", description: "Akses materi yang tersedia di course Anda.", icon: BookOpenText },
+    {
+      href: "/student/assignments",
+      label: "Lihat tugas",
+      description: "Periksa instruksi, deadline, dan status pengumpulan.",
+      icon: ClipboardList,
+    },
+    {
+      href: "/student/exams",
+      label: "Buka ujian",
+      description: "Periksa jadwal ujian dan lanjutkan pengerjaan.",
+      icon: GraduationCap,
+    },
+    {
+      href: "/student/materials",
+      label: "Lanjutkan materi",
+      description: "Akses materi yang tersedia di course Anda.",
+      icon: BookOpenText,
+    },
   ],
   teacher: [
-    { href: "/teacher/assignments", label: "Kelola tugas", description: "Buat, publikasikan, dan nilai pengumpulan siswa.", icon: ClipboardList },
-    { href: "/teacher/exams", label: "Kelola ujian", description: "Atur assessment dan publikasi ujian per course.", icon: GraduationCap },
-    { href: "/teacher/results", label: "Tinjau hasil", description: "Periksa nilai dan publikasikan hasil yang siap dibagikan.", icon: School },
+    {
+      href: "/teacher/assignments",
+      label: "Kelola tugas",
+      description: "Buat, publikasikan, dan nilai pengumpulan siswa.",
+      icon: ClipboardList,
+    },
+    {
+      href: "/teacher/exams",
+      label: "Kelola ujian",
+      description: "Siapkan jadwal, soal, dan peserta ujian.",
+      icon: GraduationCap,
+    },
+    {
+      href: "/teacher/results",
+      label: "Tinjau hasil",
+      description: "Periksa nilai dan publikasikan hasil yang siap dibagikan.",
+      icon: School,
+    },
   ],
   admin: [
-    { href: "/admin/users", label: "Kelola pengguna", description: "Atur akun dan akses guru maupun siswa.", icon: UsersRound },
-    { href: "/admin/academics", label: "Perbarui akademik", description: "Kelola struktur tahun ajaran, kelas, dan course.", icon: School },
-    { href: "/admin/monitoring", label: "Pantau ujian", description: "Tinjau status peserta pada ujian yang sedang berjalan.", icon: GraduationCap },
+    {
+      href: "/admin/users",
+      label: "Kelola pengguna",
+      description: "Atur akun dan akses guru maupun siswa.",
+      icon: UsersRound,
+    },
+    {
+      href: "/admin/academics",
+      label: "Perbarui akademik",
+      description: "Kelola struktur tahun ajaran, kelas, dan course.",
+      icon: School,
+    },
+    {
+      href: "/admin/monitoring",
+      label: "Pantau ujian",
+      description: "Tinjau status peserta pada ujian yang sedang berjalan.",
+      icon: GraduationCap,
+    },
   ],
-};
-
-const dashboardCopy: Record<UserRole, { title: string; description: string }> = {
-  student: {
-    title: "Ringkasan belajar",
-    description: "Mulai dari pekerjaan yang perlu Anda selesaikan, lalu gunakan ringkasan ini untuk melihat kondisi pembelajaran saat ini.",
-  },
-  teacher: {
-    title: "Ringkasan pengajaran",
-    description: "Akses pekerjaan inti terlebih dahulu, kemudian gunakan ringkasan untuk memantau aktivitas dalam scope course Anda.",
-  },
-  admin: {
-    title: "Ringkasan operasional",
-    description: "Mulai dari administrasi yang perlu ditindaklanjuti dan gunakan ringkasan untuk memantau kondisi LMS.",
-  },
 };
 
 const taskConfig: Record<
@@ -116,7 +147,122 @@ function taskCountLabel(task: DashboardTask) {
   if (!task.count) return null;
   if (task.kind === "grading") return `${task.count} pengumpulan`;
   if (task.kind === "results") return `${task.count} hasil`;
-  return `${task.count} attempt aktif`;
+  return `${task.count} sesi aktif`;
+}
+
+function PriorityQueue({
+  tasks,
+  role,
+}: {
+  tasks: DashboardTask[];
+  role: UserRole;
+}) {
+  return (
+    <section
+      className="workspace-section"
+      aria-labelledby="priority-work-title"
+    >
+      <div className="workspace-section-header">
+        <div>
+          <h2 id="priority-work-title" className="section-title">
+            {role === "student"
+              ? "Langkah belajar berikutnya"
+              : role === "teacher"
+                ? "Perlu ditindaklanjuti"
+                : "Antrean operasional"}
+          </h2>
+          <p className="section-description">
+            Diurutkan berdasarkan waktu dan pekerjaan yang memerlukan perhatian.
+          </p>
+        </div>
+        <span className="count-label shrink-0">{tasks.length} prioritas</span>
+      </div>
+      <div className="workspace-section-body task-list">
+        {tasks.length ? (
+          tasks.map((task) => {
+            const config = taskConfig[task.kind];
+            const status = statusConfig[task.status];
+            const Icon = config.icon;
+            const href =
+              task.kind === "monitoring" && role === "teacher"
+                ? "/teacher/monitoring"
+                : config.href;
+            return (
+              <Link
+                key={task.kind + "-" + task.id}
+                href={href}
+                className="task-list-item group"
+              >
+                <span className="metric-icon shrink-0">
+                  <Icon aria-hidden="true" size={18} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="task-category">
+                    {config.label} · {task.context}
+                  </span>
+                  <span className="mt-1 block text-sm font-semibold leading-6 text-foreground">
+                    {task.title}
+                  </span>
+                  <span className="mt-2 flex flex-wrap items-center gap-2">
+                    <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
+                    <span className="text-xs leading-5 text-muted">
+                      {[taskCountLabel(task), taskTimeLabel(task)]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </span>
+                  </span>
+                </span>
+                <ArrowRight
+                  className="shrink-0 text-muted"
+                  aria-hidden="true"
+                  size={17}
+                />
+              </Link>
+            );
+          })
+        ) : (
+          <EmptyState
+            title={
+              role === "student"
+                ? "Tidak ada tenggat yang perlu dikejar"
+                : "Tidak ada pekerjaan mendesak"
+            }
+            description="Antrean prioritas saat ini kosong. Anda tetap dapat membuka materi, ujian, atau area kerja melalui menu yang tersedia."
+          />
+        )}
+      </div>
+    </section>
+  );
+}
+
+function QuickActions({ role }: { role: UserRole }) {
+  return (
+    <nav
+      className="quick-action-grid"
+      aria-label={
+        role === "student"
+          ? "Akses cepat pembelajaran"
+          : "Akses cepat area kerja"
+      }
+    >
+      {actionByRole[role].map(({ href, label, description, icon: Icon }) => (
+        <Link key={href} href={href} className="quick-action-card">
+          <span className="quick-action-card-top">
+            <span className="quick-action-icon">
+              <Icon size={21} aria-hidden="true" />
+            </span>
+            <ArrowRight
+              size={18}
+              aria-hidden="true"
+              className="quick-action-arrow"
+            />
+          </span>
+          <span className="quick-action-title">{label}</span>
+          <span className="quick-action-description">{description}</span>
+        </Link>
+      ))}
+    </nav>
+  );
 }
 
 export function DashboardWorkspace({
@@ -128,88 +274,47 @@ export function DashboardWorkspace({
   metrics: DashboardMetric[];
   tasks: DashboardTask[];
 }) {
-  const copy = dashboardCopy[role];
-  const actions = actionByRole[role];
-
+  const overview = {
+    admin: {
+      title: "Ringkasan akademik",
+      description: "Gambaran pengguna, course, dan pelaksanaan ujian sekolah.",
+    },
+    teacher: {
+      title: "Ringkasan pengajaran",
+      description:
+        "Pantau course, kesiapan soal, dan hasil yang perlu Anda publikasikan.",
+    },
+    student: {
+      title: "Ringkasan belajar",
+      description:
+        "Lihat pembelajaran yang diikuti, ujian tersedia, dan progres Anda.",
+    },
+  }[role];
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(20rem,.8fr)]">
-      <section className="workspace-section" aria-labelledby="priority-work-title">
-        <div className="workspace-section-header">
-          <div>
-            <h2 id="priority-work-title" className="section-title">Prioritas kerja</h2>
-            <p className="section-description">Hal yang paling dekat waktunya atau masih memerlukan tindakan Anda.</p>
-          </div>
+    <div className="dashboard-composition" data-role={role}>
+      <section
+        className="dashboard-kpis"
+        aria-labelledby="dashboard-kpi-heading"
+      >
+        <div className="dashboard-overview-heading">
+          <h2 id="dashboard-kpi-heading" className="section-title">
+            {overview.title}
+          </h2>
+          <p className="section-description">{overview.description}</p>
         </div>
-        <div className="workspace-section-body task-list">
-          {tasks.length ? (
-            tasks.map((task) => {
-              const config = taskConfig[task.kind];
-              const status = statusConfig[task.status];
-              const Icon = config.icon;
-              const timeLabel = taskTimeLabel(task);
-              const countLabel = taskCountLabel(task);
-              return (
-                <Link key={`${task.kind}-${task.id}`} href={config.href} className="task-list-item group">
-                  <span className="metric-icon size-10 rounded-[var(--radius-sm)]">
-                    <Icon aria-hidden="true" size={18} />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="flex flex-wrap items-center gap-2">
-                      <span className="text-xs font-semibold text-muted">{config.label}</span>
-                      <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
-                    </span>
-                    <span className="mt-1 block truncate text-sm font-semibold text-foreground">{task.title}</span>
-                    <span className="mt-1 block text-xs leading-5 text-muted">
-                      {[task.context, countLabel, timeLabel].filter(Boolean).join(" · ")}
-                    </span>
-                  </span>
-                  <ArrowRight className="shrink-0 text-muted transition-transform group-hover:translate-x-1" aria-hidden="true" size={17} />
-                </Link>
-              );
-            })
-          ) : (
-            <EmptyState
-              title="Tidak ada pekerjaan mendesak"
-              description="Antrean prioritas Anda sedang bersih. Gunakan akses cepat untuk membuka area kerja lainnya."
-            />
-          )}
-        </div>
-      </section>
-
-      <section className="workspace-section" aria-labelledby="dashboard-summary-title">
-        <div className="workspace-section-header">
-          <div>
-            <h2 id="dashboard-summary-title" className="section-title">{copy.title}</h2>
-            <p className="section-description">{copy.description}</p>
-          </div>
-        </div>
-        <div className="workspace-section-body">
+        {metrics.length ? (
           <MetricGrid metrics={metrics} />
-        </div>
+        ) : (
+          <EmptyState
+            title="Ringkasan belum tersedia"
+            description="Belum ada metrik yang dapat ditampilkan untuk akun ini."
+          />
+        )}
       </section>
-
-      <section className="workspace-section xl:col-span-2" aria-labelledby="next-actions-title">
-        <div className="workspace-section-header">
-          <div>
-            <h2 id="next-actions-title" className="section-title">Akses cepat</h2>
-            <p className="section-description">Buka area kerja utama sesuai tanggung jawab akun Anda.</p>
-          </div>
-        </div>
-        <div className="grid divide-y divide-border md:grid-cols-3 md:divide-x md:divide-y-0">
-          {actions.map(({ href, label, description, icon: Icon }) => (
-            <Link key={href} href={href} className="group flex items-center justify-between gap-4 p-5">
-              <span className="flex min-w-0 items-center gap-3">
-                <span className="metric-icon size-10 rounded-[var(--radius-sm)]"><Icon aria-hidden="true" size={18} /></span>
-                <span className="min-w-0">
-                  <span className="block text-sm font-semibold text-foreground">{label}</span>
-                  <span className="mt-1 block text-xs leading-5 text-muted">{description}</span>
-                </span>
-              </span>
-              <ArrowRight className="shrink-0 text-muted transition-transform group-hover:translate-x-1" aria-hidden="true" size={17} />
-            </Link>
-          ))}
-        </div>
-      </section>
+      {role === "student" ? <PriorityQueue tasks={tasks} role={role} /> : null}
+      <QuickActions role={role} />
+      <DashboardInsightsWorkspace role={role} />
+      {role !== "student" ? <PriorityQueue tasks={tasks} role={role} /> : null}
     </div>
   );
 }

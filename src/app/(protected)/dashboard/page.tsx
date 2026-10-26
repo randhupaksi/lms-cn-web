@@ -4,22 +4,50 @@ import { useAuth } from "@/providers/auth-provider";
 import { ErrorState, LoadingState } from "@/components/data-state";
 import { useDashboardSummary } from "@/features/analytics/use-analytics";
 import { DashboardWorkspace } from "@/features/analytics/components/dashboard-workspace";
-import { PageHeader } from "@/components/ui/page-header";
-import { LayoutDashboard } from "lucide-react";
+import { DashboardHeader } from "@/features/analytics/components/dashboard-header";
+import { RefreshCw } from "lucide-react";
+import { useIsFetching, useQueryClient } from "@tanstack/react-query";
+import { ActionButton } from "@/components/ui/action-button";
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const summary = useDashboardSummary();
+  const queryClient = useQueryClient();
+  const refreshing =
+    useIsFetching({ queryKey: ["dashboard-summary"] }) +
+      useIsFetching({ queryKey: ["dashboard-insights"] }) >
+    0;
+  if (!user) return null;
   return (
     <section className="space-y-8">
-      <PageHeader
-        eyebrow="Dashboard"
-        title="Dashboard"
-        description="Prioritaskan pekerjaan yang perlu diselesaikan, lalu pantau aktivitas sesuai peran dan scope akun Anda."
-        icon={LayoutDashboard}
+      <DashboardHeader
+        role={user.role}
+        name={user.full_name}
+        refreshAction={
+          <ActionButton
+            icon={RefreshCw}
+            label="Perbarui data dashboard"
+            pending={refreshing}
+            onClick={() => {
+              void Promise.all([
+                queryClient.invalidateQueries({
+                  queryKey: ["dashboard-summary"],
+                }),
+                queryClient.invalidateQueries({
+                  queryKey: ["dashboard-insights"],
+                }),
+              ]);
+            }}
+          />
+        }
       />
       {summary.isLoading && <LoadingState label="Menyiapkan ringkasan…" />}
-      {summary.isError && <ErrorState label="Ringkasan belum dapat dimuat." onRetry={() => void summary.refetch()} />}
+      {summary.isError && (
+        <ErrorState
+          label="Ringkasan belum dapat dimuat."
+          onRetry={() => void summary.refetch()}
+        />
+      )}
       {summary.data && user ? (
         <DashboardWorkspace
           role={user.role}

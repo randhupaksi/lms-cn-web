@@ -14,3 +14,10 @@ export function useExamAnalytics(examId: string) {
     enabled: Boolean(examId),
   });
 }
+
+export function useDashboardInsights() {
+  return useQuery({
+    queryKey: ["dashboard-insights"],
+    queryFn: service.getDashboardInsights,
+  });
+}

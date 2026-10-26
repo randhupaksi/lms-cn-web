@@ -233,6 +233,29 @@ export type DashboardSummary = {
   tasks: DashboardTask[];
 };
 
+export type DashboardInsights = {
+  generated_at: string;
+  timezone: string;
+  starts_on: string;
+  ends_on: string;
+  metrics: DashboardMetric[];
+  activity: {
+    date: string;
+    exam_submissions: number;
+    assignment_submissions: number;
+  }[];
+  distribution_title: string;
+  distribution: { key: string; label: string; value: number }[];
+  learning_progress?: { completed: number; total: number };
+  recent_results: {
+    id: string;
+    title: string;
+    course_name: string;
+    percentage: number;
+    published_at: string;
+  }[];
+};
+
 export type ExamItemAnalysis = {
   question_id: string;
   stem: string;
