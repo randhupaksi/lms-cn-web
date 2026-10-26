@@ -43,9 +43,9 @@ export function ChangePasswordWorkspace() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <PageHeader
-        eyebrow="Account security"
+        eyebrow="Akun · Kata sandi"
         title="Perbarui kata sandi"
-        description="Credential sementara harus diganti sebelum akun dapat menggunakan fitur LMS."
+        description="Gunakan kata sandi pribadi yang berbeda dari akun lain. Kata sandi sementara perlu diganti sebelum menggunakan LMS."
         icon={KeyRound}
       />
       <form className="panel space-y-4" onSubmit={submit}>

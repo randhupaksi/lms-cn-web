@@ -24,8 +24,7 @@ export function UserCreateForm() {
   }
 
   return (
-    <section className="panel">
-      <h2 className="section-title">Tambah pengguna</h2>
+    <div>
       <form className="mt-5 grid gap-4 md:grid-cols-2" onSubmit={submit}>
         <label className="field-label">
           NIS, NIP, atau username
@@ -55,9 +54,14 @@ export function UserCreateForm() {
           Peran
           <RadixSelectField
             value={form.role}
-            onValueChange={(value) => setForm({ ...form, role: value as Exclude<UserRole, "admin"> })}
+            onValueChange={(value) =>
+              setForm({ ...form, role: value as Exclude<UserRole, "admin"> })
+            }
             placeholder="Pilih peran"
-            options={[{ value: "student", label: "Siswa" }, { value: "teacher", label: "Guru" }]}
+            options={[
+              { value: "student", label: "Siswa" },
+              { value: "teacher", label: "Guru" },
+            ]}
           />
         </label>
         <label className="field-label">
@@ -87,6 +91,6 @@ export function UserCreateForm() {
         errorMessage="Pengguna belum dapat dibuat. Periksa kembali data."
         successMessage="Pengguna berhasil ditambahkan dan siap menerima credential sementara."
       />
-    </section>
+    </div>
   );
 }

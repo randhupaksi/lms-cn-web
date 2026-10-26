@@ -35,7 +35,9 @@ export function LoginWorkspace() {
     setLoading(true);
     try {
       const user = await login({ identifier, password });
-      router.replace(user.must_change_password ? "/change-password" : "/dashboard");
+      router.replace(
+        user.must_change_password ? "/change-password" : "/dashboard",
+      );
     } catch {
       setError("Identitas atau kata sandi tidak valid.");
     } finally {
@@ -45,37 +47,45 @@ export function LoginWorkspace() {
 
   return (
     <main className="login-canvas">
-      <section className="login-brand-panel p-10 xl:p-16" aria-label="Tentang Citra Negara LMS">
-        <div className="relative z-10 flex w-full max-w-xl flex-col justify-between">
+      <section
+        className="login-brand-panel"
+        aria-label="Tentang Citra Negara LMS"
+      >
+        <div className="login-brand-content">
           <div className="flex items-center gap-4">
-            <div className="workspace-brand-mark size-16 text-base">CN</div>
+            <span className="workspace-brand-mark">
+              <GraduationCap aria-hidden="true" size={24} />
+            </span>
             <div>
-              <p className="text-lg font-bold">Citra Negara LMS</p>
-              <p className="mt-1 text-sm text-white/70">Learning Management System</p>
+              <p className="text-base font-semibold">Citra Negara</p>
+              <p className="login-brand-caption mt-1">
+                Learning Management System
+              </p>
             </div>
           </div>
-
-          <div className="my-16">
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-white/64">Portal akademik terpadu</p>
-            <h1 className="mt-5 max-w-lg text-4xl font-bold leading-tight tracking-[-0.045em] xl:text-5xl">
-              Belajar, mengajar, dan mengevaluasi dalam satu alur yang tenang.
-            </h1>
-            <p className="mt-5 max-w-lg text-base leading-8 text-white/72">
-              Ruang kerja resmi Citra Negara untuk membantu guru dan siswa menjalankan aktivitas pembelajaran secara terarah.
+          <div className="login-brand-statement">
+            <p className="login-brand-caption mb-5">RUANG AKADEMIK DIGITAL</p>
+            <h2 className="login-brand-title">
+              Tempat belajar.
+              <br />
+              Ruang bertumbuh.
+            </h2>
+            <p className="mt-6 max-w-md text-sm leading-7 opacity-90">
+              Materi, tugas, dan evaluasi yang terhubung untuk mendampingi
+              proses belajar di Citra Negara.
             </p>
-
-            <div className="mt-9 space-y-3">
+            <div className="mt-10">
               {benefits.map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/8 px-4 py-3.5">
-                  <span className="grid size-10 place-items-center rounded-xl bg-white/10">
-                    <Icon aria-hidden="true" size={18} />
-                  </span>
-                  <p className="text-sm font-semibold text-white/86">{label}</p>
+                <div key={label} className="login-benefit">
+                  <Icon aria-hidden="true" size={19} />
+                  <p className="text-sm">{label}</p>
                 </div>
               ))}
             </div>
           </div>
-
+          <p className="login-brand-caption">
+            Portal resmi pembelajaran Citra Negara
+          </p>
         </div>
       </section>
 
@@ -84,14 +94,18 @@ export function LoginWorkspace() {
           <div className="mb-8 flex items-center gap-3 lg:hidden">
             <span className="workspace-user-avatar size-12">CN</span>
             <div>
-              <p className="text-sm font-bold text-foreground">Citra Negara LMS</p>
+              <p className="text-sm font-bold text-foreground">
+                Citra Negara LMS
+              </p>
               <p className="text-xs text-muted">Portal akademik sekolah</p>
             </div>
           </div>
 
           <div className="mb-8">
-            <p className="eyebrow"><ShieldCheck size={14} /> Akses akun</p>
-            <h1 className="page-title mt-3">Selamat datang kembali</h1>
+            <p className="eyebrow">
+              <ShieldCheck size={14} /> Akses akun
+            </p>
+            <h1 className="page-title mt-3">Selamat datang</h1>
             <p className="page-description mt-2">
               Masukkan NIS, NIP, atau username yang telah terdaftar.
             </p>
@@ -104,7 +118,7 @@ export function LoginWorkspace() {
                 className="field-input"
                 value={identifier}
                 onChange={(event) => setIdentifier(event.target.value)}
-                placeholder="Contoh: 20240017 atau guru.matematika"
+                placeholder="NIS, NIP, atau username"
                 autoComplete="username"
                 required
               />
@@ -125,8 +139,13 @@ export function LoginWorkspace() {
                 <button
                   type="button"
                   className="absolute inset-y-0 right-1 my-auto grid size-10 place-items-center rounded-xl text-muted transition-colors hover:bg-primary-soft hover:text-primary"
+                  aria-pressed={showPassword}
                   onClick={() => setShowPassword((value) => !value)}
-                  aria-label={showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
+                  aria-label={
+                    showPassword
+                      ? "Sembunyikan kata sandi"
+                      : "Tampilkan kata sandi"
+                  }
                 >
                   {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                 </button>
@@ -134,7 +153,10 @@ export function LoginWorkspace() {
             </label>
 
             {error || sessionMessage ? (
-              <div className="flex items-start gap-3 rounded-2xl border border-danger/20 bg-danger-soft px-4 py-3 text-sm text-danger" role="alert">
+              <div
+                className="flex items-start gap-3 rounded-2xl border border-danger/20 bg-danger-soft px-4 py-3 text-sm text-danger"
+                role="alert"
+              >
                 <LockKeyhole className="mt-0.5 shrink-0" size={17} />
                 <p>{error ?? sessionMessage}</p>
               </div>
@@ -144,9 +166,13 @@ export function LoginWorkspace() {
               <LogIn size={17} /> {loading ? "Memverifikasi…" : "Masuk ke LMS"}
             </Button>
           </form>
+          <p className="login-help">
+            Belum memiliki akun atau mengalami kendala masuk? Hubungi
+            administrator sekolah untuk bantuan akses.
+          </p>
 
           <div className="mt-6 flex items-center justify-center gap-2 border-t border-border pt-5 text-xs text-muted">
-            <LockKeyhole size={14} /> Sesi dilindungi dan dikelola oleh server.
+            <LockKeyhole size={14} /> Gunakan akun yang diberikan sekolah.
           </div>
         </div>
       </section>

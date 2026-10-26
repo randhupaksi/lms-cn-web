@@ -1,4 +1,6 @@
 "use client";
+import { ActionButton } from "@/components/ui/action-button";
+import { KeyRound, UserRoundMinus, UserRoundCheck } from "lucide-react";
 
 import { useState, type FormEvent } from "react";
 import {
@@ -14,12 +16,12 @@ import { Button } from "@/components/ui/button";
 
 export function UserDirectory() {
   const [search, setSearch] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("all");
   const [page, setPage] = useState(1);
   const [resetUserId, setResetUserId] = useState<string | null>(null);
   const [resetPassword, setResetPassword] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const users = useUsers({ search, role, page });
+  const users = useUsers({ search, role: role === "all" ? "" : role, page });
   const toggle = useToggleUser();
   const resetCredential = useResetCredential();
 
@@ -28,12 +30,12 @@ export function UserDirectory() {
     if (!resetUserId) return;
     resetCredential.mutate(
       { id: resetUserId, password: resetPassword },
-        {
-          onSuccess: () => {
-            setResetUserId(null);
-            setResetPassword("");
-            setSuccessMessage("Kata sandi sementara berhasil diperbarui.");
-          },
+      {
+        onSuccess: () => {
+          setResetUserId(null);
+          setResetPassword("");
+          setSuccessMessage("Kata sandi sementara berhasil diperbarui.");
+        },
       },
     );
   }
@@ -44,7 +46,7 @@ export function UserDirectory() {
         <div>
           <h2 className="section-title">Daftar pengguna</h2>
           <p className="mt-1 text-xs text-muted">
-            {users.data?.meta.total ?? 0} akun
+            {users.data?.meta.total ?? "—"} akun
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -66,7 +68,11 @@ export function UserDirectory() {
               setPage(1);
             }}
             placeholder="Semua peran"
-            options={[{ value: "teacher", label: "Guru" }, { value: "student", label: "Siswa" }]}
+            options={[
+              { value: "all", label: "Semua peran" },
+              { value: "teacher", label: "Guru" },
+              { value: "student", label: "Siswa" },
+            ]}
             ariaLabel="Filter pengguna berdasarkan peran"
             className="w-36"
           />
@@ -80,7 +86,7 @@ export function UserDirectory() {
               <th>Identitas</th>
               <th>Peran</th>
               <th>Status</th>
-              <th className="text-right">Aksi</th>
+              <th className="action-column">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -98,30 +104,40 @@ export function UserDirectory() {
                 </td>
                 <td>
                   <div className="flex justify-end gap-1">
-                    <Button
-                      variant="ghost"
-                      size="compact"
+                    <ActionButton
+                      icon={KeyRound}
+                      label={`Atur ulang kata sandi ${user.full_name}`}
                       onClick={() => {
                         setResetUserId(user.id);
                         setResetPassword("");
                         setSuccessMessage("");
                       }}
-                    >
-                      Reset kata sandi
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="compact"
-                      onClick={() =>
-                        toggle.mutate({
-                          id: user.id,
-                          status:
-                            user.status === "active" ? "inactive" : "active",
-                        }, { onSuccess: () => setSuccessMessage(`Status akun ${user.full_name} berhasil diperbarui.`) })
+                    />
+                    <ActionButton
+                      icon={
+                        user.status === "active"
+                          ? UserRoundMinus
+                          : UserRoundCheck
                       }
-                    >
-                      {user.status === "active" ? "Nonaktifkan" : "Aktifkan"}
-                    </Button>
+                      label={`${user.status === "active" ? "Nonaktifkan" : "Aktifkan"} akun ${user.full_name}`}
+                      tone={user.status === "active" ? "danger" : "neutral"}
+                      pending={toggle.isPending}
+                      onClick={() =>
+                        toggle.mutate(
+                          {
+                            id: user.id,
+                            status:
+                              user.status === "active" ? "inactive" : "active",
+                          },
+                          {
+                            onSuccess: () =>
+                              setSuccessMessage(
+                                `Status akun ${user.full_name} berhasil diperbarui.`,
+                              ),
+                          },
+                        )
+                      }
+                    />
                   </div>
                 </td>
               </tr>
@@ -129,7 +145,9 @@ export function UserDirectory() {
             {!users.isLoading && users.data?.data.length === 0 && (
               <tr>
                 <td colSpan={5} className="empty-cell">
-                  Belum ada pengguna.
+                  {search || role !== "all"
+                    ? "Tidak ada pengguna yang sesuai. Ubah pencarian atau pilih semua peran."
+                    : "Belum ada pengguna. Tambahkan akun melalui tombol Tambah pengguna."}
                 </td>
               </tr>
             )}
@@ -143,8 +161,12 @@ export function UserDirectory() {
             {users.isError ? (
               <tr>
                 <td colSpan={5} className="empty-cell text-danger" role="alert">
-                  Daftar pengguna belum dapat dimuat.{' '}
-                  <Button variant="ghost" size="compact" onClick={() => void users.refetch()}>
+                  Daftar pengguna belum dapat dimuat.{" "}
+                  <Button
+                    variant="ghost"
+                    size="compact"
+                    onClick={() => void users.refetch()}
+                  >
                     Coba lagi
                   </Button>
                 </td>
@@ -168,14 +190,13 @@ export function UserDirectory() {
               value={resetPassword}
               placeholder="Masukkan kata sandi sementara baru"
               onChange={(event) => setResetPassword(event.target.value)}
-            required
-          />
-            <span className="text-xs font-normal leading-5 text-muted">Sesi aktif pengguna akan dicabut saat kata sandi diperbarui.</span>
+              required
+            />
+            <span className="text-xs font-normal leading-5 text-muted">
+              Sesi aktif pengguna akan dicabut saat kata sandi diperbarui.
+            </span>
           </label>
-          <Button
-            type="submit"
-            disabled={resetCredential.isPending}
-          >
+          <Button type="submit" disabled={resetCredential.isPending}>
             Simpan reset
           </Button>
           <Button
@@ -187,7 +208,14 @@ export function UserDirectory() {
           </Button>
         </form>
       )}
-      {successMessage ? <p className="border-t border-border px-4 py-3 text-sm font-medium text-success" role="status">{successMessage}</p> : null}
+      {successMessage ? (
+        <p
+          className="border-t border-border px-4 py-3 text-sm font-medium text-success"
+          role="status"
+        >
+          {successMessage}
+        </p>
+      ) : null}
       <div className="px-4">
         <AsyncFeedback
           error={resetCredential.error}
