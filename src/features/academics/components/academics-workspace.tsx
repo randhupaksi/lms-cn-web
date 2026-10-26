@@ -10,15 +10,17 @@ import {
   useCreateSubject,
 } from "@/features/academics/use-academics";
 import { CourseAssignments } from "@/features/academics/components/course-assignments";
+import { ErrorState, LoadingState } from "@/components/data-state";
 import { CourseTable } from "@/features/academics/components/course-table";
 import { PageHeader } from "@/components/ui/page-header";
-import { School } from "lucide-react";
+import { School, List, Layers, UsersRound } from "lucide-react";
 import { DatePickerField } from "@/components/ui/date-picker";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { AsyncFeedback } from "@/components/async-feedback";
 import { Button } from "@/components/ui/button";
 
 export function AcademicsWorkspace() {
+  const [view, setView] = useState("courses");
   const data = useAcademicData();
   const createYear = useCreateAcademicYear();
   const createClass = useCreateClassGroup();
@@ -55,244 +57,330 @@ export function AcademicsWorkspace() {
           description="Susun tahun ajaran, kelas, mata pelajaran, dan course sebagai fondasi seluruh aktivitas LMS."
           icon={School}
         />
-        <div className="grid gap-6 xl:grid-cols-2">
-          <section className="panel">
-            <h2 className="section-title">Tahun ajaran</h2>
-            <form
-              className="form-grid"
-              onSubmit={submit(() => createYear.mutate(year))}
+        <div
+          className="view-switcher"
+          role="group"
+          aria-label="Tampilan akademik"
+        >
+          {[
+            { key: "courses", label: "Daftar course", icon: List },
+            { key: "structure", label: "Struktur akademik", icon: Layers },
+            { key: "members", label: "Guru & siswa course", icon: UsersRound },
+          ].map(({ key, label, icon: Icon }) => (
+            <button
+              type="button"
+              key={key}
+              className={view === key ? "view-switcher-active" : ""}
+              aria-pressed={view === key}
+              onClick={() => setView(key)}
             >
-              <label className="field-label md:col-span-2">
-                Nama
-                <input
-                  className="field-input"
-                  value={year.name}
-                  onChange={(e) => setYear({ ...year, name: e.target.value })}
-                  placeholder="Contoh: Tahun Ajaran 2026/2027"
-                  required
-                />
-              </label>
-              <label className="field-label">
-                Mulai
-                <DatePickerField
-                  value={year.starts_on}
-                  onChange={(value) => setYear({ ...year, starts_on: value })}
-                  required
-                />
-              </label>
-              <label className="field-label">
-                Selesai
-                <DatePickerField
-                  value={year.ends_on}
-                  onChange={(value) => setYear({ ...year, ends_on: value })}
-                  required
-                />
-              </label>
-              <Button
-                type="submit"
-                className="md:col-span-2"
-                disabled={
-                  createYear.isPending ||
-                  !year.name ||
-                  !year.starts_on ||
-                  !year.ends_on
-                }
-              >
-                {createYear.isPending ? "Menyimpan…" : "Simpan tahun ajaran"}
-              </Button>
-              <div className="md:col-span-2">
-                <AsyncFeedback
-                  error={createYear.error}
-                  isError={createYear.isError}
-                  isSuccess={createYear.isSuccess}
-                  errorMessage="Tahun ajaran belum dapat disimpan."
-                  successMessage="Tahun ajaran berhasil disimpan."
-                />
-              </div>
-            </form>
-          </section>
-          <section className="panel">
-            <h2 className="section-title">Kelas</h2>
-            <form
-              className="form-grid"
-              onSubmit={submit(() => createClass.mutate(group))}
-            >
-              <label className="field-label md:col-span-2">
-                Tahun ajaran
-                <RadixSelectField
-                  value={group.academic_year_id}
-                  onValueChange={(value) => setGroup({ ...group, academic_year_id: value })}
-                  placeholder="Pilih tahun ajaran"
-                  options={data.years.data?.map((item) => ({ value: item.id, label: item.name })) ?? []}
-                />
-              </label>
-              <label className="field-label">
-                Nama kelas
-                <input
-                  className="field-input"
-                  value={group.name}
-                  onChange={(e) => setGroup({ ...group, name: e.target.value })}
-                  placeholder="Contoh: XII IPA 1"
-                  required
-                />
-              </label>
-              <label className="field-label">
-                Tingkat
-                <input
-                  className="field-input"
-                  type="number"
-                  min={1}
-                  max={12}
-                  value={group.grade_level}
-                  onChange={(e) =>
-                    setGroup({ ...group, grade_level: Number(e.target.value) })
-                  }
-                  placeholder="Contoh: 12"
-                  required
-                />
-              </label>
-              <Button
-                type="submit"
-                className="md:col-span-2"
-                disabled={
-                  createClass.isPending ||
-                  !group.academic_year_id ||
-                  !group.name
-                }
-              >
-                {createClass.isPending ? "Menyimpan…" : "Simpan kelas"}
-              </Button>
-              <div className="md:col-span-2">
-                <AsyncFeedback
-                  error={createClass.error}
-                  isError={createClass.isError}
-                  isSuccess={createClass.isSuccess}
-                  errorMessage="Kelas belum dapat disimpan."
-                  successMessage="Kelas berhasil disimpan."
-                />
-              </div>
-            </form>
-          </section>
-          <section className="panel">
-            <h2 className="section-title">Mata pelajaran</h2>
-            <form
-              className="form-grid"
-              onSubmit={submit(() => createSubject.mutate(subject))}
-            >
-              <label className="field-label">
-                Kode
-                <input
-                  className="field-input"
-                  value={subject.code}
-                  onChange={(e) =>
-                    setSubject({ ...subject, code: e.target.value })
-                  }
-                  placeholder="Contoh: MAT-XII"
-                  required
-                />
-              </label>
-              <label className="field-label">
-                Nama
-                <input
-                  className="field-input"
-                  value={subject.name}
-                  onChange={(e) =>
-                    setSubject({ ...subject, name: e.target.value })
-                  }
-                  placeholder="Contoh: Matematika"
-                  required
-                />
-              </label>
-              <Button
-                type="submit"
-                className="md:col-span-2"
-                disabled={createSubject.isPending || !subject.code || !subject.name}
-              >
-                {createSubject.isPending ? "Menyimpan…" : "Simpan mata pelajaran"}
-              </Button>
-              <div className="md:col-span-2">
-                <AsyncFeedback
-                  error={createSubject.error}
-                  isError={createSubject.isError}
-                  isSuccess={createSubject.isSuccess}
-                  errorMessage="Mata pelajaran belum dapat disimpan."
-                  successMessage="Mata pelajaran berhasil disimpan."
-                />
-              </div>
-            </form>
-          </section>
-          <section className="panel">
-            <h2 className="section-title">Course</h2>
-            <form
-              className="form-grid"
-              onSubmit={submit(() => createCourse.mutate(course))}
-            >
-              <label className="field-label md:col-span-2">
-                Nama course
-                <input
-                  className="field-input"
-                  value={course.name}
-                  onChange={(e) =>
-                    setCourse({ ...course, name: e.target.value })
-                  }
-                  placeholder="Contoh: Matematika XII IPA 1"
-                  required
-                />
-              </label>
-              <label className="field-label">
-                Tahun ajaran
-                <RadixSelectField
-                  value={course.academic_year_id}
-                  onValueChange={(value) => setCourse({ ...course, academic_year_id: value })}
-                  placeholder="Pilih tahun ajaran"
-                  options={data.years.data?.map((item) => ({ value: item.id, label: item.name })) ?? []}
-                />
-              </label>
-              <label className="field-label">
-                Kelas
-                <RadixSelectField
-                  value={course.class_group_id}
-                  onValueChange={(value) => setCourse({ ...course, class_group_id: value })}
-                  placeholder="Pilih kelas"
-                  options={data.classes.data?.map((item) => ({ value: item.id, label: item.name })) ?? []}
-                />
-              </label>
-              <label className="field-label md:col-span-2">
-                Mata pelajaran
-                <RadixSelectField
-                  value={course.subject_id}
-                  onValueChange={(value) => setCourse({ ...course, subject_id: value })}
-                  placeholder="Pilih mata pelajaran"
-                  options={data.subjects.data?.map((item) => ({ value: item.id, label: `${item.code} — ${item.name}` })) ?? []}
-                />
-              </label>
-              <Button
-                type="submit"
-                className="md:col-span-2"
-                disabled={
-                  createCourse.isPending ||
-                  !course.name ||
-                  !course.academic_year_id ||
-                  !course.class_group_id ||
-                  !course.subject_id
-                }
-              >
-                {createCourse.isPending ? "Menyimpan…" : "Simpan course"}
-              </Button>
-              <div className="md:col-span-2">
-                <AsyncFeedback
-                  error={createCourse.error}
-                  isError={createCourse.isError}
-                  isSuccess={createCourse.isSuccess}
-                  errorMessage="Course belum dapat disimpan."
-                  successMessage="Course berhasil disimpan."
-                />
-              </div>
-            </form>
-          </section>
+              <Icon size={16} aria-hidden="true" />
+              {label}
+            </button>
+          ))}
         </div>
-        <CourseAssignments />
-        <CourseTable />
+        {view === "courses" ? <CourseTable /> : null}
+        {view === "structure" ? (
+          <div className="space-y-5">
+            {Object.values(data).some((query) => query.isLoading) ? (
+              <LoadingState label="Memuat struktur akademik…" />
+            ) : null}
+            {Object.values(data).some((query) => query.isError) ? (
+              <ErrorState
+                label="Sebagian struktur akademik belum dapat dimuat."
+                onRetry={() => {
+                  Object.values(data)
+                    .filter((query) => query.isError)
+                    .forEach((query) => void query.refetch());
+                }}
+              />
+            ) : null}
+            <p className="text-sm leading-6 text-muted">
+              Mulai dari tahun ajaran, kelas, dan mata pelajaran, lalu hubungkan
+              semuanya dalam course.
+            </p>
+            <div className="grid gap-6 xl:grid-cols-2">
+              <section className="panel">
+                <h2 className="section-title">Tahun ajaran</h2>
+                <form
+                  className="form-grid"
+                  onSubmit={submit(() => createYear.mutate(year))}
+                >
+                  <label className="field-label md:col-span-2">
+                    Nama
+                    <input
+                      className="field-input"
+                      value={year.name}
+                      onChange={(e) =>
+                        setYear({ ...year, name: e.target.value })
+                      }
+                      placeholder="Contoh: Tahun Ajaran 2026/2027"
+                      required
+                    />
+                  </label>
+                  <label className="field-label">
+                    Mulai
+                    <DatePickerField
+                      value={year.starts_on}
+                      onChange={(value) =>
+                        setYear({ ...year, starts_on: value })
+                      }
+                      required
+                    />
+                  </label>
+                  <label className="field-label">
+                    Selesai
+                    <DatePickerField
+                      value={year.ends_on}
+                      onChange={(value) => setYear({ ...year, ends_on: value })}
+                      required
+                    />
+                  </label>
+                  <Button
+                    type="submit"
+                    className="md:col-span-2"
+                    disabled={
+                      createYear.isPending ||
+                      !year.name ||
+                      !year.starts_on ||
+                      !year.ends_on
+                    }
+                  >
+                    {createYear.isPending
+                      ? "Menyimpan…"
+                      : "Simpan tahun ajaran"}
+                  </Button>
+                  <div className="md:col-span-2">
+                    <AsyncFeedback
+                      error={createYear.error}
+                      isError={createYear.isError}
+                      isSuccess={createYear.isSuccess}
+                      errorMessage="Tahun ajaran belum dapat disimpan."
+                      successMessage="Tahun ajaran berhasil disimpan."
+                    />
+                  </div>
+                </form>
+              </section>
+              <section className="panel">
+                <h2 className="section-title">Kelas</h2>
+                <form
+                  className="form-grid"
+                  onSubmit={submit(() => createClass.mutate(group))}
+                >
+                  <label className="field-label md:col-span-2">
+                    Tahun ajaran
+                    <RadixSelectField
+                      value={group.academic_year_id}
+                      onValueChange={(value) =>
+                        setGroup({ ...group, academic_year_id: value })
+                      }
+                      placeholder="Pilih tahun ajaran"
+                      options={
+                        data.years.data?.map((item) => ({
+                          value: item.id,
+                          label: item.name,
+                        })) ?? []
+                      }
+                    />
+                  </label>
+                  <label className="field-label">
+                    Nama kelas
+                    <input
+                      className="field-input"
+                      value={group.name}
+                      onChange={(e) =>
+                        setGroup({ ...group, name: e.target.value })
+                      }
+                      placeholder="Contoh: XII IPA 1"
+                      required
+                    />
+                  </label>
+                  <label className="field-label">
+                    Tingkat
+                    <input
+                      className="field-input"
+                      type="number"
+                      min={1}
+                      max={12}
+                      value={group.grade_level}
+                      onChange={(e) =>
+                        setGroup({
+                          ...group,
+                          grade_level: Number(e.target.value),
+                        })
+                      }
+                      placeholder="Contoh: 12"
+                      required
+                    />
+                  </label>
+                  <Button
+                    type="submit"
+                    className="md:col-span-2"
+                    disabled={
+                      createClass.isPending ||
+                      !group.academic_year_id ||
+                      !group.name
+                    }
+                  >
+                    {createClass.isPending ? "Menyimpan…" : "Simpan kelas"}
+                  </Button>
+                  <div className="md:col-span-2">
+                    <AsyncFeedback
+                      error={createClass.error}
+                      isError={createClass.isError}
+                      isSuccess={createClass.isSuccess}
+                      errorMessage="Kelas belum dapat disimpan."
+                      successMessage="Kelas berhasil disimpan."
+                    />
+                  </div>
+                </form>
+              </section>
+              <section className="panel">
+                <h2 className="section-title">Mata pelajaran</h2>
+                <form
+                  className="form-grid"
+                  onSubmit={submit(() => createSubject.mutate(subject))}
+                >
+                  <label className="field-label">
+                    Kode
+                    <input
+                      className="field-input"
+                      value={subject.code}
+                      onChange={(e) =>
+                        setSubject({ ...subject, code: e.target.value })
+                      }
+                      placeholder="Contoh: MAT-XII"
+                      required
+                    />
+                  </label>
+                  <label className="field-label">
+                    Nama
+                    <input
+                      className="field-input"
+                      value={subject.name}
+                      onChange={(e) =>
+                        setSubject({ ...subject, name: e.target.value })
+                      }
+                      placeholder="Contoh: Matematika"
+                      required
+                    />
+                  </label>
+                  <Button
+                    type="submit"
+                    className="md:col-span-2"
+                    disabled={
+                      createSubject.isPending || !subject.code || !subject.name
+                    }
+                  >
+                    {createSubject.isPending
+                      ? "Menyimpan…"
+                      : "Simpan mata pelajaran"}
+                  </Button>
+                  <div className="md:col-span-2">
+                    <AsyncFeedback
+                      error={createSubject.error}
+                      isError={createSubject.isError}
+                      isSuccess={createSubject.isSuccess}
+                      errorMessage="Mata pelajaran belum dapat disimpan."
+                      successMessage="Mata pelajaran berhasil disimpan."
+                    />
+                  </div>
+                </form>
+              </section>
+              <section className="panel">
+                <h2 className="section-title">Course</h2>
+                <form
+                  className="form-grid"
+                  onSubmit={submit(() => createCourse.mutate(course))}
+                >
+                  <label className="field-label md:col-span-2">
+                    Nama course
+                    <input
+                      className="field-input"
+                      value={course.name}
+                      onChange={(e) =>
+                        setCourse({ ...course, name: e.target.value })
+                      }
+                      placeholder="Contoh: Matematika XII IPA 1"
+                      required
+                    />
+                  </label>
+                  <label className="field-label">
+                    Tahun ajaran
+                    <RadixSelectField
+                      value={course.academic_year_id}
+                      onValueChange={(value) =>
+                        setCourse({ ...course, academic_year_id: value })
+                      }
+                      placeholder="Pilih tahun ajaran"
+                      options={
+                        data.years.data?.map((item) => ({
+                          value: item.id,
+                          label: item.name,
+                        })) ?? []
+                      }
+                    />
+                  </label>
+                  <label className="field-label">
+                    Kelas
+                    <RadixSelectField
+                      value={course.class_group_id}
+                      onValueChange={(value) =>
+                        setCourse({ ...course, class_group_id: value })
+                      }
+                      placeholder="Pilih kelas"
+                      options={
+                        data.classes.data?.map((item) => ({
+                          value: item.id,
+                          label: item.name,
+                        })) ?? []
+                      }
+                    />
+                  </label>
+                  <label className="field-label md:col-span-2">
+                    Mata pelajaran
+                    <RadixSelectField
+                      value={course.subject_id}
+                      onValueChange={(value) =>
+                        setCourse({ ...course, subject_id: value })
+                      }
+                      placeholder="Pilih mata pelajaran"
+                      options={
+                        data.subjects.data?.map((item) => ({
+                          value: item.id,
+                          label: `${item.code} — ${item.name}`,
+                        })) ?? []
+                      }
+                    />
+                  </label>
+                  <Button
+                    type="submit"
+                    className="md:col-span-2"
+                    disabled={
+                      createCourse.isPending ||
+                      !course.name ||
+                      !course.academic_year_id ||
+                      !course.class_group_id ||
+                      !course.subject_id
+                    }
+                  >
+                    {createCourse.isPending ? "Menyimpan…" : "Simpan course"}
+                  </Button>
+                  <div className="md:col-span-2">
+                    <AsyncFeedback
+                      error={createCourse.error}
+                      isError={createCourse.isError}
+                      isSuccess={createCourse.isSuccess}
+                      errorMessage="Course belum dapat disimpan."
+                      successMessage="Course berhasil disimpan."
+                    />
+                  </div>
+                </form>
+              </section>
+            </div>
+          </div>
+        ) : null}
+        {view === "members" ? <CourseAssignments /> : null}
       </div>
     </RoleBoundary>
   );
