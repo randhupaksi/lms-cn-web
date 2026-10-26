@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Settings2 } from "lucide-react";
+import { Settings2, ArrowLeft } from "lucide-react";
+import { MetricGrid } from "@/components/metric-grid";
 import { AsyncFeedback } from "@/components/async-feedback";
 import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
@@ -27,25 +28,45 @@ export function ExamConfigurationWorkspace({ examId }: { examId: string }) {
     per_page: 20,
   });
   const members = useCourseMembers(exam.data?.course_id ?? "");
-  const [questionChanges, setQuestionChanges] = useState<Record<string, number> | null>(null);
-  const [participantChanges, setParticipantChanges] = useState<string[] | null>(null);
-
-  const questionSelection = questionChanges ?? Object.fromEntries(
-    (exam.data?.questions ?? []).map((item) => [item.source_question_id, item.points]),
+  const [questionChanges, setQuestionChanges] = useState<Record<
+    string,
+    number
+  > | null>(null);
+  const [participantChanges, setParticipantChanges] = useState<string[] | null>(
+    null,
   );
-  const participantSelection = participantChanges ?? exam.data?.participant_ids ?? [];
+
+  const questionSelection =
+    questionChanges ??
+    Object.fromEntries(
+      (exam.data?.questions ?? []).map((item) => [
+        item.source_question_id,
+        item.points,
+      ]),
+    );
+  const participantSelection =
+    participantChanges ?? exam.data?.participant_ids ?? [];
   const matchingStudents = (members.data?.students ?? []).filter((student) =>
     `${student.full_name} ${student.identifier}`
       .toLocaleLowerCase()
       .includes(participantSearch.toLocaleLowerCase()),
   );
-  const students = matchingStudents.slice((participantPage - 1) * 20, participantPage * 20);
+  const students = matchingStudents.slice(
+    (participantPage - 1) * 20,
+    participantPage * 20,
+  );
 
   if (exam.isLoading) return <LoadingState label="Memuat konfigurasi ujian…" />;
   if (exam.isError || !exam.data) {
-    return <ErrorState label="Konfigurasi ujian belum dapat dimuat." onRetry={() => void exam.refetch()} />;
+    return (
+      <ErrorState
+        label="Konfigurasi ujian belum dapat dimuat."
+        onRetry={() => void exam.refetch()}
+      />
+    );
   }
 
+  const editable = exam.data.status === "draft";
   return (
     <RoleBoundary allow={["teacher"]}>
       <div className="space-y-8">
@@ -54,20 +75,74 @@ export function ExamConfigurationWorkspace({ examId }: { examId: string }) {
           title={exam.data.title}
           description="Perubahan soal dan peserta hanya diizinkan saat ujian masih draft dan belum memiliki attempt."
           icon={Settings2}
-          actions={<Link className="button-secondary" href="/teacher/exams">← Kembali</Link>}
+          actions={
+            <Link className="button-secondary" href="/teacher/exams">
+              <ArrowLeft size={16} aria-hidden="true" /> Daftar ujian
+            </Link>
+          }
         />
 
+        <MetricGrid
+          layout="strip"
+          metrics={[
+            {
+              key: "selected_questions",
+              label: "Soal dipilih",
+              value: Object.keys(questionSelection).length,
+            },
+            {
+              key: "selected_points",
+              label: "Total poin terpilih",
+              value: Object.values(questionSelection).reduce(
+                (sum, points) => sum + points,
+                0,
+              ),
+            },
+            {
+              key: "selected_participants",
+              label: "Peserta dipilih",
+              value: participantSelection.length,
+            },
+          ]}
+        />
+        {!editable ? (
+          <div className="context-note">
+            <p>
+              Ujian telah dipublikasikan. Susunan soal dan peserta ditampilkan
+              untuk ditinjau; perubahan hanya tersedia ketika ujian masih draft.
+            </p>
+          </div>
+        ) : null}
         <div className="grid gap-6 xl:grid-cols-2">
           <section className="panel" aria-labelledby="exam-question-heading">
-            <h2 id="exam-question-heading" className="section-title">Pilih soal</h2>
-            <label className="field-label mt-4">Cari soal
-              <input className="field-input" type="search" value={questionSearch} onChange={(event) => { setQuestionSearch(event.target.value); setQuestionPage(1); }} placeholder="Cari isi pertanyaan" />
+            <h2 id="exam-question-heading" className="section-title">
+              1. Susunan soal
+            </h2>
+            <label className="field-label mt-4">
+              Cari soal
+              <input
+                className="field-input"
+                type="search"
+                value={questionSearch}
+                onChange={(event) => {
+                  setQuestionSearch(event.target.value);
+                  setQuestionPage(1);
+                }}
+                placeholder="Cari isi pertanyaan"
+              />
             </label>
-            {questions.isLoading ? <LoadingState label="Memuat bank soal…" /> : null}
-            {questions.isError ? (
-              <ErrorState label="Bank soal belum dapat dimuat." onRetry={() => void questions.refetch()} />
+            {questions.isLoading ? (
+              <LoadingState label="Memuat bank soal…" />
             ) : null}
-            {!questions.isLoading && !questions.isError && questions.data?.data.length === 0 ? (
+            {questions.isError ? (
+              <ErrorState
+                label="Bank soal belum dapat dimuat."
+                onRetry={() => void questions.refetch()}
+              />
+            ) : null}
+            {!questions.isLoading &&
+            !questions.isError &&
+            questions.data?.data.length === 0 ? (
               <EmptyState
                 title="Belum ada soal siap pakai"
                 description="Tambahkan soal pada bank soal course ini sebelum menyusun ujian."
@@ -75,46 +150,79 @@ export function ExamConfigurationWorkspace({ examId }: { examId: string }) {
             ) : null}
             <div className="mt-4 space-y-3">
               {questions.data?.data.map((question) => (
-                <label className="selection-item flex items-start gap-3 p-3" key={question.id}>
-                  <input
-                    className="mt-1"
-                    type="checkbox"
-                    checked={question.id in questionSelection}
-                    onChange={(event) => {
-                      const next = { ...questionSelection };
-                      if (event.target.checked) next[question.id] = question.default_points;
-                      else delete next[question.id];
-                      setQuestionChanges(next);
-                    }}
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-semibold">{question.stem}</span>
-                    <span className="mt-1 block text-xs text-muted">Poin default: {question.default_points}</span>
-                  </span>
+                <div
+                  className="selection-item flex items-start gap-3 p-3"
+                  key={question.id}
+                >
+                  <label className="flex min-w-0 flex-1 items-start gap-3">
+                    <input
+                      className="mt-1"
+                      type="checkbox"
+                      disabled={!editable || configuration.questions.isPending}
+                      checked={question.id in questionSelection}
+                      onChange={(event) => {
+                        const next = { ...questionSelection };
+                        if (event.target.checked)
+                          next[question.id] = question.default_points;
+                        else delete next[question.id];
+                        setQuestionChanges(next);
+                      }}
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-semibold">
+                        {question.stem}
+                      </span>
+                      <span className="mt-1 block text-xs text-muted">
+                        Poin default: {question.default_points}
+                      </span>
+                    </span>
+                  </label>
                   {question.id in questionSelection ? (
                     <input
                       aria-label={`Poin untuk soal: ${question.stem}`}
                       className="field-input w-20"
                       type="number"
+                      disabled={!editable || configuration.questions.isPending}
                       min={0.1}
                       step={0.1}
                       value={questionSelection[question.id]}
-                      onChange={(event) => setQuestionChanges({ ...questionSelection, [question.id]: Number(event.target.value) })}
+                      onChange={(event) =>
+                        setQuestionChanges({
+                          ...questionSelection,
+                          [question.id]: Number(event.target.value),
+                        })
+                      }
                       placeholder={`Default ${question.default_points}`}
                     />
                   ) : null}
-                </label>
+                </div>
               ))}
             </div>
-            {questions.data ? <Pagination page={questionPage} totalPages={questions.data.meta.total_pages} onPageChange={setQuestionPage} /> : null}
+            {questions.data ? (
+              <Pagination
+                page={questionPage}
+                totalPages={questions.data.meta.total_pages}
+                onPageChange={setQuestionPage}
+              />
+            ) : null}
             <Button
               className="mt-5"
-              onClick={() => configuration.questions.mutate(
-                Object.entries(questionSelection).map(([question_id, points]) => ({ question_id, points })),
-              )}
-              disabled={configuration.questions.isPending || Object.keys(questionSelection).length === 0}
+              onClick={() =>
+                configuration.questions.mutate(
+                  Object.entries(questionSelection).map(
+                    ([question_id, points]) => ({ question_id, points }),
+                  ),
+                )
+              }
+              disabled={
+                !editable ||
+                configuration.questions.isPending ||
+                Object.keys(questionSelection).length === 0
+              }
             >
-              {configuration.questions.isPending ? "Menyimpan…" : "Simpan susunan soal"}
+              {configuration.questions.isPending
+                ? "Menyimpan…"
+                : "Simpan susunan soal"}
             </Button>
             <AsyncFeedback
               error={configuration.questions.error}
@@ -126,13 +234,30 @@ export function ExamConfigurationWorkspace({ examId }: { examId: string }) {
           </section>
 
           <section className="panel" aria-labelledby="exam-participant-heading">
-            <h2 id="exam-participant-heading" className="section-title">Pilih peserta</h2>
-            <label className="field-label mt-4">Cari siswa
-              <input className="field-input" type="search" value={participantSearch} onChange={(event) => { setParticipantSearch(event.target.value); setParticipantPage(1); }} placeholder="Nama atau identifier" />
+            <h2 id="exam-participant-heading" className="section-title">
+              2. Peserta ujian
+            </h2>
+            <label className="field-label mt-4">
+              Cari siswa
+              <input
+                className="field-input"
+                type="search"
+                value={participantSearch}
+                onChange={(event) => {
+                  setParticipantSearch(event.target.value);
+                  setParticipantPage(1);
+                }}
+                placeholder="Nama atau identifier"
+              />
             </label>
-            {members.isLoading ? <LoadingState label="Memuat peserta course…" /> : null}
+            {members.isLoading ? (
+              <LoadingState label="Memuat peserta course…" />
+            ) : null}
             {members.isError ? (
-              <ErrorState label="Peserta course belum dapat dimuat." onRetry={() => void members.refetch()} />
+              <ErrorState
+                label="Peserta course belum dapat dimuat."
+                onRetry={() => void members.refetch()}
+              />
             ) : null}
             {!members.isLoading && !members.isError && students.length === 0 ? (
               <EmptyState
@@ -142,30 +267,56 @@ export function ExamConfigurationWorkspace({ examId }: { examId: string }) {
             ) : null}
             <div className="mt-4 max-h-96 space-y-2 overflow-y-auto">
               {students.map((student) => (
-                <label className="selection-item flex items-center gap-3 p-3 text-sm" key={student.id}>
+                <label
+                  className="selection-item flex items-center gap-3 p-3 text-sm"
+                  key={student.id}
+                >
                   <input
                     type="checkbox"
+                    disabled={!editable || configuration.participants.isPending}
                     checked={participantSelection.includes(student.id)}
-                    onChange={(event) => setParticipantChanges(
-                      event.target.checked
-                        ? [...participantSelection, student.id]
-                        : participantSelection.filter((id) => id !== student.id),
-                    )}
+                    onChange={(event) =>
+                      setParticipantChanges(
+                        event.target.checked
+                          ? [...participantSelection, student.id]
+                          : participantSelection.filter(
+                              (id) => id !== student.id,
+                            ),
+                      )
+                    }
                   />
                   <span>
-                    <span className="block font-semibold">{student.full_name}</span>
-                    <span className="text-xs text-muted">{student.identifier}</span>
+                    <span className="block font-semibold">
+                      {student.full_name}
+                    </span>
+                    <span className="text-xs text-muted">
+                      {student.identifier}
+                    </span>
                   </span>
                 </label>
               ))}
             </div>
-            <Pagination page={participantPage} totalPages={Math.ceil(matchingStudents.length / 20)} onPageChange={setParticipantPage} />
+            <Pagination
+              page={participantPage}
+              totalPages={Math.ceil(matchingStudents.length / 20)}
+              onPageChange={setParticipantPage}
+            />
             <Button
               className="mt-5"
-              onClick={() => configuration.participants.mutate(participantSelection)}
-              disabled={configuration.participants.isPending || participantSelection.length === 0}
+              onClick={() =>
+                configuration.participants.mutate(participantSelection)
+              }
+              disabled={
+                !editable ||
+                configuration.participants.isPending ||
+                members.isLoading ||
+                members.isError ||
+                participantSelection.length === 0
+              }
             >
-              {configuration.participants.isPending ? "Menyimpan…" : "Simpan peserta"}
+              {configuration.participants.isPending
+                ? "Menyimpan…"
+                : "Simpan peserta"}
             </Button>
             <AsyncFeedback
               error={configuration.participants.error}
