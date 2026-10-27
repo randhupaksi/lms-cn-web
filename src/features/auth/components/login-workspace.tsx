@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/auth-provider";
+import { useSchoolProfile } from "@/providers/school-provider";
 
 const benefits = [
   { icon: BookOpenCheck, label: "Materi dan tugas dalam satu ruang belajar" },
@@ -21,6 +22,7 @@ const benefits = [
 ];
 
 export function LoginWorkspace() {
+  const school=useSchoolProfile();
   const router = useRouter();
   const { login, sessionMessage } = useAuth();
   const [identifier, setIdentifier] = useState("");
@@ -57,7 +59,7 @@ export function LoginWorkspace() {
               <GraduationCap aria-hidden="true" size={24} />
             </span>
             <div>
-              <p className="text-base font-semibold">Citra Negara</p>
+              <p className="text-base font-semibold">{school.school_name}</p>
               <p className="login-brand-caption mt-1">
                 Learning Management System
               </p>
@@ -167,8 +169,7 @@ export function LoginWorkspace() {
             </Button>
           </form>
           <p className="login-help">
-            Belum memiliki akun atau mengalami kendala masuk? Hubungi
-            administrator sekolah untuk bantuan akses.
+            {school.support_message}{school.contact_email&&<> <a href={`mailto:${school.contact_email}`}>{school.contact_email}</a></>}
           </p>
 
           <div className="mt-6 flex items-center justify-center gap-2 border-t border-border pt-5 text-xs text-muted">
