@@ -9,29 +9,51 @@ export function useUsers(params?: Parameters<typeof service.listUsers>[0]) {
   });
 }
 export function useCreateUser() {
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: service.createUser,
-    onSuccess: () => client.invalidateQueries({ queryKey: userKeys.all }),
-  });
+  return useGovernedUserMutation(service.createUser);
 }
 export function useToggleUser() {
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      id,
-      status,
-    }: {
-      id: string;
-      status: "active" | "inactive";
-    }) => service.updateUser(id, { status }),
-    onSuccess: () => client.invalidateQueries({ queryKey: userKeys.all }),
-  });
+  return useGovernedUserMutation(
+    ({ id, status }: { id: string; status: "active" | "inactive" }) =>
+      service.updateUser(id, { status }),
+  );
 }
 
 export function useResetCredential() {
-  return useMutation({
-    mutationFn: ({ id, password }: { id: string; password: string }) =>
+  return useGovernedUserMutation(
+    ({ id, password }: { id: string; password: string }) =>
       service.resetCredential(id, password),
+  );
+}
+
+export function useUserSessions(id: string) {
+  return useQuery({
+    queryKey: [...userKeys.all, id, "sessions"],
+    queryFn: () => service.listUserSessions(id),
+    enabled: Boolean(id),
   });
 }
+function useGovernedUserMutation<T>(
+  mutationFn: (input: T) => Promise<unknown>,
+) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn,
+    onSuccess: () =>
+      Promise.all([
+        client.invalidateQueries({ queryKey: userKeys.all }),
+        client.invalidateQueries({ queryKey: ["governance"] }),
+      ]),
+  });
+}
+export const useChangeUserRole = () =>
+  useGovernedUserMutation(service.changeUserRole);
+export const useRevokeUserSessions = () =>
+  useGovernedUserMutation(service.revokeUserSessions);
+export const useUpdateManagedUser = () =>
+  useGovernedUserMutation(
+    (input: { id: string; identifier: string; full_name: string }) =>
+      service.updateUser(input.id, {
+        identifier: input.identifier,
+        full_name: input.full_name,
+      }),
+  );

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 const initialForm = {
   identifier: "",
   full_name: "",
-  role: "student" as Exclude<UserRole, "admin">,
+  role: "student" as Extract<UserRole, "teacher" | "student">,
   temporary_password: "",
 };
 
@@ -55,7 +55,7 @@ export function UserCreateForm() {
           <RadixSelectField
             value={form.role}
             onValueChange={(value) =>
-              setForm({ ...form, role: value as Exclude<UserRole, "admin"> })
+              setForm({ ...form, role: value as Extract<UserRole, "teacher" | "student"> })
             }
             placeholder="Pilih peran"
             options={[

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../features/governance/governance.css";
 
 :root {
   --background: 60 14% 96%;
@@ -42,6 +43,8 @@
   --topbar-height: 4.5rem;
   --content-width: 90rem;
   --reading-width: 44rem;
+  --governance-aside-width: 22rem;
+  --governance-calendar-cell: 5.5rem;
   --control-height: 2.75rem;
   --space-1: 0.25rem;
   --space-2: 0.5rem;

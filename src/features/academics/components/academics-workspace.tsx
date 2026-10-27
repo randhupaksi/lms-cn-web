@@ -49,7 +49,7 @@ export function AcademicsWorkspace() {
     action();
   };
   return (
-    <RoleBoundary allow={["admin"]}>
+    <RoleBoundary allow={["superadmin", "admin"]}>
       <div className="space-y-8">
         <PageHeader
           eyebrow="Struktur akademik"

@@ -20,11 +20,17 @@ import {
   ShieldCheck,
   UsersRound,
   X,
+  CalendarDays,
+  ClipboardCheck,
+  Database,
+  Settings2,
+  ChartNoAxesCombined,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { cn } from "@/lib/cn";
 import { useAuth } from "@/providers/auth-provider";
+import { useSchoolProfile } from "@/providers/school-provider";
 import type { UserRole } from "@/types/api";
 
 type NavigationItem = {
@@ -35,6 +41,80 @@ type NavigationItem = {
 };
 
 const navigation: Record<UserRole, NavigationItem[]> = {
+  superadmin: [
+    {
+      href: "/dashboard",
+      label: "Pusat kendali",
+      icon: LayoutDashboard,
+      group: "Pengawasan sekolah",
+    },
+    {
+      href: "/superadmin/exams",
+      label: "Kesiapan ujian",
+      icon: BookOpenCheck,
+      group: "Pengawasan sekolah",
+    },
+    {
+      href: "/governance/requests",
+      label: "Kotak keputusan",
+      icon: ClipboardCheck,
+      group: "Pengawasan sekolah",
+    },
+    {
+      href: "/superadmin/calendar",
+      label: "Kalender sekolah",
+      icon: CalendarDays,
+      group: "Akademik & mutu",
+    },
+    {
+      href: "/admin/academics",
+      label: "Data akademik",
+      icon: School,
+      group: "Akademik & mutu",
+    },
+    {
+      href: "/superadmin/quality",
+      label: "Kualitas data",
+      icon: Database,
+      group: "Akademik & mutu",
+    },
+    {
+      href: "/superadmin/reports",
+      label: "Laporan sekolah",
+      icon: ChartNoAxesCombined,
+      group: "Akademik & mutu",
+    },
+    {
+      href: "/superadmin/users",
+      label: "Pengguna & akses",
+      icon: UsersRound,
+      group: "Tata kelola",
+    },
+    {
+      href: "/admin/monitoring",
+      label: "Monitoring ujian",
+      icon: Activity,
+      group: "Tata kelola",
+    },
+    {
+      href: "/teacher/results",
+      label: "Hasil ujian",
+      icon: GraduationCap,
+      group: "Tata kelola",
+    },
+    {
+      href: "/admin/audit",
+      label: "Audit aktivitas",
+      icon: ShieldCheck,
+      group: "Tata kelola",
+    },
+    {
+      href: "/superadmin/settings",
+      label: "Pengaturan sekolah",
+      icon: Settings2,
+      group: "Tata kelola",
+    },
+  ],
   admin: [
     {
       href: "/dashboard",
@@ -71,6 +151,12 @@ const navigation: Record<UserRole, NavigationItem[]> = {
       label: "Audit aktivitas",
       icon: ShieldCheck,
       group: "Operasional",
+    },
+    {
+      href: "/governance/requests",
+      label: "Pengajuan jadwal",
+      icon: ClipboardCheck,
+      group: "Koordinasi sekolah",
     },
   ],
   teacher: [
@@ -116,6 +202,12 @@ const navigation: Record<UserRole, NavigationItem[]> = {
       icon: School,
       group: "Evaluasi",
     },
+    {
+      href: "/governance/requests",
+      label: "Pengajuan jadwal",
+      icon: ClipboardCheck,
+      group: "Koordinasi sekolah",
+    },
   ],
   student: [
     {
@@ -152,6 +244,7 @@ const navigation: Record<UserRole, NavigationItem[]> = {
 };
 
 const roleLabels: Record<UserRole, string> = {
+  superadmin: "Superadmin Sekolah",
   admin: "Administrator",
   teacher: "Guru",
   student: "Siswa",
@@ -179,6 +272,7 @@ function resolvePageTitle(pathname: string, items: NavigationItem[]) {
 }
 
 export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
+  const school = useSchoolProfile();
   const { user, logout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
@@ -312,7 +406,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
           <div className="workspace-brand-mark">CN</div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-bold text-white">
-              Citra Negara LMS
+              {school.school_name} LMS
             </p>
             <p className="workspace-role-label mt-1">Portal {roleLabel}</p>
           </div>

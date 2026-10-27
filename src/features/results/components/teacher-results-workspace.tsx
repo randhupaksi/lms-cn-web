@@ -6,6 +6,7 @@ import { AsyncFeedback } from "@/components/async-feedback";
 import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
 import { MetricGrid } from "@/components/metric-grid";
 import { RoleBoundary } from "@/components/role-boundary";
+import { useAuth } from "@/providers/auth-provider";
 import { Button } from "@/components/ui/button";
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
 import { PageHeader } from "@/components/ui/page-header";
@@ -24,6 +25,7 @@ const resultStatus = {
   published: { label: "Dipublikasikan", tone: "success" as const },
 };
 export function TeacherResultsWorkspace() {
+  const canPublish = useAuth().user?.role === "teacher";
   const courses = useAllCourses();
   const [courseFilter, setCourseFilter] = useState("all");
   const [examFilter, setExamFilter] = useState("all");
@@ -85,7 +87,7 @@ export function TeacherResultsWorkspace() {
     label: item.title,
   }));
   return (
-    <RoleBoundary allow={["teacher", "admin"]}>
+    <RoleBoundary allow={["superadmin", "teacher", "admin"]}>
       <div className="space-y-8">
         <PageHeader
           eyebrow="Evaluasi · Hasil ujian"
@@ -181,18 +183,20 @@ export function TeacherResultsWorkspace() {
                       ? "Menyiapkan…"
                       : "Unduh CSV ujian terpilih"}
                   </Button>
-                  <Button
-                    disabled={
-                      !selectedExam ||
-                      publish.isPending ||
-                      !results.data.data.length
-                    }
-                    onClick={() => publish.mutate()}
-                  >
-                    {publish.isPending
-                      ? "Mempublikasikan…"
-                      : "Publikasikan hasil ujian terpilih"}
-                  </Button>
+                  {canPublish && (
+                    <Button
+                      disabled={
+                        !selectedExam ||
+                        publish.isPending ||
+                        !results.data.data.length
+                      }
+                      onClick={() => publish.mutate()}
+                    >
+                      {publish.isPending
+                        ? "Mempublikasikan…"
+                        : "Publikasikan hasil ujian terpilih"}
+                    </Button>
+                  )}
                 </div>
               </div>
               <AsyncFeedback

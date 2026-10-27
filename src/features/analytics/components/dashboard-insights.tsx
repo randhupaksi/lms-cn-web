@@ -417,7 +417,7 @@ function RecentResults({ data }: { data: DashboardInsights }) {
   );
 }
 
-export function DashboardInsightsWorkspace({ role }: { role: UserRole }) {
+export function DashboardInsightsWorkspace({ role }: { role: Exclude<UserRole, "superadmin"> }) {
   const insights = useDashboardInsights();
   if (insights.isLoading)
     return (

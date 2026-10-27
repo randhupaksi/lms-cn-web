@@ -16,7 +16,7 @@ export function AuditWorkspace() {
   const [page, setPage] = useState(1);
   const events = useAuditEvents({ action, entity_type: entityType, page });
   return (
-    <RoleBoundary allow={["admin"]}>
+    <RoleBoundary allow={["superadmin", "admin"]}>
       <div className="space-y-8">
         <PageHeader
           eyebrow="Administrasi · Jejak aktivitas"

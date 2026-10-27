@@ -12,6 +12,7 @@ export function ConfirmationDialog({
   confirmLabel,
   pendingLabel = "Memproses…",
   pending = false,
+  confirmDisabled = false,
   onConfirm,
   children,
 }: {
@@ -22,6 +23,7 @@ export function ConfirmationDialog({
   confirmLabel: string;
   pendingLabel?: string;
   pending?: boolean;
+  confirmDisabled?: boolean;
   onConfirm: () => void;
   children?: ReactNode;
 }) {
@@ -52,7 +54,7 @@ export function ConfirmationDialog({
             >
               Batal
             </Dialog.Close>
-            <Button onClick={onConfirm} disabled={pending}>
+            <Button onClick={onConfirm} disabled={pending || confirmDisabled}>
               {pending ? pendingLabel : confirmLabel}
             </Button>
           </div>

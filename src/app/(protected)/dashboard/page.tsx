@@ -8,8 +8,16 @@ import { DashboardHeader } from "@/features/analytics/components/dashboard-heade
 import { RefreshCw } from "lucide-react";
 import { useIsFetching, useQueryClient } from "@tanstack/react-query";
 import { ActionButton } from "@/components/ui/action-button";
+import { ControlCenter } from "@/features/governance";
 
 export default function DashboardPage() {
+  const { user } = useAuth();
+  if (!user) return null;
+  if (user.role === "superadmin") return <ControlCenter />;
+  return <StandardDashboard />;
+}
+
+function StandardDashboard() {
   const { user } = useAuth();
   const summary = useDashboardSummary();
   const queryClient = useQueryClient();
@@ -17,7 +25,7 @@ export default function DashboardPage() {
     useIsFetching({ queryKey: ["dashboard-summary"] }) +
       useIsFetching({ queryKey: ["dashboard-insights"] }) >
     0;
-  if (!user) return null;
+  if (!user || user.role === "superadmin") return null;
   return (
     <section className="space-y-8">
       <DashboardHeader

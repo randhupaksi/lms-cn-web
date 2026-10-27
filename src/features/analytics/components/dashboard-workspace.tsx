@@ -27,7 +27,7 @@ type Action = {
   icon: typeof BookOpenText;
 };
 
-const actionByRole: Record<UserRole, Action[]> = {
+const actionByRole: Record<Exclude<UserRole, "superadmin">, Action[]> = {
   student: [
     {
       href: "/student/assignments",
@@ -155,7 +155,7 @@ function PriorityQueue({
   role,
 }: {
   tasks: DashboardTask[];
-  role: UserRole;
+  role: Exclude<UserRole, "superadmin">;
 }) {
   return (
     <section
@@ -235,7 +235,7 @@ function PriorityQueue({
   );
 }
 
-function QuickActions({ role }: { role: UserRole }) {
+function QuickActions({ role }: { role: Exclude<UserRole, "superadmin"> }) {
   return (
     <nav
       className="quick-action-grid"
@@ -270,7 +270,7 @@ export function DashboardWorkspace({
   metrics,
   tasks,
 }: {
-  role: UserRole;
+  role: Exclude<UserRole, "superadmin">;
   metrics: DashboardMetric[];
   tasks: DashboardTask[];
 }) {

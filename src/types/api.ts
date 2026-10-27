@@ -13,7 +13,7 @@ export type ApiErrorPayload = {
   errors?: Record<string, string[]>;
 };
 
-export type UserRole = "admin" | "teacher" | "student";
+export type UserRole = "superadmin" | "admin" | "teacher" | "student";
 export type UserStatus = "active" | "inactive";
 export type User = {
   id: string;

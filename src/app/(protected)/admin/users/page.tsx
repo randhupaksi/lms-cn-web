@@ -12,7 +12,7 @@ import { UsersRound, Plus } from "lucide-react";
 export default function UsersPage() {
   const [editorOpen, setEditorOpen] = useState(false);
   return (
-    <RoleBoundary allow={["admin"]}>
+    <RoleBoundary allow={["superadmin", "admin"]}>
       <div className="space-y-8">
         <PageHeader
           eyebrow="Identitas & akses"
