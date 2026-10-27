@@ -35,6 +35,15 @@ gap. Do not reserve a tall blank label area or use a minimum card height.
 
 - Admin: featured KPI tiles, quick-action cards, a 14-day collection chart,
   exam lifecycle distribution, and an operational priority queue.
+- School superadmin: compact command header and uniform neutral metric strip,
+  decision/quality priorities, role ledger, school-wide exam-cycle segments,
+  upcoming exams and agenda. Dedicated workspaces use an index/detail decision
+  comparison, numbered quality groups, month calendar + agenda, aggregate report
+  table, settings form + live preview/history, and account/session inspector.
+  Reuse emerald tokens and controls while varying composition by responsibility.
+  All role decisions remain authoritative in the API. Result publication stays
+  visible to teachers only. The school profile provider displays the saved
+  school name and login support information; metadata retains Citra Negara.
 - Teacher: teaching KPI tiles, quick-action cards, course-scoped activity and
   exam lifecycle charts, then an assessment queue. Authoring starts from the
   collection; long forms open in

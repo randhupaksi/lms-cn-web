@@ -74,6 +74,14 @@ part of any student-facing type.
 
 ## LMS and operations workspaces
 
+School governance lives in `features/governance`, exported through its public
+entrypoint. It owns React Query keys and consumes typed `governance.service`
+contracts for command overview, readiness, quality, schedule requests, calendar,
+reports and settings. Protected account management remains in `features/users`.
+School-wide routes have explicit `superadmin` guards; the shared requests page
+admits staff and server-scopes teacher/admin reads. A school-profile provider
+supplies the public whitelisted branding/support contract to shell and login.
+
 Materials, assignments, monitoring, analytics, and audit follow the same data
 flow as the examination modules: route composition calls a feature-owned React
 Query hook, which calls a typed service contract. Student routes only request
