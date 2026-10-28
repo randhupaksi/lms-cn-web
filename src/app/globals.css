@@ -2361,3 +2361,95 @@ input[type="radio"] {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* Each dashboard arranges its work around the role's first action. */
+.dashboard-student-focus,
+.dashboard-teacher-focus {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+.dashboard-student-focus > *,
+.dashboard-teacher-focus > * {
+  min-width: 0;
+}
+.dashboard-student-links {
+  display: grid;
+  gap: var(--space-4);
+}
+.dashboard-student-links .quick-action-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+}
+.dashboard-student-links .quick-action-card {
+  display: grid;
+  grid-template-columns: var(--space-10) minmax(0, 1fr);
+  gap: 0 var(--space-4);
+  padding: var(--space-4);
+}
+.dashboard-student-links .quick-action-card-top {
+  grid-row: 1 / span 2;
+}
+.dashboard-student-links .quick-action-arrow {
+  display: none;
+}
+.dashboard-student-links .quick-action-title {
+  margin-top: 0;
+}
+.dashboard-student-links .quick-action-description {
+  margin-top: var(--space-1);
+}
+.dashboard-composition[data-role="teacher"] .dashboard-kpis .metric-card {
+  background: hsl(var(--card-soft));
+}
+.monitoring-table tr[data-selected="true"] {
+  background: hsl(var(--primary-soft));
+}
+.monitoring-table tr[data-selected="true"] td:first-child {
+  box-shadow: inset var(--space-1) 0 hsl(var(--primary));
+}
+@media (max-width: 1023px) {
+  .dashboard-student-focus,
+  .dashboard-teacher-focus {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Table variants keep shared controls while emphasizing each record type. */
+.access-table tbody tr[data-inspected="true"] {
+  background: hsl(var(--primary-soft));
+}
+.access-table tbody tr[data-inspected="true"] td:first-child {
+  box-shadow: inset var(--space-1) 0 hsl(var(--primary));
+}
+.access-table .access-user-link {
+  font-weight: 650;
+  text-align: left;
+}
+.gradebook-table th:nth-child(4),
+.gradebook-table th:nth-child(5),
+.gradebook-table td:nth-child(4),
+.gradebook-table td:nth-child(5) {
+  font-variant-numeric: tabular-nums;
+}
+.gradebook-table td:nth-child(5) {
+  font-weight: 650;
+}
+.student-score-table tbody td:nth-child(2) {
+  color: hsl(var(--primary));
+  font-variant-numeric: tabular-nums;
+}
+.audit-table td:nth-child(1) {
+  white-space: nowrap;
+  color: hsl(var(--muted));
+  font-variant-numeric: tabular-nums;
+}
+.audit-table td:nth-child(3) {
+  font-size: var(--text-small);
+  font-weight: 650;
+}
+
+.readiness-table tbody tr:has(.is-pending) {
+  background: hsl(var(--warning-soft) / 0.28);
+}

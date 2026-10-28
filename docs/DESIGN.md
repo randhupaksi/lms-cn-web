@@ -27,34 +27,39 @@ The UI refresh applies the task hierarchy principles from the Matik dashboard
 guide while retaining Citra Negara's emerald identity. Variation comes from
 layout, useful density, and emphasis rather than additional brand colors.
 
-The dashboard welcome header uses a narrow emerald rule, a role-specific
-greeting and context, and a direct role-specific workspace action. Refresh is
-a compact secondary icon action. KPI groups have their own section heading;
+Every role dashboard follows the same opening order: welcome header, then KPI
+cards. Sections after the KPIs vary to fit each role. The welcome header uses a
+narrow emerald rule, a role-specific greeting and context, and a direct
+role-specific workspace action. Refresh is a compact secondary icon action.
+KPI groups have their own section heading;
 their cards use content-driven height, compact padding, and a short label/value
 gap. Do not reserve a tall blank label area or use a minimum card height.
 
-- Admin: featured KPI tiles, quick-action cards, a 14-day collection chart,
-  exam lifecycle distribution, and an operational priority queue.
-- School superadmin: compact command header and uniform neutral metric strip,
-  decision/quality priorities, role ledger, school-wide exam-cycle segments,
-  upcoming exams and agenda. Dedicated workspaces use an index/detail decision
+- Admin: KPI tiles first, followed by the operational priority queue, quick
+  actions, a 14-day collection chart, and exam lifecycle distribution.
+- School superadmin: compact command header and uniform neutral KPI strip,
+  followed by decision/quality priorities, school-wide exam-cycle segments, upcoming exams,
+  agenda, and role ledger. Dedicated workspaces use an index/detail decision
   comparison, numbered quality groups, month calendar + agenda, aggregate report
   table, settings form + live preview/history, and account/session inspector.
   Reuse emerald tokens and controls while varying composition by responsibility.
   All role decisions remain authoritative in the API. Result publication stays
   visible to teachers only. The school profile provider displays the saved
   school name and login support information; metadata retains Citra Negara.
-- Teacher: teaching KPI tiles, quick-action cards, course-scoped activity and
-  exam lifecycle charts, then an assessment queue. Authoring starts from the
+- Teacher: compact teaching KPIs, followed by the assessment queue beside
+  quick-action cards, course-scoped activity and exam lifecycle charts. Authoring starts from the
   collection; long forms open in
   an inline editor with a focused heading and a return action.
-- Student: learning KPI tiles and next actions precede quick-action cards,
-  personal activity, material completion, assignment status, and published
-  result bars. A zero-material denominator shows a dash, not an invented rate.
+- Student: compact learning KPIs, followed by next actions beside learning
+  shortcuts, personal activity, material completion, assignment status,
+  and published result bars. A zero-material denominator shows a dash, not an invented rate.
 - Materials: a selectable index and one reading surface. On narrower screens,
   the index precedes the reader; selecting a material focuses its heading.
 - Operational comparisons: tables for exams and results; continuous record
-  lists for questions, materials, and assignments.
+  lists for questions, materials, and assignments. Data tables retain common
+  controls and density while emphasizing the scan task: identities and selected
+  records for access, numeric alignment for grades, time and action for audit,
+  and warning context for exam readiness.
 - Examination: a dedicated shell, sticky time/progress toolbar, readable
   question area, and question navigation. Starting and final submission use
   the shared confirmation dialog; the server remains authoritative for time,
