@@ -5,7 +5,7 @@ import { BookOpenText, CheckCircle2, ArrowRight } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
-import { useAllCourses } from "@/features/academics/use-academics";
+import { useAllCourses } from "@/features/academics";
 import {
   useCompleteMaterial,
   useMaterials,

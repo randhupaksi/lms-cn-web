@@ -3,7 +3,7 @@ import { ActionButton } from "@/components/ui/action-button";
 
 import { useState, type FormEvent } from "react";
 import { RoleBoundary } from "@/components/role-boundary";
-import { useAllCourses } from "@/features/academics/use-academics";
+import { useAllCourses } from "@/features/academics";
 import {
   useArchiveQuestion,
   useQuestions,

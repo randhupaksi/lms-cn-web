@@ -13,7 +13,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Pagination } from "@/components/ui/pagination";
-import { useAllCourses } from "@/features/academics/use-academics";
+import { useAllCourses } from "@/features/academics";
 import { useExamAnalytics } from "@/features/analytics";
 import { useExams } from "@/features/exams";
 import { usePublishResults, useResults } from "@/features/results/use-results";

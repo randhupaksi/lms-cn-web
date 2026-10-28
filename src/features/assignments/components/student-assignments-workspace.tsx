@@ -3,7 +3,7 @@ import { FilterBar } from "@/components/ui/filter-bar";
 import { useEffect, useState } from "react";
 import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
-import { useAllCourses } from "@/features/academics/use-academics";
+import { useAllCourses } from "@/features/academics";
 import {
   useAssignments,
   useSubmitAssignment,

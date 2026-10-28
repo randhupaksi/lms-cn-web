@@ -4,7 +4,7 @@ import { FilterBar } from "@/components/ui/filter-bar";
 import { useState } from "react";
 import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
 import { MetricGrid } from "@/components/metric-grid";
-import { useAllCourses } from "@/features/academics/use-academics";
+import { useAllCourses } from "@/features/academics";
 import { useExams } from "@/features/exams";
 import { useExamMonitoring } from "@/features/monitoring/use-monitoring";
 import { PageHeader } from "@/components/ui/page-header";

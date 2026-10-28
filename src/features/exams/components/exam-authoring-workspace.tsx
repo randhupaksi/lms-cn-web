@@ -4,7 +4,7 @@ import { ActionButton, ActionLink } from "@/components/ui/action-button";
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { RoleBoundary } from "@/components/role-boundary";
-import { useAllCourses } from "@/features/academics/use-academics";
+import { useAllCourses } from "@/features/academics";
 import {
   useCreateExam,
   useExamAction,

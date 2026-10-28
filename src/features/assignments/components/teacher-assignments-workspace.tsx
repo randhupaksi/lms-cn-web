@@ -3,7 +3,7 @@ import { ActionButton } from "@/components/ui/action-button";
 import { useState, type FormEvent } from "react";
 import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
-import { useAllCourses } from "@/features/academics/use-academics";
+import { useAllCourses } from "@/features/academics";
 import {
   useAssignments,
   useGradeSubmission,
