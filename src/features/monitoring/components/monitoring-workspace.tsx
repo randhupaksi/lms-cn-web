@@ -105,7 +105,7 @@ export function MonitoringWorkspace() {
         {exams.data?.data.length ? (
           <DataTableShell>
             <div className="overflow-x-auto">
-              <DataTable>
+              <DataTable className="monitoring-table">
                 <thead>
                   <tr>
                     <th>Ujian</th>
@@ -117,7 +117,10 @@ export function MonitoringWorkspace() {
                 </thead>
                 <tbody>
                   {exams.data.data.map((exam) => (
-                    <tr key={exam.id}>
+                    <tr
+                      key={exam.id}
+                      data-selected={selectedExam?.id === exam.id}
+                    >
                       <td className="font-semibold">{exam.title}</td>
                       <td>
                         {exam.course_name ??

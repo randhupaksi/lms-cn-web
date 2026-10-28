@@ -214,7 +214,10 @@ export function TeacherResultsWorkspace() {
                 successMessage="File hasil berhasil disiapkan."
               />
               <div className="overflow-x-auto">
-                <DataTable>
+                <DataTable className="gradebook-table">
+                  <caption className="sr-only">
+                    Nilai siswa untuk ujian yang dipilih
+                  </caption>
                   <thead>
                     <tr>
                       <th>Ujian</th>

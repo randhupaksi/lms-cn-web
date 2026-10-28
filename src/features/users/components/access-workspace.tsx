@@ -398,7 +398,10 @@ export function AccessWorkspace() {
           {query.data && (
             <>
               <div className="table-scroll">
-                <table className="data-table">
+                <table className="data-table access-table">
+                  <caption className="sr-only">
+                    Akun sekolah dan status akses
+                  </caption>
                   <thead>
                     <tr>
                       <th>Pengguna</th>
@@ -411,7 +414,7 @@ export function AccessWorkspace() {
                   </thead>
                   <tbody>
                     {query.data.data.map((user) => (
-                      <tr key={user.id}>
+                      <tr key={user.id} data-inspected={inspected === user.id}>
                         <td>
                           <button
                             className="access-user-link"

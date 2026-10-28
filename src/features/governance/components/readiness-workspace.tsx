@@ -59,7 +59,10 @@ export function ReadinessWorkspace() {
         {query.data && (
           <>
             <div className="table-scroll">
-              <table className="data-table">
+              <table className="data-table readiness-table">
+                <caption className="sr-only">
+                  Kelengkapan dan kesiapan setiap ujian
+                </caption>
                 <thead>
                   <tr>
                     <th>Ujian & jadwal</th>
