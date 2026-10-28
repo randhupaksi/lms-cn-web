@@ -7,6 +7,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install chromium",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fast": "oxlint",
@@ -29,6 +31,7 @@
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.1",
     "@tailwindcss/postcss": "^4.3.2",
     "@types/node": "^20.19.43",
     "@types/react": "^19.2.17",
