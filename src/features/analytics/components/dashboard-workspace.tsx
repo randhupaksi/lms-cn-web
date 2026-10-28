@@ -175,11 +175,15 @@ function PriorityQueue({
             Diurutkan berdasarkan waktu dan pekerjaan yang memerlukan perhatian.
           </p>
         </div>
-        <span className="count-label shrink-0">{tasks.length} prioritas</span>
+        <span className="count-label shrink-0">
+          {tasks.length > 3
+            ? `3 dari ${tasks.length} prioritas`
+            : `${tasks.length} prioritas`}
+        </span>
       </div>
       <div className="workspace-section-body task-list">
         {tasks.length ? (
-          tasks.map((task) => {
+          tasks.slice(0, 3).map((task) => {
             const config = taskConfig[task.kind];
             const status = statusConfig[task.status];
             const Icon = config.icon;
@@ -227,7 +231,13 @@ function PriorityQueue({
                 ? "Tidak ada tenggat yang perlu dikejar"
                 : "Tidak ada pekerjaan mendesak"
             }
-            description="Antrean prioritas saat ini kosong. Anda tetap dapat membuka materi, ujian, atau area kerja melalui menu yang tersedia."
+            description={
+              role === "student"
+                ? "Belum ada tugas atau ujian yang memerlukan perhatian. Lanjutkan belajar melalui akses cepat."
+                : role === "teacher"
+                  ? "Belum ada penilaian atau hasil yang memerlukan tindak lanjut."
+                  : "Belum ada kegiatan operasional yang memerlukan perhatian."
+            }
           />
         )}
       </div>
@@ -290,31 +300,58 @@ export function DashboardWorkspace({
         "Lihat pembelajaran yang diikuti, ujian tersedia, dan progres Anda.",
     },
   }[role];
+  const summary = (
+    <section className="dashboard-kpis" aria-labelledby="dashboard-kpi-heading">
+      <div className="dashboard-overview-heading">
+        <h2 id="dashboard-kpi-heading" className="section-title">
+          {overview.title}
+        </h2>
+        <p className="section-description">{overview.description}</p>
+      </div>
+      {metrics.length ? (
+        <MetricGrid metrics={metrics} />
+      ) : (
+        <EmptyState
+          title="Ringkasan belum tersedia"
+          description="Belum ada metrik yang dapat ditampilkan untuk akun ini."
+        />
+      )}
+    </section>
+  );
   return (
     <div className="dashboard-composition" data-role={role}>
-      <section
-        className="dashboard-kpis"
-        aria-labelledby="dashboard-kpi-heading"
-      >
-        <div className="dashboard-overview-heading">
-          <h2 id="dashboard-kpi-heading" className="section-title">
-            {overview.title}
-          </h2>
-          <p className="section-description">{overview.description}</p>
-        </div>
-        {metrics.length ? (
-          <MetricGrid metrics={metrics} />
-        ) : (
-          <EmptyState
-            title="Ringkasan belum tersedia"
-            description="Belum ada metrik yang dapat ditampilkan untuk akun ini."
-          />
-        )}
-      </section>
-      {role === "student" ? <PriorityQueue tasks={tasks} role={role} /> : null}
-      <QuickActions role={role} />
-      <DashboardInsightsWorkspace role={role} />
-      {role !== "student" ? <PriorityQueue tasks={tasks} role={role} /> : null}
+      {summary}
+      {role === "student" ? (
+        <>
+          <div className="dashboard-student-focus">
+            <PriorityQueue tasks={tasks} role={role} />
+            <div className="dashboard-student-links">
+              <div>
+                <h2 className="section-title">Jelajahi pembelajaran</h2>
+                <p className="section-description">
+                  Pilih tempat untuk melanjutkan kegiatan Anda.
+                </p>
+              </div>
+              <QuickActions role={role} />
+            </div>
+          </div>
+          <DashboardInsightsWorkspace role={role} />
+        </>
+      ) : role === "teacher" ? (
+        <>
+          <div className="dashboard-teacher-focus">
+            <PriorityQueue tasks={tasks} role={role} />
+            <QuickActions role={role} />
+          </div>
+          <DashboardInsightsWorkspace role={role} />
+        </>
+      ) : (
+        <>
+          <PriorityQueue tasks={tasks} role={role} />
+          <QuickActions role={role} />
+          <DashboardInsightsWorkspace role={role} />
+        </>
+      )}
     </div>
   );
 }

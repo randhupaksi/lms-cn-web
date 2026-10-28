@@ -94,73 +94,37 @@ export function ControlCenter() {
               </div>
             ))}
           </div>
-          <div className="command-main-grid">
-            <GovernanceSection
-              eyebrow="Perlu perhatian"
-              title="Mulai dari yang penting"
-            >
-              <Link href="/governance/requests" className="command-priority">
-                <span className="command-priority-number">
-                  {data.pending_requests}
-                </span>
-                <div>
-                  <h3>Pengajuan jadwal</h3>
-                  <p>
-                    Tinjau alasan, bandingkan waktu, lalu berikan keputusan.
-                  </p>
-                </div>
-                <ArrowRight size={20} aria-hidden="true" />
-              </Link>
-              <Link href="/superadmin/quality" className="command-priority">
-                <span className="command-priority-number">{findings}</span>
-                <div>
-                  <h3>Temuan kualitas data</h3>
-                  <p>
-                    Periksa kelengkapan penugasan, peserta, dan persiapan ujian.
-                  </p>
-                </div>
-                <ArrowRight size={20} aria-hidden="true" />
-              </Link>
-              <div className="command-footnote">
-                <span>{data.draft_results} hasil belum dipublikasikan</span>
-                <WorkspaceLink href="/teacher/results">
-                  Tinjau hasil
-                </WorkspaceLink>
+          <GovernanceSection
+            eyebrow="Perlu perhatian"
+            title="Mulai dari yang penting"
+          >
+            <Link href="/governance/requests" className="command-priority">
+              <span className="command-priority-number">
+                {data.pending_requests}
+              </span>
+              <div>
+                <h3>Pengajuan jadwal</h3>
+                <p>Tinjau alasan, bandingkan waktu, lalu berikan keputusan.</p>
               </div>
-            </GovernanceSection>
-            <GovernanceSection
-              eyebrow="Lingkup sekolah"
-              title="Komposisi akses"
-              action={
-                <WorkspaceLink href="/superadmin/users">
-                  Kelola akses
-                </WorkspaceLink>
-              }
-            >
-              <div className="role-ledger">
-                {["superadmin", "admin", "teacher", "student"].map((role) => {
-                  const row = data.roles.find((r) => r.role === role);
-                  const value = row?.active ?? 0;
-                  return (
-                    <div className="role-ledger-row" key={role}>
-                      <div>
-                        <span>{roleLabels[role]}</span>
-                        <small>{row?.inactive ?? 0} nonaktif</small>
-                      </div>
-                      <div className="role-ledger-track" aria-hidden="true">
-                        <span
-                          style={{
-                            width: `${active ? (value / active) * 100 : 0}%`,
-                          }}
-                        />
-                      </div>
-                      <strong>{value}</strong>
-                    </div>
-                  );
-                })}
+              <ArrowRight size={20} aria-hidden="true" />
+            </Link>
+            <Link href="/superadmin/quality" className="command-priority">
+              <span className="command-priority-number">{findings}</span>
+              <div>
+                <h3>Temuan kualitas data</h3>
+                <p>
+                  Periksa kelengkapan penugasan, peserta, dan persiapan ujian.
+                </p>
               </div>
-            </GovernanceSection>
-          </div>
+              <ArrowRight size={20} aria-hidden="true" />
+            </Link>
+            <div className="command-footnote">
+              <span>{data.draft_results} hasil belum dipublikasikan</span>
+              <WorkspaceLink href="/teacher/results">
+                Tinjau hasil
+              </WorkspaceLink>
+            </div>
+          </GovernanceSection>
           <GovernanceSection
             eyebrow="Pelaksanaan asesmen"
             title="Siklus ujian sekolah"
@@ -213,7 +177,7 @@ export function ControlCenter() {
                 </p>
               ) : (
                 <div className="command-exam-list">
-                  {data.exams.slice(0, 6).map((exam) => (
+                  {data.exams.slice(0, 3).map((exam) => (
                     <div key={exam.id}>
                       <div>
                         <h3>{exam.title}</h3>
@@ -243,7 +207,7 @@ export function ControlCenter() {
                 </p>
               ) : (
                 <div className="command-agenda">
-                  {data.agenda.slice(0, 5).map((event) => (
+                  {data.agenda.slice(0, 3).map((event) => (
                     <div key={`${event.category}-${event.id}`}>
                       <span className="agenda-date">
                         <CalendarDays size={17} aria-hidden="true" />
@@ -262,6 +226,38 @@ export function ControlCenter() {
               )}
             </GovernanceSection>
           </div>
+          <GovernanceSection
+            eyebrow="Lingkup sekolah"
+            title="Komposisi akses"
+            action={
+              <WorkspaceLink href="/superadmin/users">
+                Kelola akses
+              </WorkspaceLink>
+            }
+          >
+            <div className="role-ledger">
+              {["superadmin", "admin", "teacher", "student"].map((role) => {
+                const row = data.roles.find((r) => r.role === role);
+                const value = row?.active ?? 0;
+                return (
+                  <div className="role-ledger-row" key={role}>
+                    <div>
+                      <span>{roleLabels[role]}</span>
+                      <small>{row?.inactive ?? 0} nonaktif</small>
+                    </div>
+                    <div className="role-ledger-track" aria-hidden="true">
+                      <span
+                        style={{
+                          width: `${active ? (value / active) * 100 : 0}%`,
+                        }}
+                      />
+                    </div>
+                    <strong>{value}</strong>
+                  </div>
+                );
+              })}
+            </div>
+          </GovernanceSection>
           <p className="governance-update">
             Diperbarui {schoolTime(data.generated_at)} WIB · Lingkup seluruh
             sekolah

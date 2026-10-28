@@ -370,11 +370,11 @@ function RecentResults({ data }: { data: DashboardInsights }) {
       <ChartHeading
         eyebrow="Hasil belajar"
         title="Perolehan nilai terbaru"
-        description="Maksimal 5 hasil terakhir dipublikasikan. Skala nilai 0–100%."
+        description="Maksimal 3 hasil terakhir dipublikasikan. Skala nilai 0–100%."
       />
       {data.recent_results.length ? (
         <ol className="result-bars">
-          {data.recent_results.map((result) => (
+          {data.recent_results.slice(0, 3).map((result) => (
             <li key={result.id}>
               <div className="result-bar-heading">
                 <span>
@@ -417,7 +417,11 @@ function RecentResults({ data }: { data: DashboardInsights }) {
   );
 }
 
-export function DashboardInsightsWorkspace({ role }: { role: Exclude<UserRole, "superadmin"> }) {
+export function DashboardInsightsWorkspace({
+  role,
+}: {
+  role: Exclude<UserRole, "superadmin">;
+}) {
   const insights = useDashboardInsights();
   if (insights.isLoading)
     return (
@@ -487,12 +491,9 @@ export function DashboardInsightsWorkspace({ role }: { role: Exclude<UserRole, "
       <div
         className={`insights-grid ${role === "student" ? "insights-grid-student" : ""}`}
       >
+        {role === "student" ? <StudentLearning data={data} /> : null}
         <ActivityChart data={data} />
-        {role === "student" ? (
-          <StudentLearning data={data} />
-        ) : (
-          <Distribution data={data} />
-        )}
+        {role !== "student" ? <Distribution data={data} /> : null}
         {role === "student" ? <RecentResults data={data} /> : null}
       </div>
       <p className="insight-freshness">
