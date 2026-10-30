@@ -45,6 +45,12 @@ export const navigation: Record<UserRole, NavigationItem[]> = {
       group: "Pengawasan sekolah",
     },
     {
+      href: "/governance/actions",
+      label: "Tindak lanjut",
+      icon: ClipboardList,
+      group: "Pengawasan sekolah",
+    },
+    {
       href: "/superadmin/calendar",
       label: "Kalender sekolah",
       icon: CalendarDays,
@@ -142,6 +148,92 @@ export const navigation: Record<UserRole, NavigationItem[]> = {
       icon: ClipboardCheck,
       group: "Koordinasi sekolah",
     },
+    {
+      href: "/governance/actions",
+      label: "Tindak lanjut saya",
+      icon: ClipboardList,
+      group: "Koordinasi sekolah",
+    },
+  ],
+  principal: [
+    {
+      href: "/dashboard",
+      label: "Pusat kendali",
+      icon: LayoutDashboard,
+      group: "Kepemimpinan sekolah",
+    },
+    {
+      href: "/principal/exams",
+      label: "Kesiapan ujian",
+      icon: BookOpenCheck,
+      group: "Kepemimpinan sekolah",
+    },
+    {
+      href: "/governance/requests",
+      label: "Kotak keputusan",
+      icon: ClipboardCheck,
+      group: "Kepemimpinan sekolah",
+    },
+    {
+      href: "/governance/actions",
+      label: "Tindak lanjut",
+      icon: ClipboardList,
+      group: "Kepemimpinan sekolah",
+    },
+    {
+      href: "/principal/calendar",
+      label: "Kalender sekolah",
+      icon: CalendarDays,
+      group: "Akademik & mutu",
+    },
+    {
+      href: "/admin/academics",
+      label: "Data akademik",
+      icon: School,
+      group: "Akademik & mutu",
+    },
+    {
+      href: "/principal/quality",
+      label: "Kualitas data",
+      icon: Database,
+      group: "Akademik & mutu",
+    },
+    {
+      href: "/principal/reports",
+      label: "Laporan sekolah",
+      icon: ChartNoAxesCombined,
+      group: "Akademik & mutu",
+    },
+    {
+      href: "/principal/users",
+      label: "Pengguna sekolah",
+      icon: UsersRound,
+      group: "Tata kelola",
+    },
+    {
+      href: "/admin/monitoring",
+      label: "Monitoring ujian",
+      icon: Activity,
+      group: "Tata kelola",
+    },
+    {
+      href: "/teacher/results",
+      label: "Hasil ujian",
+      icon: GraduationCap,
+      group: "Tata kelola",
+    },
+    {
+      href: "/admin/audit",
+      label: "Audit aktivitas",
+      icon: ShieldCheck,
+      group: "Tata kelola",
+    },
+    {
+      href: "/principal/settings",
+      label: "Pengaturan sekolah",
+      icon: Settings2,
+      group: "Tata kelola",
+    },
   ],
   teacher: [
     {
@@ -192,6 +284,12 @@ export const navigation: Record<UserRole, NavigationItem[]> = {
       icon: ClipboardCheck,
       group: "Koordinasi sekolah",
     },
+    {
+      href: "/governance/actions",
+      label: "Tindak lanjut saya",
+      icon: ClipboardList,
+      group: "Koordinasi sekolah",
+    },
   ],
   student: [
     {
@@ -229,6 +327,7 @@ export const navigation: Record<UserRole, NavigationItem[]> = {
 
 export const roleLabels: Record<UserRole, string> = {
   superadmin: "Superadmin Sekolah",
+  principal: "Kepala Sekolah",
   admin: "Administrator",
   teacher: "Guru",
   student: "Siswa",

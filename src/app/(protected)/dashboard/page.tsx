@@ -13,7 +13,8 @@ import { ControlCenter } from "@/features/governance";
 export default function DashboardPage() {
   const { user } = useAuth();
   if (!user) return null;
-  if (user.role === "superadmin") return <ControlCenter />;
+  if (user.role === "superadmin" || user.role === "principal")
+    return <ControlCenter />;
   return <StandardDashboard />;
 }
 
@@ -25,7 +26,8 @@ function StandardDashboard() {
     useIsFetching({ queryKey: ["dashboard-summary"] }) +
       useIsFetching({ queryKey: ["dashboard-insights"] }) >
     0;
-  if (!user || user.role === "superadmin") return null;
+  if (!user || user.role === "superadmin" || user.role === "principal")
+    return null;
   return (
     <section className="space-y-8">
       <DashboardHeader

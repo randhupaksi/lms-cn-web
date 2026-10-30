@@ -153,3 +153,19 @@ test("keeps the login form usable without horizontal overflow on mobile", async 
   );
   expect(hasHorizontalOverflow).toBe(false);
 });
+
+test("opens the principal control center with school governance navigation", async ({ page }) => {
+  const session = sessionEnvelope(false);
+  session.data.user.role = "principal";
+  session.data.user.full_name = "Kepala Sekolah Uji";
+  await page.route("**/api/v1/auth/login", (route) => route.fulfill({ status: 200, json: session }));
+  await page.route("**/api/v1/governance/overview", (route) => route.fulfill({ status: 200, json: { success: true, message: "OK", data: { generated_at: "2026-01-01T00:00:00Z", roles: [], courses: 0, classes: 0, active_attempts: 0, pending_requests: 0, draft_results: 0, exams: [], exam_states: [], quality: [], agenda: [] } } }));
+  await page.route("**/api/v1/governance/actions/summary", (route) => route.fulfill({ status: 200, json: { success: true, message: "OK", data: { open: 1, overdue: 0 } } }));
+  await page.goto("/login");
+  await page.getByLabel("Identitas").fill("principal.test");
+  await page.getByPlaceholder("Masukkan kata sandi akun Anda").fill("synthetic-password");
+  await page.getByRole("button", { name: "Masuk ke LMS" }).click();
+  await expect(page.getByRole("heading", { name: "Kepemimpinan sekolah" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Laporan sekolah/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Tindak lanjut sekolah/ })).toBeVisible();
+});

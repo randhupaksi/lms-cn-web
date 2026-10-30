@@ -3,7 +3,7 @@ import { RoleBoundary } from "@/components/role-boundary";
 import { MonitoringWorkspace } from "@/features/monitoring/components/monitoring-workspace";
 export default function AdminMonitoringPage() {
   return (
-    <RoleBoundary allow={["superadmin", "admin"]}>
+    <RoleBoundary allow={["superadmin", "principal", "admin"]}>
       <MonitoringWorkspace />
     </RoleBoundary>
   );
