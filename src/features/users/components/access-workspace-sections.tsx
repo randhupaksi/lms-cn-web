@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { AsyncFeedback } from "@/components/async-feedback";
 import { ErrorState } from "@/components/data-state";
+import { useAuth } from "@/providers/auth-provider";
 import {
   useCreateUser,
   useUpdateManagedUser,
@@ -12,6 +13,7 @@ import {
 } from "../use-users";
 export const labels: Record<UserRole, string> = {
   superadmin: "Superadmin",
+  principal: "Kepala Sekolah",
   admin: "Administrator",
   teacher: "Guru",
   student: "Siswa",
@@ -46,10 +48,11 @@ export function CreateManagedUser({
   onCreated: () => void;
 }) {
   const mutation = useCreateUser();
+  const isSuperadmin = useAuth().user?.role === "superadmin";
   const [form, setForm] = useState({
     identifier: "",
     full_name: "",
-    role: "admin" as "admin" | "teacher" | "student",
+    role: "admin" as "principal" | "admin" | "teacher" | "student",
     temporary_password: "",
   });
   function submit(e: FormEvent) {
@@ -98,7 +101,12 @@ export function CreateManagedUser({
             onValueChange={(value) =>
               setForm({ ...form, role: value as typeof form.role })
             }
-            options={["admin", "teacher", "student"].map((role) => ({
+            options={[
+              ...(isSuperadmin ? ["principal"] : []),
+              "admin",
+              "teacher",
+              "student",
+            ].map((role) => ({
               value: role,
               label: labels[role as UserRole],
             }))}
@@ -134,11 +142,17 @@ export function CreateManagedUser({
     </section>
   );
 }
-export function UserInspector({ user }: { user: User }) {
+export function UserInspector({
+  user,
+  showSessions = true,
+}: {
+  user: User;
+  showSessions?: boolean;
+}) {
   const [name, setName] = useState(user.full_name);
   const [identifier, setIdentifier] = useState(user.identifier);
   const update = useUpdateManagedUser();
-  const sessions = useUserSessions(user.id);
+  const sessions = useUserSessions(user.id, showSessions);
   function submit(e: FormEvent) {
     e.preventDefault();
     update.mutate({ id: user.id, identifier, full_name: name });
@@ -179,32 +193,34 @@ export function UserInspector({ user }: { user: User }) {
         </Button>
         <Feedback mutation={update} />
       </form>
-      <div className="access-sessions">
-        <h3>
-          <Monitor size={17} aria-hidden="true" />
-          Sesi aktif
-        </h3>
-        {sessions.isLoading && (
-          <p className="text-sm text-muted">Memuat sesi…</p>
-        )}
-        {sessions.isError && (
-          <ErrorState
-            label="Sesi belum dapat dimuat."
-            onRetry={() => void sessions.refetch()}
-          />
-        )}{" "}
-        {sessions.data?.length === 0 && (
-          <p className="text-sm text-muted">Tidak ada sesi aktif.</p>
-        )}
-        {sessions.data?.map((session, index) => (
-          <div className="session-record" key={session.id}>
-            <strong>Sesi {index + 1}</strong>
-            <p>Dibuat {when(session.created_at)} WIB</p>
-            <p>Pembaruan sesi {when(session.last_used_at)} WIB</p>
-            <small>Berakhir {when(session.expires_at)} WIB</small>
-          </div>
-        ))}
-      </div>
+      {showSessions && (
+        <div className="access-sessions">
+          <h3>
+            <Monitor size={17} aria-hidden="true" />
+            Sesi aktif
+          </h3>
+          {sessions.isLoading && (
+            <p className="text-sm text-muted">Memuat sesi…</p>
+          )}
+          {sessions.isError && (
+            <ErrorState
+              label="Sesi belum dapat dimuat."
+              onRetry={() => void sessions.refetch()}
+            />
+          )}{" "}
+          {sessions.data?.length === 0 && (
+            <p className="text-sm text-muted">Tidak ada sesi aktif.</p>
+          )}
+          {sessions.data?.map((session, index) => (
+            <div className="session-record" key={session.id}>
+              <strong>Sesi {index + 1}</strong>
+              <p>Dibuat {when(session.created_at)} WIB</p>
+              <p>Pembaruan sesi {when(session.last_used_at)} WIB</p>
+              <small>Berakhir {when(session.expires_at)} WIB</small>
+            </div>
+          ))}
+        </div>
+      )}
     </aside>
   );
 }

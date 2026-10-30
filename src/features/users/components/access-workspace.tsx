@@ -37,6 +37,7 @@ import {
 export function AccessWorkspace() {
   const [notice, setNotice] = useState("");
   const { user: actor } = useAuth();
+  const isSuperadmin = actor?.role === "superadmin";
   const [search, setSearch] = useState("");
   const [role, setRole] = useState("");
   const [page, setPage] = useState(1);
@@ -158,7 +159,13 @@ export function AccessWorkspace() {
         role="group"
         aria-label="Filter peran pengguna"
       >
-        {["", "superadmin", "admin", "teacher", "student"].map((value) => (
+        {[
+          "",
+          ...(isSuperadmin ? ["superadmin", "principal"] : []),
+          "admin",
+          "teacher",
+          "student",
+        ].map((value) => (
           <button
             key={value}
             aria-pressed={role === value}
@@ -247,19 +254,21 @@ export function AccessWorkspace() {
                           <div className="table-actions">
                             <ActionButton
                               icon={Monitor}
-                              label={`Rincian dan sesi ${user.full_name}`}
+                              label={`Rincian ${user.full_name}`}
                               onClick={() =>
                                 setInspected(
                                   inspected === user.id ? "" : user.id,
                                 )
                               }
                             />
-                            <ActionButton
-                              icon={ShieldCheck}
-                              label={`Ubah peran ${user.full_name}`}
-                              disabled={user.id === actor?.id}
-                              onClick={() => open(user, "role")}
-                            />
+                            {isSuperadmin && (
+                              <ActionButton
+                                icon={ShieldCheck}
+                                label={`Ubah peran ${user.full_name}`}
+                                disabled={user.id === actor?.id}
+                                onClick={() => open(user, "role")}
+                              />
+                            )}
                             <ActionButton
                               icon={KeyRound}
                               label={`Reset kredensial ${user.full_name}`}
@@ -276,13 +285,15 @@ export function AccessWorkspace() {
                               disabled={user.id === actor?.id}
                               onClick={() => open(user, "toggle")}
                             />
-                            <ActionButton
-                              icon={LogOut}
-                              tone="danger"
-                              label={`Akhiri seluruh sesi ${user.full_name}`}
-                              disabled={user.id === actor?.id}
-                              onClick={() => open(user, "revoke")}
-                            />
+                            {isSuperadmin && (
+                              <ActionButton
+                                icon={LogOut}
+                                tone="danger"
+                                label={`Akhiri seluruh sesi ${user.full_name}`}
+                                disabled={user.id === actor?.id}
+                                onClick={() => open(user, "revoke")}
+                              />
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -308,6 +319,7 @@ export function AccessWorkspace() {
           <UserInspector
             key={`${selected.id}-${selected.updated_at}`}
             user={selected}
+            showSessions={isSuperadmin}
           />
         )}
       </div>

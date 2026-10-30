@@ -87,7 +87,7 @@ export function TeacherResultsWorkspace() {
     label: item.title,
   }));
   return (
-    <RoleBoundary allow={["superadmin", "teacher", "admin"]}>
+    <RoleBoundary allow={["superadmin", "principal", "teacher", "admin"]}>
       <div className="space-y-8">
         <PageHeader
           eyebrow="Evaluasi · Hasil ujian"

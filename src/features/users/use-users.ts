@@ -25,11 +25,11 @@ export function useResetCredential() {
   );
 }
 
-export function useUserSessions(id: string) {
+export function useUserSessions(id: string, enabled = true) {
   return useQuery({
     queryKey: [...userKeys.all, id, "sessions"],
     queryFn: () => service.listUserSessions(id),
-    enabled: Boolean(id),
+    enabled: Boolean(id) && enabled,
   });
 }
 function useGovernedUserMutation<T>(

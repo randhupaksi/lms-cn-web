@@ -420,7 +420,7 @@ function RecentResults({ data }: { data: DashboardInsights }) {
 export function DashboardInsightsWorkspace({
   role,
 }: {
-  role: Exclude<UserRole, "superadmin">;
+  role: Exclude<UserRole, "superadmin" | "principal">;
 }) {
   const insights = useDashboardInsights();
   if (insights.isLoading)

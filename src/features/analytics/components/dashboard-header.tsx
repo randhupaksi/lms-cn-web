@@ -5,7 +5,7 @@ import { ArrowRight, BookOpenText, GraduationCap, School } from "lucide-react";
 import type { UserRole } from "@/types/api";
 
 const headerByRole: Record<
-  Exclude<UserRole, "superadmin">,
+  Exclude<UserRole, "superadmin" | "principal">,
   {
     eyebrow: string;
     greeting: string;
@@ -49,7 +49,7 @@ export function DashboardHeader({
   name,
   refreshAction,
 }: {
-  role: Exclude<UserRole, "superadmin">;
+  role: Exclude<UserRole, "superadmin" | "principal">;
   name: string;
   refreshAction: ReactNode;
 }) {
