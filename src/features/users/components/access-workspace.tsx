@@ -162,6 +162,7 @@ export function AccessWorkspace() {
         {[
           "",
           ...(isSuperadmin ? ["superadmin", "principal"] : []),
+          "curriculum",
           "admin",
           "teacher",
           "student",

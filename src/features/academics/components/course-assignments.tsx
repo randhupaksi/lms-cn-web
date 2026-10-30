@@ -27,7 +27,7 @@ export function CourseAssignments() {
   const [teacherPage, setTeacherPage] = useState(1);
   const [studentPage, setStudentPage] = useState(1);
   const teachers = useUsers({
-    role: "teacher",
+    role: "teaching_staff",
     search: teacherSearch,
     page: teacherPage,
     per_page: PAGE_SIZE,
@@ -106,7 +106,7 @@ export function CourseAssignments() {
           <div className="mt-6 grid gap-6 xl:grid-cols-2">
             <MemberSelector
               title="Guru pengelola"
-              placeholder="Cari guru…"
+              placeholder="Cari guru atau guru kurikulum…"
               search={teacherSearch}
               onSearch={(v) => {
                 setTeacherSearch(v);
