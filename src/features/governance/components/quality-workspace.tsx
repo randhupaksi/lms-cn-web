@@ -3,8 +3,10 @@ import { Database, CheckCircle2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { useQuality } from "../use-governance";
 import { QueryState, WorkspaceLink } from "./governance-shared";
+import { useAuth } from "@/providers/auth-provider";
 
 export function QualityWorkspace() {
+  const principal = useAuth().user?.role === "principal";
   const query = useQuality();
   const groups = query.data ?? [];
   const total = groups.reduce((n, g) => n + g.count, 0);
@@ -65,10 +67,14 @@ export function QualityWorkspace() {
                 <WorkspaceLink
                   href={
                     group.key.startsWith("exams")
-                      ? "/superadmin/exams"
+                      ? principal
+                        ? "/principal/exams"
+                        : "/superadmin/exams"
                       : group.key.startsWith("courses")
                         ? "/admin/academics"
-                        : "/superadmin/users"
+                        : principal
+                          ? "/principal/users"
+                          : "/superadmin/users"
                   }
                 >
                   Buka pengelolaan

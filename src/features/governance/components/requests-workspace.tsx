@@ -136,7 +136,7 @@ function ScheduleForm({
             {mutation.isPending ? "Mengajukan…" : "Kirim pengajuan"}
           </Button>
           <p className="text-xs text-muted">
-            Jadwal berlaku setelah disetujui superadmin.
+            Jadwal berlaku setelah disetujui pimpinan sekolah.
           </p>
         </div>
         <div className="governance-form-wide">
@@ -150,7 +150,7 @@ function ScheduleForm({
 export function RequestsWorkspace() {
   const [notice, setNotice] = useState("");
   const { user } = useAuth();
-  const reviewer = user?.role === "superadmin";
+  const reviewer = user?.role === "superadmin" || user?.role === "principal";
   const [status, setStatus] = useState("pending");
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState("");
@@ -205,7 +205,7 @@ export function RequestsWorkspace() {
         description={
           reviewer
             ? "Bandingkan usulan dengan jadwal awal, lalu berikan keputusan yang dapat ditelusuri."
-            : "Ajukan perubahan jadwal kepada superadmin dan ikuti keputusan sekolah."
+            : "Ajukan perubahan jadwal kepada pimpinan sekolah dan ikuti keputusannya."
         }
         actions={
           !reviewer ? (
@@ -221,7 +221,7 @@ export function RequestsWorkspace() {
           onClose={() => setCreating(false)}
           onCreated={() => {
             setCreating(false);
-            setNotice("Pengajuan jadwal berhasil dikirim kepada superadmin.");
+            setNotice("Pengajuan jadwal berhasil dikirim kepada pimpinan sekolah.");
           }}
         />
       )}
@@ -345,7 +345,7 @@ export function RequestsWorkspace() {
                         Batalkan pengajuan
                       </Button>
                     ) : (
-                      <p>Menunggu keputusan superadmin.</p>
+                      <p>Menunggu keputusan pimpinan sekolah.</p>
                     )}
                   </div>
                 ) : (

@@ -8,6 +8,7 @@ import { ErrorState, LoadingState } from "@/components/data-state";
 
 export const roleLabels: Record<string, string> = {
   superadmin: "Superadmin",
+  principal: "Kepala Sekolah",
   admin: "Administrator",
   teacher: "Guru",
   student: "Siswa",

@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/providers/auth-provider";
+import { useQuery } from "@tanstack/react-query";
+import { actionSummary } from "@/services/leadership.service";
 import { ActionButton } from "@/components/ui/action-button";
 import { useGovernanceOverview } from "../use-governance";
 import {
@@ -25,7 +27,12 @@ import {
 
 export function ControlCenter() {
   const query = useGovernanceOverview();
+  const actions = useQuery({
+    queryKey: ["leadership-summary"],
+    queryFn: actionSummary,
+  });
   const { user } = useAuth();
+  const principal = user?.role === "principal";
   const data = query.data;
   const active = data?.roles.reduce((n, r) => n + r.active, 0) ?? 0;
   const findings = data?.quality.reduce((n, g) => n + g.count, 0) ?? 0;
@@ -35,7 +42,7 @@ export function ControlCenter() {
       <header className="command-heading">
         <div>
           <p className="eyebrow">Citra Negara · Pusat kendali</p>
-          <h1>Tata kelola sekolah</h1>
+          <h1>{principal ? "Kepemimpinan sekolah" : "Tata kelola sekolah"}</h1>
           <p>
             Selamat datang, {user?.full_name}. Lihat kesiapan sekolah dan
             tentukan langkah berikutnya.
@@ -44,7 +51,7 @@ export function ControlCenter() {
         <div className="command-heading-meta">
           <span className="governance-command-tag">
             <ShieldCheck size={15} aria-hidden="true" />
-            Superadmin Sekolah
+            {principal ? "Kepala Sekolah" : "Superadmin Sekolah"}
           </span>
           <ActionButton
             icon={RefreshCw}
@@ -108,7 +115,24 @@ export function ControlCenter() {
               </div>
               <ArrowRight size={20} aria-hidden="true" />
             </Link>
-            <Link href="/superadmin/quality" className="command-priority">
+            <Link href="/governance/actions" className="command-priority">
+              <span className="command-priority-number">
+                {actions.data?.open ?? "—"}
+              </span>
+              <div>
+                <h3>Tindak lanjut sekolah</h3>
+                <p>
+                  {actions.data
+                    ? `${actions.data.overdue} melewati tenggat`
+                    : "Pantau tugas dan perkembangan."}
+                </p>
+              </div>
+              <ArrowRight size={20} aria-hidden="true" />
+            </Link>
+            <Link
+              href={principal ? "/principal/quality" : "/superadmin/quality"}
+              className="command-priority"
+            >
               <span className="command-priority-number">{findings}</span>
               <div>
                 <h3>Temuan kualitas data</h3>
@@ -129,7 +153,9 @@ export function ControlCenter() {
             eyebrow="Pelaksanaan asesmen"
             title="Siklus ujian sekolah"
             action={
-              <WorkspaceLink href="/superadmin/exams">
+              <WorkspaceLink
+                href={principal ? "/principal/exams" : "/superadmin/exams"}
+              >
                 Periksa kesiapan
               </WorkspaceLink>
             }
@@ -166,7 +192,9 @@ export function ControlCenter() {
               eyebrow="Berikutnya"
               title="Ujian mendatang"
               action={
-                <WorkspaceLink href="/superadmin/exams">
+                <WorkspaceLink
+                  href={principal ? "/principal/exams" : "/superadmin/exams"}
+                >
                   Semua ujian
                 </WorkspaceLink>
               }
@@ -196,7 +224,11 @@ export function ControlCenter() {
               eyebrow="30 hari ke depan"
               title="Agenda sekolah"
               action={
-                <WorkspaceLink href="/superadmin/calendar">
+                <WorkspaceLink
+                  href={
+                    principal ? "/principal/calendar" : "/superadmin/calendar"
+                  }
+                >
                   Buka kalender
                 </WorkspaceLink>
               }
@@ -230,32 +262,36 @@ export function ControlCenter() {
             eyebrow="Lingkup sekolah"
             title="Komposisi akses"
             action={
-              <WorkspaceLink href="/superadmin/users">
+              <WorkspaceLink
+                href={principal ? "/principal/users" : "/superadmin/users"}
+              >
                 Kelola akses
               </WorkspaceLink>
             }
           >
             <div className="role-ledger">
-              {["superadmin", "admin", "teacher", "student"].map((role) => {
-                const row = data.roles.find((r) => r.role === role);
-                const value = row?.active ?? 0;
-                return (
-                  <div className="role-ledger-row" key={role}>
-                    <div>
-                      <span>{roleLabels[role]}</span>
-                      <small>{row?.inactive ?? 0} nonaktif</small>
+              {["superadmin", "principal", "admin", "teacher", "student"].map(
+                (role) => {
+                  const row = data.roles.find((r) => r.role === role);
+                  const value = row?.active ?? 0;
+                  return (
+                    <div className="role-ledger-row" key={role}>
+                      <div>
+                        <span>{roleLabels[role]}</span>
+                        <small>{row?.inactive ?? 0} nonaktif</small>
+                      </div>
+                      <div className="role-ledger-track" aria-hidden="true">
+                        <span
+                          style={{
+                            width: `${active ? (value / active) * 100 : 0}%`,
+                          }}
+                        />
+                      </div>
+                      <strong>{value}</strong>
                     </div>
-                    <div className="role-ledger-track" aria-hidden="true">
-                      <span
-                        style={{
-                          width: `${active ? (value / active) * 100 : 0}%`,
-                        }}
-                      />
-                    </div>
-                    <strong>{value}</strong>
-                  </div>
-                );
-              })}
+                  );
+                },
+              )}
             </div>
           </GovernanceSection>
           <p className="governance-update">
