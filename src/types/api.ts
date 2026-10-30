@@ -14,7 +14,7 @@ export type ApiErrorPayload = {
 };
 
 export type UserRole =
-  "superadmin" | "principal" | "admin" | "teacher" | "student";
+  "superadmin" | "principal" | "curriculum" | "admin" | "teacher" | "student";
 export type UserStatus = "active" | "inactive";
 export type User = {
   id: string;

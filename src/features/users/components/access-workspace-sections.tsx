@@ -14,6 +14,7 @@ import {
 export const labels: Record<UserRole, string> = {
   superadmin: "Superadmin",
   principal: "Kepala Sekolah",
+  curriculum: "Guru Kurikulum",
   admin: "Administrator",
   teacher: "Guru",
   student: "Siswa",
@@ -48,11 +49,13 @@ export function CreateManagedUser({
   onCreated: () => void;
 }) {
   const mutation = useCreateUser();
-  const isSuperadmin = useAuth().user?.role === "superadmin";
+  const actorRole = useAuth().user?.role;
+  const isSuperadmin = actorRole === "superadmin";
+  const canCreateCurriculum = isSuperadmin || actorRole === "principal";
   const [form, setForm] = useState({
     identifier: "",
     full_name: "",
-    role: "admin" as "principal" | "admin" | "teacher" | "student",
+    role: "admin" as "principal" | "curriculum" | "admin" | "teacher" | "student",
     temporary_password: "",
   });
   function submit(e: FormEvent) {
@@ -103,6 +106,7 @@ export function CreateManagedUser({
             }
             options={[
               ...(isSuperadmin ? ["principal"] : []),
+              ...(canCreateCurriculum ? ["curriculum"] : []),
               "admin",
               "teacher",
               "student",

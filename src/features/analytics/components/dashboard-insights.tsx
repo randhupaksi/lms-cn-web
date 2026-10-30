@@ -504,7 +504,7 @@ export function DashboardInsightsWorkspace({
           timeZone: data.timezone,
         }).format(new Date(data.generated_at))}{" "}
         WIB ·{" "}
-        {role === "admin"
+        {role === "admin" || role === "curriculum"
           ? "Lingkup sekolah"
           : role === "teacher"
             ? "Course yang Anda kelola"

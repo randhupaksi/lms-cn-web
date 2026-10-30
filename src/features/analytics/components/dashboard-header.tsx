@@ -24,6 +24,14 @@ const headerByRole: Record<
     href: "/admin/academics",
     icon: School,
   },
+  curriculum: {
+    eyebrow: "Ruang koordinasi akademik Citra Negara",
+    greeting: "Selamat mengoordinasikan pembelajaran",
+    description: "Pantau struktur akademik, kesiapan asesmen, dan tindak lanjut sekolah dari satu tempat.",
+    action: "Buka struktur akademik",
+    href: "/admin/academics",
+    icon: School,
+  },
   teacher: {
     eyebrow: "Ruang mengajar Citra Negara",
     greeting: "Selamat mengajar",

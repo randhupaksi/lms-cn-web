@@ -235,6 +235,22 @@ export const navigation: Record<UserRole, NavigationItem[]> = {
       group: "Tata kelola",
     },
   ],
+  curriculum: [
+    { href: "/dashboard", label: "Ringkasan kurikulum", icon: LayoutDashboard, group: "Koordinasi akademik" },
+    { href: "/admin/academics", label: "Struktur akademik", icon: School, group: "Koordinasi akademik" },
+    { href: "/curriculum/exams", label: "Kesiapan ujian", icon: BookOpenCheck, group: "Koordinasi akademik" },
+    { href: "/curriculum/calendar", label: "Kalender akademik", icon: CalendarDays, group: "Koordinasi akademik" },
+    { href: "/curriculum/quality", label: "Kualitas data", icon: Database, group: "Koordinasi akademik" },
+    { href: "/curriculum/reports", label: "Laporan akademik", icon: ChartNoAxesCombined, group: "Koordinasi akademik" },
+    { href: "/teacher/questions", label: "Bank soal", icon: BookOpenCheck, group: "Pengajaran saya" },
+    { href: "/teacher/materials", label: "Materi", icon: BookOpenText, group: "Pengajaran saya" },
+    { href: "/teacher/assignments", label: "Tugas", icon: ClipboardList, group: "Pengajaran saya" },
+    { href: "/teacher/exams", label: "Ujian", icon: GraduationCap, group: "Pengajaran saya" },
+    { href: "/teacher/results", label: "Hasil", icon: School, group: "Pengajaran saya" },
+    { href: "/teacher/monitoring", label: "Monitoring", icon: Activity, group: "Pengajaran saya" },
+    { href: "/governance/requests", label: "Pengajuan jadwal", icon: ClipboardCheck, group: "Koordinasi sekolah" },
+    { href: "/governance/actions", label: "Tindak lanjut saya", icon: ClipboardList, group: "Koordinasi sekolah" },
+  ],
   teacher: [
     {
       href: "/dashboard",
@@ -328,6 +344,7 @@ export const navigation: Record<UserRole, NavigationItem[]> = {
 export const roleLabels: Record<UserRole, string> = {
   superadmin: "Superadmin Sekolah",
   principal: "Kepala Sekolah",
+  curriculum: "Guru Kurikulum",
   admin: "Administrator",
   teacher: "Guru",
   student: "Siswa",

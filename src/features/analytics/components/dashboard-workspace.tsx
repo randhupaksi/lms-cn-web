@@ -91,6 +91,26 @@ const actionByRole: Record<
       icon: GraduationCap,
     },
   ],
+  curriculum: [
+    {
+      href: "/admin/academics",
+      label: "Kelola struktur akademik",
+      description: "Atur tahun ajaran, kelas, mata pelajaran, dan course.",
+      icon: School,
+    },
+    {
+      href: "/curriculum/exams",
+      label: "Periksa kesiapan ujian",
+      description: "Tinjau kelengkapan ujian dan koordinasikan tindak lanjut.",
+      icon: GraduationCap,
+    },
+    {
+      href: "/curriculum/quality",
+      label: "Tinjau kualitas data",
+      description: "Temukan data akademik yang memerlukan perbaikan.",
+      icon: Radar,
+    },
+  ],
 };
 
 const taskConfig: Record<
@@ -295,6 +315,10 @@ export function DashboardWorkspace({
     admin: {
       title: "Ringkasan akademik",
       description: "Gambaran pengguna, course, dan pelaksanaan ujian sekolah.",
+    },
+    curriculum: {
+      title: "Ringkasan kurikulum",
+      description: "Gambaran struktur akademik dan pelaksanaan ujian di seluruh sekolah.",
     },
     teacher: {
       title: "Ringkasan pengajaran",
