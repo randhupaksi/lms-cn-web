@@ -105,7 +105,7 @@ export function QuestionBankWorkspace() {
     courses.data?.map((course) => ({ value: course.id, label: course.name })) ??
     [];
   return (
-    <RoleBoundary allow={["teacher"]}>
+    <RoleBoundary allow={["teacher", "curriculum"]}>
       <div className="space-y-8">
         <PageHeader
           eyebrow="Pembelajaran · Bank soal"

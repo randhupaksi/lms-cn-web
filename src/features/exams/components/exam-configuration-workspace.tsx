@@ -68,7 +68,7 @@ export function ExamConfigurationWorkspace({ examId }: { examId: string }) {
 
   const editable = exam.data.status === "draft";
   return (
-    <RoleBoundary allow={["teacher"]}>
+    <RoleBoundary allow={["teacher", "curriculum"]}>
       <div className="space-y-8">
         <PageHeader
           eyebrow="Konfigurasi ujian"

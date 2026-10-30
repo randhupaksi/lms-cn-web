@@ -77,7 +77,7 @@ export function TeacherAssignmentsWorkspace() {
   const courseOptions =
     courses.data?.map((item) => ({ value: item.id, label: item.name })) ?? [];
   return (
-    <RoleBoundary allow={["teacher"]}>
+    <RoleBoundary allow={["teacher", "curriculum"]}>
       <div className="space-y-8">
         <PageHeader
           eyebrow="Pembelajaran · Tugas"

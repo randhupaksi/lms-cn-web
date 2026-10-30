@@ -25,7 +25,7 @@ const resultStatus = {
   published: { label: "Dipublikasikan", tone: "success" as const },
 };
 export function TeacherResultsWorkspace() {
-  const canPublish = useAuth().user?.role === "teacher";
+  const canPublish = ["teacher", "curriculum"].includes(useAuth().user?.role ?? "");
   const courses = useAllCourses();
   const [courseFilter, setCourseFilter] = useState("all");
   const [examFilter, setExamFilter] = useState("all");
@@ -87,7 +87,7 @@ export function TeacherResultsWorkspace() {
     label: item.title,
   }));
   return (
-    <RoleBoundary allow={["superadmin", "principal", "teacher", "admin"]}>
+    <RoleBoundary allow={["superadmin", "principal", "curriculum", "teacher", "admin"]}>
       <div className="space-y-8">
         <PageHeader
           eyebrow="Evaluasi · Hasil ujian"
