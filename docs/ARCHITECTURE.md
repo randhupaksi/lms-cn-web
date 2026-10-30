@@ -78,8 +78,8 @@ School governance lives in `features/governance`, exported through its public
 entrypoint. It owns React Query keys and consumes typed `governance.service`
 contracts for command overview, readiness, quality, schedule requests, calendar,
 reports and settings. Protected account management remains in `features/users`.
-School-wide routes have explicit `superadmin` guards; the shared requests page
-admits staff and server-scopes teacher/admin reads. A school-profile provider
+School-wide routes have explicit `superadmin` or `principal` guards; the shared requests and actions pages
+admit staff and server-scope teacher/admin reads. A school-profile provider
 supplies the public whitelisted branding/support contract to shell and login.
 
 Materials, assignments, monitoring, analytics, and audit follow the same data
