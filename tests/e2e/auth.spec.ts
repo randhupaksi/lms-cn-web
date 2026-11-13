@@ -55,7 +55,7 @@ test("redirects an unauthenticated visitor from protected pages to login", async
 
   await expect(page).toHaveURL(/\/login$/);
   await expect(
-    page.getByRole("heading", { name: "Selamat datang" }),
+    page.getByRole("heading", { name: "Masuk ke ruang belajar" }),
   ).toBeVisible();
 });
 
