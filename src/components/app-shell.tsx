@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ChevronRight, KeyRound, LogOut, Menu, X } from "lucide-react";
+import { ChevronRight, KeyRound, LogOut, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { cn } from "@/lib/cn";
@@ -26,12 +26,17 @@ function isNavigationActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function resolvePageTitle(pathname: string, items: NavigationItem[]) {
+function resolvePageLocation(pathname: string, items: NavigationItem[]) {
   const item = [...items]
     .sort((a, b) => b.href.length - a.href.length)
     .find(({ href }) => isNavigationActive(pathname, href));
-  return item?.label ?? "Citra Negara LMS";
+  return {
+    group: item?.group ?? "Akun",
+    title: item?.label ?? "Citra Negara LMS",
+  };
 }
+
+const MOBILE_VIEWPORT_QUERY = "(max-width: 1023px)";
 
 export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
   const school = useSchoolProfile();
@@ -39,11 +44,27 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState<boolean | null>(
+    null,
+  );
   const [isLoggingOut, setLoggingOut] = useState(false);
   const sidebarRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    if (!sidebarOpen) return;
+    const mobileViewport = window.matchMedia(MOBILE_VIEWPORT_QUERY);
+    const syncViewport = () => {
+      setIsMobileViewport(mobileViewport.matches);
+      if (!mobileViewport.matches) setSidebarOpen(false);
+    };
+
+    syncViewport();
+    mobileViewport.addEventListener("change", syncViewport);
+    return () => mobileViewport.removeEventListener("change", syncViewport);
+  }, []);
+
+  useEffect(() => {
+    if (!sidebarOpen || !isMobileViewport) return;
     const previousFocus = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -75,19 +96,13 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
       }
     }
 
-    const desktop = window.matchMedia("(min-width: 1024px)");
-    const closeOnDesktop = () => {
-      if (desktop.matches) setSidebarOpen(false);
-    };
-    desktop.addEventListener("change", closeOnDesktop);
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      desktop.removeEventListener("change", closeOnDesktop);
       document.body.style.overflow = previousOverflow;
       previousFocus?.focus();
     };
-  }, [sidebarOpen]);
+  }, [isMobileViewport, sidebarOpen]);
 
   if (!user) return null;
 
@@ -122,7 +137,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
 
   const items = navigation[user.role];
   const roleLabel = roleLabels[user.role];
-  const pageTitle = resolvePageTitle(pathname, items);
+  const pageLocation = resolvePageLocation(pathname, items);
 
   async function handleLogout() {
     setLoggingOut(true);
@@ -133,6 +148,21 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
       setLoggingOut(false);
     }
   }
+
+  function toggleSidebar() {
+    if (window.matchMedia(MOBILE_VIEWPORT_QUERY).matches) {
+      setSidebarOpen((open) => !open);
+      return;
+    }
+    setSidebarCollapsed((collapsed) => !collapsed);
+  }
+
+  const sidebarExpanded =
+    isMobileViewport === null
+      ? undefined
+      : isMobileViewport
+        ? sidebarOpen
+        : !sidebarCollapsed;
 
   return (
     <div className="workspace-shell">
@@ -159,10 +189,18 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
         className={cn(
           "workspace-sidebar",
           sidebarOpen ? "workspace-sidebar-open" : "workspace-sidebar-closed",
+          sidebarCollapsed && "workspace-sidebar-desktop-collapsed",
         )}
         aria-label="Navigasi aplikasi"
         role={sidebarOpen ? "dialog" : undefined}
         aria-modal={sidebarOpen ? true : undefined}
+        inert={
+          isMobileViewport === null
+            ? undefined
+            : isMobileViewport
+              ? !sidebarOpen
+              : sidebarCollapsed
+        }
       >
         <div className="workspace-brand">
           <div className="workspace-brand-mark">CN</div>
@@ -172,15 +210,6 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
             </p>
             <p className="workspace-role-label mt-1">Portal {roleLabel}</p>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-white hover:bg-white/10 hover:text-white lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-            aria-label="Tutup menu"
-          >
-            <X size={18} />
-          </Button>
         </div>
 
         <div className="mx-5 h-px bg-white/12" />
@@ -252,16 +281,27 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
         </div>
       </aside>
 
-      <div className="workspace-main">
+      <div
+        className={cn(
+          "workspace-main",
+          sidebarCollapsed && "workspace-main-sidebar-collapsed",
+        )}
+      >
         <header className="workspace-topbar">
           <div className="flex min-w-0 items-center gap-3">
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden"
-              onClick={() => setSidebarOpen(true)}
-              aria-label="Buka menu navigasi"
-              aria-expanded={sidebarOpen}
+              className="shrink-0"
+              onClick={toggleSidebar}
+              aria-label={
+                sidebarExpanded === undefined
+                  ? "Tampilkan atau sembunyikan navigasi"
+                  : sidebarExpanded
+                    ? "Sembunyikan navigasi"
+                    : "Tampilkan navigasi"
+              }
+              aria-expanded={sidebarExpanded}
               aria-controls="application-navigation"
             >
               <Menu size={19} />
@@ -270,9 +310,20 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
               aria-label="Lokasi halaman"
               className="workspace-breadcrumb min-w-0"
             >
-              <Link href="/dashboard" className="hidden shrink-0 sm:inline">
-                Portal {roleLabel}
+              <Link
+                href="/dashboard"
+                className="workspace-breadcrumb-school hidden shrink-0 lg:inline"
+              >
+                {school.school_name}
               </Link>
+              <ChevronRight
+                className="hidden shrink-0 lg:block"
+                size={14}
+                aria-hidden="true"
+              />
+              <span className="workspace-breadcrumb-section hidden shrink-0 sm:inline">
+                {pageLocation.group}
+              </span>
               <ChevronRight
                 className="hidden shrink-0 sm:block"
                 size={14}
@@ -284,7 +335,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
               >
                 {pathname === "/change-password"
                   ? "Ubah kata sandi"
-                  : pageTitle}
+                  : pageLocation.title}
               </span>
             </nav>
           </div>

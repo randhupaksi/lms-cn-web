@@ -5,51 +5,48 @@ designing or changing a component, page, layout, or interaction.
 
 ## 1. Design direction
 
-Citra Negara LMS should feel calm, minimal, structured, premium, and
-academically trustworthy. Premium quality comes from hierarchy, alignment,
-typography, spacing, consistency, accessibility, and reliable feedback—not from
-decoration.
+The LMS uses the visual language of a modern academic register: precise,
+considered, readable, and confident. A consistent sans-serif family keeps the
+interface legible and enterprise-ready; size and weight create hierarchy.
+Deep evergreen navigation, a warm paper canvas, small leaf-green identity
+details, and open rules give the product a recognizable character without
+slowing operational work.
 
-The LMS is a sibling product of Citra Negara Attendance. Its interface adopts
-the same recognizable family DNA: deep emerald navigation, warm neutral canvas,
-soft green surfaces, rounded workspaces, compact role-aware top bars, clear data
-tables, and restrained tactile feedback. LMS compositions may vary to support
-learning and assessment, but must remain visibly related to the attendance
-product rather than introducing an unrelated visual language.
-
-Reference qualities: Linear and Vercel for clarity, Stripe Dashboard for
-information hierarchy, Notion for calm density, and serious academic portals
-for trust and focus.
+The LMS has its own academic identity within the Citra Negara product family.
+Keep the school name and role language visible while letting learning,
+assessment, and school operations shape the page composition. Reference
+qualities: editorial publications for hierarchy and spacing, Linear for clear
+work hierarchy, and serious academic portals for trust and focus. Adapt their
+principles without copying their brands or layouts.
 
 ### Role and task compositions
 
-The UI refresh applies the task hierarchy principles from the Matik dashboard
-guide while retaining Citra Negara's emerald identity. Variation comes from
-layout, useful density, and emphasis rather than additional brand colors.
+Role compositions share evergreen, paper, and leaf-green token roles. Variation
+comes from each role's work order, useful density, and emphasis.
 
-Every role dashboard follows the same opening order: welcome header, then KPI
-cards. Sections after the KPIs vary to fit each role. The welcome header uses a
-narrow emerald rule, a role-specific greeting and context, and a direct
-role-specific workspace action. Refresh is a compact secondary icon action.
-KPI groups have their own section heading;
-their cards use content-driven height, compact padding, and a short label/value
-gap. Do not reserve a tall blank label area or use a minimum card height.
+Every role dashboard follows the same opening order: welcome header, then a
+compact KPI register. Sections after the metrics vary to fit each role. The
+welcome header uses a narrow leaf-green rule, a role-specific greeting and
+context, and a direct role-specific workspace action. Refresh is a compact
+secondary icon action. KPI groups have their own section heading; each metric
+uses a clear label and tabular value without a decorative icon tile or reserved
+blank label area.
 
-- Admin: KPI tiles first, followed by the operational priority queue, quick
+- Admin: KPI register first, followed by the operational priority queue, quick
   actions, a 14-day collection chart, and exam lifecycle distribution.
-- School superadmin: compact command header and uniform neutral KPI strip,
+- School superadmin: compact command header and neutral KPI register,
   followed by decision/quality priorities, school-wide exam-cycle segments, upcoming exams,
   agenda, and role ledger. Dedicated workspaces use an index/detail decision
   comparison, numbered quality groups, month calendar + agenda, aggregate report
   table, settings form + live preview/history, and account/session inspector.
-  Reuse emerald tokens and controls while varying composition by responsibility.
+  Reuse shared tokens and controls while varying composition by responsibility.
   All role decisions remain authoritative in the API. Result publication stays
   visible to teachers only. The school profile provider displays the saved
   school name and login support information; metadata retains Citra Negara.
 - Teacher: compact teaching KPIs, followed by the assessment queue beside
-  quick-action cards, course-scoped activity and exam lifecycle charts. Authoring starts from the
-  collection; long forms open in
-  an inline editor with a focused heading and a return action.
+  quick-action rows, course-scoped activity and exam lifecycle charts.
+  Authoring starts from the collection; long forms open in an inline editor
+  with a focused heading and a return action.
 - Student: compact learning KPIs, followed by next actions beside learning
   shortcuts, personal activity, material completion, assignment status,
   and published result bars. A zero-material denominator shows a dash, not an invented rate.
@@ -86,7 +83,8 @@ All product UI values must come from the shared token layer in
 
 Token families:
 
-- brand and interactive primary;
+- evergreen navigation and interactive primary;
+- restrained leaf-green school-identity accent;
 - neutral canvas, surfaces, and borders;
 - text hierarchy and inverse text;
 - semantic success, warning, danger, and information;
@@ -94,6 +92,13 @@ Token families:
 - spacing based on 4/8/12/16/24/32/48;
 - radius and elevation;
 - focus, motion, and breakpoint values.
+
+The current light palette uses paper `--background: 44 32% 96%`, green-tinted
+ink `--foreground: 156 24% 15%`, evergreen action `--primary: 152 48% 28%`,
+sage soft surface `--primary-soft: 145 32% 91%`, leaf identity detail
+`--brand-accent: 88 46% 60%`, and forest navigation
+`--sidebar-end: 155 43% 14%`. Semantic success, warning, danger, information,
+and chart roles remain separate from the identity accent.
 
 Composition tokens also define sidebar/content widths, control height,
 reading width, dialog width, and examination toolbar/rail dimensions. Ordinary
@@ -107,8 +112,11 @@ components or page JSX.
 
 ## 3. Visual rules
 
-- Use a restrained palette: one primary brand color, neutral surfaces, and
-  semantic colors only for meaning.
+- Use evergreen for actions and navigation, warm neutrals for most surfaces,
+  and leaf green only for small identity details. Keep status and chart colors
+  semantic.
+- Keep scrollbars clearly visible: use a strong evergreen thumb on a sage track
+  and the leaf accent at full opacity within the dark sidebar.
 - Use borders and surface contrast for hierarchy; keep shadows subtle and
   limited to a small approved scale.
 - Keep content aligned to a clear grid. Do not center everything.
@@ -118,6 +126,8 @@ components or page JSX.
   visually compete with it.
 - Use no more than four typography levels on one screen. Prefer semibold over
   excessive bold and avoid display typography inside dense workflows.
+- Use the shared sans-serif family for headings, metrics, navigation, and body
+  text. Distinguish hierarchy with size, weight, and spacing.
 - Icons come from the approved icon library and always have an accessible
   label when the action is icon-only. Never use emoji as interface icons.
 - Repeated row actions use compact `ActionButton`/`ActionLink` controls with
@@ -145,8 +155,10 @@ quantitative values.
 
 ### Authentication and public entry points
 
-Use clear hierarchy, concise copy, visible errors, and a single obvious next
-action. Do not make security-critical messages ambiguous or overly decorative.
+Use the evergreen academic panel to orient users to the actual material, task,
+and evaluation journey. Keep the sign-in form on a warm paper surface, with
+clear hierarchy, concise copy, visible errors, and one obvious next action. Do
+not make security-critical messages ambiguous or overly decorative.
 
 ## 5. Required states
 
@@ -168,8 +180,10 @@ Do not use a centered spinner as the only loading design for a full page.
 - Every input has a visible label or an equivalent accessible name.
 - Focus states are visible and consistent.
 - Keyboard users can complete important flows, including examination actions.
-- A closed mobile sidebar is hidden from keyboard navigation. Opening it
-  traps focus; closing it restores focus. Resize to desktop releases the trap.
+- The navigation toggle opens and closes the sidebar on mobile and collapses
+  or expands it on desktop. A closed mobile sidebar is hidden from keyboard
+  navigation. Opening it traps focus; closing it restores focus. Resizing to
+  desktop releases the focus trap.
 - Confirmation dialogs use Base UI's focus trap and restoration, put initial
   focus on cancel, and stay open while their mutation is pending.
 - Status is communicated with text or icon plus color, never color alone.
