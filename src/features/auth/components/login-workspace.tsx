@@ -3,7 +3,6 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  BookOpenCheck,
   Eye,
   EyeOff,
   GraduationCap,
@@ -15,14 +14,23 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/auth-provider";
 import { useSchoolProfile } from "@/providers/school-provider";
 
-const benefits = [
-  { icon: BookOpenCheck, label: "Materi dan tugas dalam satu ruang belajar" },
-  { icon: GraduationCap, label: "Ujian terstruktur dengan sesi terlindungi" },
-  { icon: ShieldCheck, label: "Akses disesuaikan dengan peran pengguna" },
+const learningSteps = [
+  {
+    title: "Materi",
+    description: "Buka materi dari course yang Anda akses.",
+  },
+  {
+    title: "Tugas",
+    description: "Periksa instruksi, tenggat, dan status pengumpulan.",
+  },
+  {
+    title: "Evaluasi",
+    description: "Ikuti ujian atau kelola evaluasi sesuai peran Anda.",
+  },
 ];
 
 export function LoginWorkspace() {
-  const school=useSchoolProfile();
+  const school = useSchoolProfile();
   const router = useRouter();
   const { login, sessionMessage } = useAuth();
   const [identifier, setIdentifier] = useState("");
@@ -61,29 +69,32 @@ export function LoginWorkspace() {
             <div>
               <p className="text-base font-semibold">{school.school_name}</p>
               <p className="login-brand-caption mt-1">
-                Learning Management System
+                Portal pembelajaran dan ujian
               </p>
             </div>
           </div>
           <div className="login-brand-statement">
-            <p className="login-brand-caption mb-5">RUANG AKADEMIK DIGITAL</p>
+            <p className="login-brand-caption mb-5">PORTAL PEMBELAJARAN</p>
             <h2 className="login-brand-title">
-              Tempat belajar.
-              <br />
-              Ruang bertumbuh.
+              Materi, tugas, dan ujian dalam satu alur belajar.
             </h2>
             <p className="mt-6 max-w-md text-sm leading-7 opacity-90">
-              Materi, tugas, dan evaluasi yang terhubung untuk mendampingi
-              proses belajar di Citra Negara.
+              Masuk untuk membuka materi, meninjau tugas, atau mengelola
+              evaluasi sesuai peran Anda.
             </p>
-            <div className="mt-10">
-              {benefits.map(({ icon: Icon, label }) => (
-                <div key={label} className="login-benefit">
-                  <Icon aria-hidden="true" size={19} />
-                  <p className="text-sm">{label}</p>
-                </div>
+            <ol className="login-learning-path" aria-label="Alur pembelajaran">
+              {learningSteps.map(({ title, description }, index) => (
+                <li className="login-learning-step" key={title}>
+                  <span className="login-learning-index" aria-hidden="true">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <div>
+                    <h3>{title}</h3>
+                    <p>{description}</p>
+                  </div>
+                </li>
               ))}
-            </div>
+            </ol>
           </div>
           <p className="login-brand-caption">
             Portal resmi pembelajaran Citra Negara
@@ -97,7 +108,7 @@ export function LoginWorkspace() {
             <span className="workspace-user-avatar size-12">CN</span>
             <div>
               <p className="text-sm font-bold text-foreground">
-                Citra Negara LMS
+                {school.school_name} LMS
               </p>
               <p className="text-xs text-muted">Portal akademik sekolah</p>
             </div>
@@ -107,9 +118,9 @@ export function LoginWorkspace() {
             <p className="eyebrow">
               <ShieldCheck size={14} /> Akses akun
             </p>
-            <h1 className="page-title mt-3">Selamat datang</h1>
+            <h1 className="page-title mt-3">Masuk ke ruang belajar</h1>
             <p className="page-description mt-2">
-              Masukkan NIS, NIP, atau username yang telah terdaftar.
+              Gunakan NIS, NIP, atau username yang telah terdaftar.
             </p>
           </div>
 
@@ -169,7 +180,15 @@ export function LoginWorkspace() {
             </Button>
           </form>
           <p className="login-help">
-            {school.support_message}{school.contact_email&&<> <a href={`mailto:${school.contact_email}`}>{school.contact_email}</a></>}
+            {school.support_message}
+            {school.contact_email && (
+              <>
+                {" "}
+                <a href={`mailto:${school.contact_email}`}>
+                  {school.contact_email}
+                </a>
+              </>
+            )}
           </p>
 
           <div className="mt-6 flex items-center justify-center gap-2 border-t border-border pt-5 text-xs text-muted">

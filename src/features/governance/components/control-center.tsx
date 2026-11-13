@@ -1,14 +1,5 @@
 "use client";
-import {
-  Activity,
-  ArrowRight,
-  CalendarDays,
-  ClipboardCheck,
-  Database,
-  RefreshCw,
-  ShieldCheck,
-  UsersRound,
-} from "lucide-react";
+import { ArrowRight, CalendarDays, RefreshCw, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/providers/auth-provider";
 import { useQuery } from "@tanstack/react-query";
@@ -70,32 +61,25 @@ export function ControlCenter() {
                 label: "Pengguna aktif",
                 value: active,
                 detail: `${data.roles.reduce((n, r) => n + r.inactive, 0)} akun nonaktif`,
-                Icon: UsersRound,
               },
               {
                 label: "Course aktif",
                 value: data.courses,
                 detail: `${data.classes} kelas terdaftar`,
-                Icon: Database,
               },
               {
                 label: "Sesi ujian berjalan",
                 value: data.active_attempts,
                 detail: "Sesi pengerjaan yang belum selesai",
-                Icon: Activity,
               },
               {
                 label: "Menunggu keputusan",
                 value: data.pending_requests,
                 detail: "Pengajuan perubahan jadwal",
-                Icon: ClipboardCheck,
               },
-            ].map(({ label, value, detail, Icon }) => (
+            ].map(({ label, value, detail }) => (
               <div key={label} className="command-metric">
-                <span>
-                  {label}
-                  <Icon size={17} aria-hidden="true" />
-                </span>
+                <span>{label}</span>
                 <strong>{value}</strong>
                 <small>{detail}</small>
               </div>

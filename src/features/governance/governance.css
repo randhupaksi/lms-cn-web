@@ -15,9 +15,10 @@
 .command-heading h1 {
   margin-block: var(--space-3);
   font-size: var(--text-page);
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 1.25;
+  font-family: var(--font-display);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
 }
 .command-heading p:not(.eyebrow) {
   font-size: var(--text-body);
@@ -45,36 +46,35 @@
 .command-metrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  border: 1px solid hsl(var(--border));
-  border-radius: var(--radius-lg);
-  background: hsl(var(--card));
+  border-block: 1px solid hsl(var(--border-strong));
+  border-radius: 0;
+  background: transparent;
   overflow: hidden;
 }
 .command-metric {
-  padding: var(--space-5) var(--space-6);
+  padding: var(--space-4) var(--space-5);
   border-right: 1px solid hsl(var(--border));
   display: grid;
   gap: var(--space-2);
 }
+.command-metric:first-child {
+  padding-inline-start: 0;
+}
 .command-metric:last-child {
   border-right: 0;
+  padding-inline-end: 0;
 }
 .command-metric > span {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-2);
   color: hsl(var(--muted));
-  font-size: var(--text-body);
-}
-.command-metric svg {
-  color: hsl(var(--primary));
-  flex-shrink: 0;
+  font-size: var(--text-small);
+  font-weight: 700;
+  line-height: 1.5;
 }
 .command-metric strong {
   font-size: var(--text-metric);
+  font-family: var(--font-display);
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 .command-metric small {
@@ -88,18 +88,19 @@
 }
 .governance-section {
   min-width: 0;
-  border: 1px solid hsl(var(--border));
-  border-radius: var(--radius-lg);
-  background: hsl(var(--card));
-  overflow: clip;
+  border: 0;
+  border-top: 1px solid hsl(var(--border-strong));
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
 }
 .governance-section-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-5) var(--space-6);
-  border-bottom: 1px solid hsl(var(--border));
+  padding: var(--space-5) 0 var(--space-3);
+  border-bottom: 0;
 }
 .governance-section-heading .eyebrow {
   margin-bottom: var(--space-2);
@@ -125,7 +126,7 @@
   display: flex;
   gap: var(--space-4);
   align-items: center;
-  padding: var(--space-5) var(--space-6);
+  padding: var(--space-4) 0;
   border-bottom: 1px solid hsl(var(--border));
   text-decoration: none;
   transition: background var(--motion-normal);
@@ -163,12 +164,12 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: var(--space-3);
-  padding: var(--space-4) var(--space-6);
+  padding: var(--space-4) 0;
   font-size: var(--text-small);
   color: hsl(var(--muted));
 }
 .role-ledger {
-  padding: var(--space-2) var(--space-6);
+  padding: var(--space-2) 0;
 }
 .role-ledger-row {
   display: grid;
@@ -210,7 +211,7 @@
   display: flex;
   gap: var(--space-1);
   height: var(--space-3);
-  margin: var(--space-6) var(--space-6) var(--space-4);
+  margin: var(--space-4) 0;
   border-radius: var(--radius-sm);
   overflow: hidden;
   background: hsl(var(--surface));
@@ -231,7 +232,7 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-6);
-  padding: 0 var(--space-6) var(--space-6);
+  padding: 0 0 var(--space-4);
 }
 .exam-cycle-legend > div {
   display: flex;
@@ -258,7 +259,7 @@
   flex-shrink: 0;
 }
 .command-exam-list > div {
-  padding: var(--space-4) var(--space-6);
+  padding: var(--space-4) 0;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -278,7 +279,7 @@
   display: grid;
   grid-template-columns: minmax(0, 0.65fr) minmax(0, 1.5fr);
   gap: var(--space-4);
-  padding: var(--space-4) var(--space-6);
+  padding: var(--space-4) 0;
   border-bottom: 1px solid hsl(var(--border));
 }
 .command-agenda > div:last-child {
@@ -301,7 +302,7 @@
   font-size: var(--text-small);
 }
 .governance-empty {
-  padding: var(--space-8) var(--space-6);
+  padding: var(--space-6) 0;
   color: hsl(var(--muted));
   font-size: var(--text-body);
   line-height: 1.8;
@@ -329,7 +330,7 @@
   flex-wrap: wrap;
   gap: var(--space-4);
   align-items: center;
-  padding: var(--space-4) var(--space-6);
+  padding: var(--space-4) 0;
   border-bottom: 1px solid hsl(var(--border));
 }
 .governance-search {
@@ -472,7 +473,7 @@
   flex-direction: column;
   gap: var(--space-4);
   border: 1px solid hsl(var(--border));
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   padding: var(--space-6);
   background: hsl(var(--card));
 }
@@ -488,6 +489,7 @@
 }
 .quality-count {
   font-size: var(--text-metric);
+  font-family: var(--font-display);
   font-weight: 600;
   color: hsl(var(--warning));
 }
@@ -961,9 +963,6 @@
   }
   .command-metric:nth-child(n + 3) {
     border-bottom: 0;
-  }
-  .command-metric > span {
-    align-items: flex-start;
   }
   .command-metric small {
     line-height: 1.7;

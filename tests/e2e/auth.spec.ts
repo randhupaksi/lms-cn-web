@@ -48,7 +48,6 @@ function sessionEnvelope(mustChangePassword: boolean) {
 test.beforeEach(async ({ page }) => {
   await prepareUnauthenticatedPage(page);
 });
-
 test("redirects an unauthenticated visitor from protected pages to login", async ({
   page,
 }) => {
@@ -169,3 +168,4 @@ test("opens the principal control center with school governance navigation", asy
   await expect(page.getByRole("link", { name: /Laporan sekolah/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Tindak lanjut sekolah/ })).toBeVisible();
 });
+

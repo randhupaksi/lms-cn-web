@@ -4,14 +4,11 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import {
   ArrowRight,
-  BookOpenText,
   CheckCircle2,
   ClipboardCheck,
   ClipboardList,
   GraduationCap,
   Radar,
-  School,
-  UsersRound,
 } from "lucide-react";
 import { EmptyState } from "@/components/data-state";
 import { DashboardInsightsWorkspace } from "./dashboard-insights";
@@ -24,7 +21,6 @@ type Action = {
   href: Route;
   label: string;
   description: string;
-  icon: typeof BookOpenText;
 };
 
 const actionByRole: Record<
@@ -36,19 +32,16 @@ const actionByRole: Record<
       href: "/student/assignments",
       label: "Lihat tugas",
       description: "Periksa instruksi, deadline, dan status pengumpulan.",
-      icon: ClipboardList,
     },
     {
       href: "/student/exams",
       label: "Buka ujian",
       description: "Periksa jadwal ujian dan lanjutkan pengerjaan.",
-      icon: GraduationCap,
     },
     {
       href: "/student/materials",
       label: "Lanjutkan materi",
       description: "Akses materi yang tersedia di course Anda.",
-      icon: BookOpenText,
     },
   ],
   teacher: [
@@ -56,19 +49,16 @@ const actionByRole: Record<
       href: "/teacher/assignments",
       label: "Kelola tugas",
       description: "Buat, publikasikan, dan nilai pengumpulan siswa.",
-      icon: ClipboardList,
     },
     {
       href: "/teacher/exams",
       label: "Kelola ujian",
       description: "Siapkan jadwal, soal, dan peserta ujian.",
-      icon: GraduationCap,
     },
     {
       href: "/teacher/results",
       label: "Tinjau hasil",
       description: "Periksa nilai dan publikasikan hasil yang siap dibagikan.",
-      icon: School,
     },
   ],
   admin: [
@@ -76,19 +66,16 @@ const actionByRole: Record<
       href: "/admin/users",
       label: "Kelola pengguna",
       description: "Atur akun dan akses guru maupun siswa.",
-      icon: UsersRound,
     },
     {
       href: "/admin/academics",
       label: "Perbarui akademik",
       description: "Kelola struktur tahun ajaran, kelas, dan course.",
-      icon: School,
     },
     {
       href: "/admin/monitoring",
       label: "Pantau ujian",
       description: "Tinjau status peserta pada ujian yang sedang berjalan.",
-      icon: GraduationCap,
     },
   ],
   curriculum: [
@@ -96,19 +83,16 @@ const actionByRole: Record<
       href: "/admin/academics",
       label: "Kelola struktur akademik",
       description: "Atur tahun ajaran, kelas, mata pelajaran, dan course.",
-      icon: School,
     },
     {
       href: "/curriculum/exams",
       label: "Periksa kesiapan ujian",
       description: "Tinjau kelengkapan ujian dan koordinasikan tindak lanjut.",
-      icon: GraduationCap,
     },
     {
       href: "/curriculum/quality",
       label: "Tinjau kualitas data",
       description: "Temukan data akademik yang memerlukan perbaikan.",
-      icon: Radar,
     },
   ],
 };
@@ -282,20 +266,20 @@ function QuickActions({
           : "Akses cepat area kerja"
       }
     >
-      {actionByRole[role].map(({ href, label, description, icon: Icon }) => (
+      {actionByRole[role].map(({ href, label, description }, index) => (
         <Link key={href} href={href} className="quick-action-card">
-          <span className="quick-action-card-top">
-            <span className="quick-action-icon">
-              <Icon size={21} aria-hidden="true" />
-            </span>
-            <ArrowRight
-              size={18}
-              aria-hidden="true"
-              className="quick-action-arrow"
-            />
+          <span className="quick-action-index" aria-hidden="true">
+            {String(index + 1).padStart(2, "0")}
           </span>
-          <span className="quick-action-title">{label}</span>
-          <span className="quick-action-description">{description}</span>
+          <span className="quick-action-copy">
+            <span className="quick-action-title">{label}</span>
+            <span className="quick-action-description">{description}</span>
+          </span>
+          <ArrowRight
+            size={18}
+            aria-hidden="true"
+            className="quick-action-arrow"
+          />
         </Link>
       ))}
     </nav>
@@ -318,7 +302,8 @@ export function DashboardWorkspace({
     },
     curriculum: {
       title: "Ringkasan kurikulum",
-      description: "Gambaran struktur akademik dan pelaksanaan ujian di seluruh sekolah.",
+      description:
+        "Gambaran struktur akademik dan pelaksanaan ujian di seluruh sekolah.",
     },
     teacher: {
       title: "Ringkasan pengajaran",
