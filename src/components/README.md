@@ -4,6 +4,11 @@ Reusable, business-agnostic UI components belong here. Components that serve
 only one domain belong inside that domain's `features/<domain>/components`.
 Use client components only when their behavior requires browser APIs or events.
 
+The protected application shell and role-aware navigation also live here.
+Shell-level role checks only control navigation and presentation; they never
+replace API authorization. Shared colors, typography, spacing, focus, and
+responsive rules are owned by [`docs/DESIGN.md`](../../docs/DESIGN.md).
+
 Shared patterns:
 
 - `PageHeader`: one page heading, concise context, and a primary action.
@@ -20,6 +25,10 @@ Shared patterns:
   label, Lucide icon, focus/hover tooltip, and button pending state. Tooltips
   share the Base UI provider in `AppProviders`.
 - `LoadingState`: content-shaped loading rows, with reduced-motion support.
+
+Prefer the smallest shared primitive that represents a real repeated pattern.
+Keep domain filters, business actions, API calls, permissions, and route
+decisions in their owning feature.
 
 Do not put API calls, role decisions, grading rules, or task routing in these
 shared patterns. Keep those responsibilities in their owning features.

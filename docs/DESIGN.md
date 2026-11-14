@@ -1,5 +1,9 @@
 # Design System — Citra Negara LMS Web
 
+See the [frontend documentation index](INDEX.md) for architecture and source
+ownership links. This document is the canonical owner of visual and
+interaction decisions.
+
 This is the source of truth for the LMS visual language. Read it before
 designing or changing a component, page, layout, or interaction.
 
@@ -99,6 +103,12 @@ sage soft surface `--primary-soft: 145 32% 91%`, leaf identity detail
 `--brand-accent: 88 46% 60%`, and forest navigation
 `--sidebar-end: 155 43% 14%`. Semantic success, warning, danger, information,
 and chart roles remain separate from the identity accent.
+
+Typography uses the system `--font-sans` stack (`Segoe UI Variable`, `Segoe UI`,
+Inter, and standard platform fallbacks). `--font-display` aliases the same
+stack, so welcome headings, page titles, metrics, navigation, and body copy
+share a legible enterprise sans-serif. Do not add a separate decorative serif
+face or a remote font dependency for dashboard headings.
 
 Composition tokens also define sidebar/content widths, control height,
 reading width, dialog width, and examination toolbar/rail dimensions. Ordinary

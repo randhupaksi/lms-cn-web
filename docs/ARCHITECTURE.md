@@ -1,5 +1,8 @@
 # Citra Negara LMS Web Architecture
 
+See the [frontend documentation index](INDEX.md) for design and source
+ownership guides.
+
 Citra Negara LMS Web uses Next.js App Router with feature-first domain modules.
 The foundation targets one school and deliberately does not introduce
 multi-tenant or SaaS abstractions.
@@ -57,6 +60,13 @@ components/        # business-agnostic shell and access presentation
 
 Only add folders when the domain needs them. Avoid empty abstractions.
 
+Implemented feature modules are `auth`, `users`, `academics`, `questions`,
+`exams`, `attempts`, `results`, `audit`, `monitoring`, `materials`,
+`assignments`, `analytics`, and `governance`. Grading workflows are owned by
+the results and exam features where the UI consumes them; the API retains the
+grading domain and all score calculations. See the source directory's
+[feature guide](../src/features/README.md) for ownership rules.
+
 ## Authentication boundary
 
 The browser keeps the access token in memory. The API refresh token stays in an
@@ -78,9 +88,13 @@ School governance lives in `features/governance`, exported through its public
 entrypoint. It owns React Query keys and consumes typed `governance.service`
 contracts for command overview, readiness, quality, schedule requests, calendar,
 reports and settings. Protected account management remains in `features/users`.
-School-wide routes have explicit `superadmin` or `principal` guards; the shared requests and actions pages
-admit staff and server-scope teacher/admin reads. A school-profile provider
-supplies the public whitelisted branding/support contract to shell and login.
+Role routes and navigation are composed in the protected application shell.
+Governance workspaces expose distinct `superadmin`, `principal`, and
+`curriculum` capabilities; shared requests and leadership-action pages have
+their own staff and assignment scopes. These frontend checks control
+presentation only. The API enforces every role, ownership, and mutation rule.
+A school-profile provider supplies the public whitelisted branding/support
+contract to the shell and login.
 
 Materials, assignments, monitoring, analytics, and audit follow the same data
 flow as the examination modules: route composition calls a feature-owned React
@@ -92,3 +106,12 @@ Shared loading, empty, error, and metric presentation live in
 `src/components/`. Domain-specific forms, polling, mutations, and cache keys
 stay in `src/features/<domain>/`. This keeps page files focused on role-facing
 composition while avoiding a generic feature framework.
+
+## Application shell and responsive navigation
+
+`src/components/app-shell.tsx` owns the protected workspace shell, role-aware
+navigation, account actions, and page chrome. The top-bar toggle collapses or
+expands the sidebar on desktop and opens or closes it as a modal drawer on
+mobile. Mobile navigation manages focus and hides a closed drawer from keyboard
+navigation. Role decisions remain in the API; route guards are a user
+experience boundary.

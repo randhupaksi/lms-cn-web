@@ -14,12 +14,17 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 > Workspace-wide rules are in `../AGENTS.md`. Read this file after the Next.js
 > block and before changing frontend code.
 
+The frontend documentation map is [`docs/INDEX.md`](docs/INDEX.md). It links
+the architecture and design sources of truth and source ownership guides.
+
 ## 1. Product scope
 
 This is the Citra Negara LMS frontend, initially for the school's graduation
 examination workflow. It currently implements role-aware authentication,
 academic administration, examination, grading/results, monitoring, materials,
-assignments, and dashboard workflows. Preserve those contracts and consult
+assignments, analytics, and school governance workflows. The six school roles
+are `superadmin`, `principal`, `curriculum`, `admin`, `teacher`, and `student`.
+Preserve those contracts and consult
 `../docs/IMPLEMENTATION_STATUS.md` before extending product scope; do not invent
 unconfirmed business features.
 
