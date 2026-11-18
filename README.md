@@ -32,3 +32,7 @@ starts the appropriate Next.js server automatically. The Playwright
 configuration targets Chromium. E2E tests use synthetic API responses and do
 not access student or production data. Build configuration and the public API
 base URL are described in the [operations runbook](../lms-cn-api/docs/OPERATIONS.md).
+
+For local verification with Microsoft Edge already installed, set
+`PLAYWRIGHT_BROWSER_CHANNEL=msedge`. Set `PLAYWRIGHT_PORT` when using a server
+port other than 3000, and start the local server on that same port.

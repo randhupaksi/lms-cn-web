@@ -46,10 +46,11 @@ export async function uploadMaterialAttachment(materialId: string, file: File) {
 export async function downloadMaterialAttachment(
   materialId: string,
   attachmentId: string,
+  signal: AbortSignal,
 ) {
   const { data } = await apiClient.get<Blob>(
     `/materials/${materialId}/attachments/${attachmentId}`,
-    { responseType: "blob" },
+    { responseType: "blob", signal },
   );
   return data;
 }

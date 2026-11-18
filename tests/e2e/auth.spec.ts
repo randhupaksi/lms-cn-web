@@ -60,6 +60,12 @@ test("redirects an unauthenticated visitor from protected pages to login", async
 });
 
 test("shows a safe message when login fails", async ({ page }) => {
+  let refreshCalls = 0;
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname.endsWith("/auth/refresh")) {
+      refreshCalls++;
+    }
+  });
   await page.route("**/api/v1/auth/login", (route) =>
     route.fulfill({
       status: 401,
@@ -81,6 +87,7 @@ test("shows a safe message when login fails", async ({ page }) => {
     "Identitas atau kata sandi tidak valid.",
   );
   await expect(page.getByText(/Synthetic backend diagnostic/)).toHaveCount(0);
+  expect(refreshCalls).toBe(1);
 });
 
 test("requires matching password confirmation before submitting a password change", async ({
@@ -153,7 +160,7 @@ test("keeps the login form usable without horizontal overflow on mobile", async 
   expect(hasHorizontalOverflow).toBe(false);
 });
 
-test("opens the principal control center with school governance navigation", async ({ page }) => {
+async function loginAsPrincipal(page: Page) {
   const session = sessionEnvelope(false);
   session.data.user.role = "principal";
   session.data.user.full_name = "Kepala Sekolah Uji";
@@ -165,7 +172,104 @@ test("opens the principal control center with school governance navigation", asy
   await page.getByPlaceholder("Masukkan kata sandi akun Anda").fill("synthetic-password");
   await page.getByRole("button", { name: "Masuk ke LMS" }).click();
   await expect(page.getByRole("heading", { name: "Kepemimpinan sekolah" })).toBeVisible();
+}
+
+test("opens the principal control center with collapsible desktop navigation", async ({ page }) => {
+  await loginAsPrincipal(page);
   await expect(page.getByRole("link", { name: /Laporan sekolah/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Tindak lanjut sekolah/ })).toBeVisible();
+  await page.getByRole("button", { name: "Sembunyikan navigasi" }).click();
+  await expect(page.getByRole("link", { name: /Laporan sekolah/ })).toHaveCount(0);
+  await page.getByRole("button", { name: "Tampilkan navigasi" }).click();
+  await expect(page.getByRole("link", { name: /Laporan sekolah/ })).toBeVisible();
 });
 
+test("keeps keyboard focus within mobile navigation and returns it after closing", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await loginAsPrincipal(page);
+  const toggle = page.getByRole("button", { name: "Tampilkan navigasi" });
+  await toggle.click();
+
+  const drawer = page.getByRole("dialog", { name: "Navigasi aplikasi" });
+  const firstLink = drawer.getByRole("link").first();
+  await expect(firstLink).toBeFocused();
+  await expect(page.locator(".workspace-main")).toHaveJSProperty("inert", true);
+  await page.keyboard.press("Shift+Tab");
+  await expect(drawer.getByRole("button", { name: "Keluar" })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(firstLink).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(drawer).toHaveCount(0);
+  await expect(toggle).toBeFocused();
+
+  await toggle.press("Enter");
+  await drawer.getByRole("button", { name: "Tutup navigasi" }).click();
+  await expect(drawer).toHaveCount(0);
+  await expect(toggle).toBeFocused();
+});
+
+test("restores a student session and cancels an image preview when leaving its material", async ({ page }) => {
+  const session = sessionEnvelope(false);
+  await page.route("**/api/v1/auth/refresh", (route) =>
+    route.fulfill({ json: session }),
+  );
+  const meta = { page: 1, per_page: 20, total: 2, total_pages: 1 };
+  await page.route(/\/api\/v1\/courses\?/, (route) =>
+    route.fulfill({ json: { success: true, data: [], meta } }),
+  );
+  const material = {
+    course_id: "synthetic-course",
+    course_name: "Course Uji",
+    content: "Konten uji.",
+    description: "Deskripsi uji.",
+    status: "published",
+  };
+  await page.route(/\/api\/v1\/materials\?/, (route) =>
+    route.fulfill({
+      json: {
+        success: true,
+        meta,
+        data: [
+          {
+            ...material,
+            id: "synthetic-first",
+            title: "Materi dengan gambar",
+            position: 1,
+            attachments: [
+              { id: "synthetic-image", file_name: "uji.png", content_type: "image/png", size_bytes: 64 },
+            ],
+          },
+          {
+            ...material,
+            id: "synthetic-second",
+            title: "Materi berikutnya",
+            position: 2,
+            attachments: [],
+          },
+        ],
+      },
+    }),
+  );
+  const imagePath = "**/api/v1/materials/synthetic-first/attachments/synthetic-image";
+  const pendingPreview = Promise.withResolvers<void>();
+  await page.route(imagePath, async (route) => {
+    await pendingPreview.promise;
+    await route.abort().catch(() => undefined);
+  });
+
+  try {
+    const previewStarted = page.waitForRequest(imagePath);
+    await page.goto("/student/materials");
+    await previewStarted;
+    const previewCancelled = page.waitForEvent("requestfailed", {
+      predicate: (request) => request.url().endsWith("/attachments/synthetic-image"),
+    });
+    await page.getByRole("button", { name: /Materi berikutnya/ }).click();
+    const cancelled = await previewCancelled;
+    expect(cancelled.failure()?.errorText).toMatch(/abort/i);
+    await expect(page.getByRole("heading", { name: "Materi berikutnya" })).toBeFocused();
+    await expect(page.getByText("Lampiran belum dapat dimuat.")).toHaveCount(0);
+  } finally {
+    pendingPreview.resolve();
+  }
+});

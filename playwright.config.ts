@@ -1,6 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const isCI = Boolean(process.env.CI);
+const browserChannel = process.env.PLAYWRIGHT_BROWSER_CHANNEL;
+const port = process.env.PLAYWRIGHT_PORT ?? "3000";
+const baseURL = `http://127.0.0.1:${port}`;
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -17,14 +20,14 @@ export default defineConfig({
   ],
   outputDir: "test-results",
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: { ...devices["Desktop Chrome"], channel: browserChannel },
     },
   ],
   webServer:
@@ -33,15 +36,15 @@ export default defineConfig({
       : {
           command: isCI
             ? "node .next/standalone/server.js"
-            : "node ./node_modules/next/dist/bin/next dev --turbopack --hostname 127.0.0.1 --port 3000",
-          url: "http://127.0.0.1:3000/login",
+            : "node ./node_modules/next/dist/bin/next dev --turbopack --hostname 127.0.0.1",
+          url: `${baseURL}/login`,
           reuseExistingServer: !isCI,
           timeout: 90_000,
           env: {
             ...process.env,
             NEXT_PUBLIC_API_BASE_URL: "http://localhost:8080/api/v1",
             HOSTNAME: "127.0.0.1",
-            PORT: "3000",
+            PORT: port,
           },
         },
 });

@@ -50,6 +50,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
   );
   const [isLoggingOut, setLoggingOut] = useState(false);
   const sidebarRef = useRef<HTMLElement>(null);
+  const sidebarToggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const mobileViewport = window.matchMedia(MOBILE_VIEWPORT_QUERY);
@@ -65,7 +66,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
 
   useEffect(() => {
     if (!sidebarOpen || !isMobileViewport) return;
-    const previousFocus = document.activeElement as HTMLElement | null;
+    const toggle = sidebarToggleRef.current;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const focusableSelector =
@@ -100,7 +101,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = previousOverflow;
-      previousFocus?.focus();
+      toggle?.focus();
     };
   }, [isMobileViewport, sidebarOpen]);
 
@@ -163,17 +164,21 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
       : isMobileViewport
         ? sidebarOpen
         : !sidebarCollapsed;
+  const mobileDrawerOpen = isMobileViewport === true && sidebarOpen;
 
   return (
     <div className="workspace-shell">
-      <a href="#main-content" className="skip-link button-primary">
+      <a
+        href="#main-content"
+        className="skip-link button-primary"
+        inert={mobileDrawerOpen}
+      >
         Langsung ke konten utama
       </a>
       <button
         type="button"
-        aria-label="Tutup navigasi"
-        aria-hidden={!sidebarOpen}
-        tabIndex={sidebarOpen ? 0 : -1}
+        aria-hidden="true"
+        tabIndex={-1}
         onClick={() => setSidebarOpen(false)}
         className={cn(
           "sidebar-overlay lg:hidden",
@@ -192,8 +197,8 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
           sidebarCollapsed && "workspace-sidebar-desktop-collapsed",
         )}
         aria-label="Navigasi aplikasi"
-        role={sidebarOpen ? "dialog" : undefined}
-        aria-modal={sidebarOpen ? true : undefined}
+        role={mobileDrawerOpen ? "dialog" : undefined}
+        aria-modal={mobileDrawerOpen || undefined}
         inert={
           isMobileViewport === null
             ? undefined
@@ -250,6 +255,15 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
         </div>
 
         <div className="workspace-sidebar-footer">
+          {mobileDrawerOpen ? (
+            <button
+              type="button"
+              className="workspace-account-link mb-2"
+              onClick={() => setSidebarOpen(false)}
+            >
+              Tutup navigasi
+            </button>
+          ) : null}
           <div className="workspace-account-dock">
             <span className="workspace-user-avatar">
               {getInitials(user.full_name)}
@@ -282,6 +296,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
       </aside>
 
       <div
+        inert={mobileDrawerOpen}
         className={cn(
           "workspace-main",
           sidebarCollapsed && "workspace-main-sidebar-collapsed",
@@ -290,6 +305,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
         <header className="workspace-topbar">
           <div className="flex min-w-0 items-center gap-3">
             <Button
+              ref={sidebarToggleRef}
               variant="ghost"
               size="icon"
               className="shrink-0"

@@ -50,24 +50,21 @@ function MaterialAttachmentItem({
 
   useEffect(() => {
     if (!requested) return;
-    let cancelled = false;
+    const controller = new AbortController();
     let nextObjectUrl = "";
 
-    void downloadMaterialAttachment(materialId, attachment.id)
+    void downloadMaterialAttachment(materialId, attachment.id, controller.signal)
       .then((blob) => {
+        if (controller.signal.aborted) return;
         nextObjectUrl = URL.createObjectURL(blob);
-        if (cancelled) {
-          URL.revokeObjectURL(nextObjectUrl);
-          return;
-        }
         setDownloadResult({ key: attachmentKey, objectUrl: nextObjectUrl });
       })
       .catch(() => {
-        if (!cancelled) setDownloadResult({ key: attachmentKey, error: true });
+        if (!controller.signal.aborted) setDownloadResult({ key: attachmentKey, error: true });
       });
 
     return () => {
-      cancelled = true;
+      controller.abort();
       if (nextObjectUrl) URL.revokeObjectURL(nextObjectUrl);
     };
   }, [attachment.id, attachmentKey, materialId, requested, retry]);
