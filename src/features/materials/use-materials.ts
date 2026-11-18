@@ -32,6 +32,22 @@ export function usePublishMaterial() {
       client.invalidateQueries({ queryKey: keys.all }),
   });
 }
+export function useUploadMaterialAttachment() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ materialId, file }: { materialId: string; file: File }) =>
+      service.uploadMaterialAttachment(materialId, file),
+    onSuccess: () => client.invalidateQueries({ queryKey: keys.all }),
+  });
+}
+export function useDeleteMaterialAttachment() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ materialId, attachmentId }: { materialId: string; attachmentId: string }) =>
+      service.deleteMaterialAttachment(materialId, attachmentId),
+    onSuccess: () => client.invalidateQueries({ queryKey: keys.all }),
+  });
+}
 export function useCompleteMaterial() {
   const client = useQueryClient();
   return useMutation({

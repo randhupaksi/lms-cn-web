@@ -129,6 +129,14 @@ export type ExamResult = {
   published_at: string | null;
 };
 
+export type MaterialAttachment = {
+  id: string;
+  file_name: string;
+  content_type: string;
+  size_bytes: number;
+  created_at: string;
+};
+
 export type CourseMaterial = {
   id: string;
   course_id: string;
@@ -137,6 +145,7 @@ export type CourseMaterial = {
   title: string;
   description: string;
   content: string;
+  attachments: MaterialAttachment[];
   position: number;
   status: "draft" | "published" | "archived";
   published_at: string | null;

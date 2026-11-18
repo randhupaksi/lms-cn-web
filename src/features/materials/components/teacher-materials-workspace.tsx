@@ -6,19 +6,25 @@ import { RoleBoundary } from "@/components/role-boundary";
 import { useAllCourses } from "@/features/academics";
 import {
   useMaterials,
+  useDeleteMaterialAttachment,
   usePublishMaterial,
   useSaveMaterial,
+  useUploadMaterialAttachment,
 } from "@/features/materials/use-materials";
-import type { CourseMaterial } from "@/types/lms";
+import type { CourseMaterial, MaterialAttachment } from "@/types/lms";
 import { PageHeader } from "@/components/ui/page-header";
 import { BookOpenText, Plus, Pencil, Send } from "lucide-react";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { AsyncFeedback } from "@/components/async-feedback";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
-import { EditorPanel } from "@/components/ui/editor-panel";
+import { FormDialog } from "@/components/ui/form-dialog";
 import { FilterBar } from "@/components/ui/filter-bar";
+import { MaterialAttachments } from "@/features/materials/components/material-attachments";
 const PAGE_SIZE = 20;
+const MAX_ATTACHMENT_COUNT = 5;
+const MAX_ATTACHMENT_BYTES = 8 * 1024 * 1024;
+const MAX_ATTACHMENT_TOTAL_BYTES = 20 * 1024 * 1024;
 const emptyForm = { title: "", description: "", content: "", position: 1 };
 export function TeacherMaterialsWorkspace() {
   const [editorOpen, setEditorOpen] = useState(false);
@@ -30,6 +36,10 @@ export function TeacherMaterialsWorkspace() {
   const [page, setPage] = useState(1);
   const [editingId, setEditingId] = useState<string>();
   const [form, setForm] = useState(emptyForm);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [attachments, setAttachments] = useState<MaterialAttachment[]>([]);
+  const [attachmentSelectionError, setAttachmentSelectionError] = useState("");
+  const [isUploadingAttachments, setIsUploadingAttachments] = useState(false);
   const materials = useMaterials(
     courseFilter === "all" ? undefined : courseFilter,
     {
@@ -41,11 +51,17 @@ export function TeacherMaterialsWorkspace() {
   );
   const save = useSaveMaterial();
   const publish = usePublishMaterial();
+  const uploadAttachment = useUploadMaterialAttachment();
+  const deleteAttachment = useDeleteMaterialAttachment();
   function edit(item: CourseMaterial) {
     setEditorOpen(true);
     save.reset();
+    uploadAttachment.reset();
     setEditingId(item.id);
     setTargetCourseId(item.course_id);
+    setAttachments(item.attachments ?? []);
+    setSelectedFiles([]);
+    setAttachmentSelectionError("");
     setForm({
       title: item.title,
       description: item.description,
@@ -56,14 +72,93 @@ export function TeacherMaterialsWorkspace() {
   function reset() {
     setEditingId(undefined);
     setForm(emptyForm);
+    setAttachments([]);
+    setSelectedFiles([]);
+    setAttachmentSelectionError("");
+    uploadAttachment.reset();
     setEditorOpen(false);
+  }
+  function closeEditor() {
+    if (save.isPending || isUploadingAttachments) return;
+    reset();
+  }
+  function selectFiles(files: File[]) {
+    setSelectedFiles(files);
+    uploadAttachment.reset();
+    if (files.length + attachments.length > MAX_ATTACHMENT_COUNT) {
+      setAttachmentSelectionError("Satu materi maksimal memiliki 5 lampiran.");
+      return;
+    }
+    if (files.some((file) => file.size > MAX_ATTACHMENT_BYTES)) {
+      setAttachmentSelectionError("Ukuran setiap lampiran maksimal 8 MiB.");
+      return;
+    }
+    const currentBytes = attachments.reduce((total, file) => total + file.size_bytes, 0);
+    const selectedBytes = files.reduce((total, file) => total + file.size, 0);
+    if (currentBytes + selectedBytes > MAX_ATTACHMENT_TOTAL_BYTES) {
+      setAttachmentSelectionError("Total ukuran lampiran satu materi maksimal 20 MiB.");
+      return;
+    }
+    setAttachmentSelectionError("");
+  }
+  function removeAttachment(materialId: string, attachmentId: string) {
+    deleteAttachment.mutate(
+      { materialId, attachmentId },
+      {
+        onSuccess: () => {
+          if (materialId === editingId) {
+            setAttachments((current) => current.filter((item) => item.id !== attachmentId));
+          }
+        },
+      },
+    );
   }
   function submit(event: FormEvent) {
     event.preventDefault();
-    if (!targetCourseId) return;
+    if (!targetCourseId || attachmentSelectionError) return;
+    const pendingFiles = [...selectedFiles];
     save.mutate(
       { id: editingId, input: { ...form, course_id: targetCourseId } },
-      { onSuccess: reset },
+      {
+        onSuccess: async (material) => {
+          setEditingId(material.id);
+          setTargetCourseId(material.course_id);
+          setForm({
+            title: material.title,
+            description: material.description,
+            content: material.content,
+            position: material.position,
+          });
+          setAttachments(material.attachments ?? []);
+          if (pendingFiles.length === 0) {
+            reset();
+            return;
+          }
+
+          setIsUploadingAttachments(true);
+          let remainingFiles = pendingFiles;
+          try {
+            for (const file of pendingFiles) {
+              const uploaded = await uploadAttachment.mutateAsync({
+                materialId: material.id,
+                file,
+              });
+              remainingFiles = remainingFiles.filter((candidate) => candidate !== file);
+              setSelectedFiles(remainingFiles);
+              setAttachments((current) =>
+                current.some((item) => item.id === uploaded.id)
+                  ? current
+                  : [...current, uploaded],
+              );
+            }
+            reset();
+          } catch {
+            // Keep the draft and remaining files in the dialog so the teacher can retry.
+          } finally {
+            setIsUploadingAttachments(false);
+          }
+        },
+      },
     );
   }
   const courseOptions =
@@ -79,9 +174,9 @@ export function TeacherMaterialsWorkspace() {
           actions={
             <Button
               id="material-editor-trigger"
+              aria-haspopup="dialog"
               aria-expanded={editorOpen}
               aria-controls={editorOpen ? "material-editor" : undefined}
-              disabled={editorOpen}
               onClick={() => {
                 if (editingId) reset();
                 setEditorOpen(true);
@@ -92,14 +187,13 @@ export function TeacherMaterialsWorkspace() {
           }
         />
         {editorOpen ? (
-          <EditorPanel
-            focusKey={editingId ?? "new"}
+          <FormDialog
             id="material-editor"
             title={editingId ? "Perbarui materi" : "Buat materi baru"}
-            description="Susun judul, ringkasan, dan isi materi. Konten tersimpan sebagai draft sebelum dipublikasikan."
-            onClose={() => setEditorOpen(false)}
+            description="Susun isi materi dan tambahkan gambar atau dokumen. Draft serta lampirannya tersedia bagi siswa setelah dipublikasikan."
+            onClose={closeEditor}
           >
-            <form className="mt-5 grid gap-4 md:grid-cols-2" onSubmit={submit}>
+            <form className="grid gap-4 md:grid-cols-2" onSubmit={submit}>
               <label className="field-label md:col-span-2">
                 Course untuk materi
                 <RadixSelectField
@@ -142,6 +236,50 @@ export function TeacherMaterialsWorkspace() {
                   required
                 />
               </label>
+              <label className="field-label md:col-span-2">
+                Lampiran gambar atau dokumen
+                <input
+                  className="field-input file:mr-3 file:rounded-md file:border-0 file:bg-primary-soft file:px-3 file:py-2 file:font-semibold file:text-primary"
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.pdf,.docx"
+                  multiple
+                  onChange={(event) => selectFiles(Array.from(event.currentTarget.files ?? []))}
+                  disabled={save.isPending || isUploadingAttachments || attachments.length >= MAX_ATTACHMENT_COUNT}
+                />
+                <span className="mt-1 block text-xs font-normal leading-5 text-muted">
+                  JPG, PNG, PDF, atau DOCX · maksimal 8 MiB per file · 5 file dan total 20 MiB per materi.
+                </span>
+              </label>
+              {selectedFiles.length ? (
+                <ul className="space-y-1 text-xs leading-5 text-muted md:col-span-2" aria-label="File yang akan diunggah">
+                  {selectedFiles.map((file) => (
+                    <li key={`${file.name}-${file.lastModified}`} className="break-all">
+                      {file.name} · {(file.size / (1024 * 1024)).toFixed(1)} MiB
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              {attachmentSelectionError ? (
+                <p className="text-sm text-danger md:col-span-2" role="alert">
+                  {attachmentSelectionError}
+                </p>
+              ) : null}
+              <AsyncFeedback
+                error={uploadAttachment.error}
+                isError={uploadAttachment.isError}
+                isSuccess={false}
+                errorMessage="Sebagian lampiran belum dapat diunggah. Draft dan file yang belum terkirim tetap tersedia untuk dicoba kembali."
+                successMessage=""
+              />
+              {attachments.length ? (
+                <MaterialAttachments
+                  materialId={editingId ?? "new-material"}
+                  attachments={attachments}
+                  onRemove={editingId ? (attachmentId) => removeAttachment(editingId, attachmentId) : undefined}
+                  removingAttachmentId={deleteAttachment.isPending ? deleteAttachment.variables?.attachmentId : undefined}
+                  className="md:col-span-2"
+                />
+              ) : null}
               <label className="field-label max-w-32">
                 Urutan
                 <input
@@ -157,13 +295,17 @@ export function TeacherMaterialsWorkspace() {
               <div className="self-end">
                 <Button
                   type="submit"
-                  disabled={save.isPending || !targetCourseId}
+                  disabled={save.isPending || isUploadingAttachments || !targetCourseId || Boolean(attachmentSelectionError)}
                 >
-                  {save.isPending ? "Menyimpan…" : "Simpan draft"}
+                  {isUploadingAttachments
+                    ? "Mengunggah lampiran…"
+                    : save.isPending
+                      ? "Menyimpan…"
+                      : "Simpan draft"}
                 </Button>
               </div>
             </form>
-          </EditorPanel>
+          </FormDialog>
         ) : null}
         <AsyncFeedback
           error={save.error}
@@ -171,6 +313,13 @@ export function TeacherMaterialsWorkspace() {
           isSuccess={save.isSuccess}
           errorMessage="Materi belum dapat disimpan."
           successMessage="Draft materi berhasil disimpan."
+        />
+        <AsyncFeedback
+          error={deleteAttachment.error}
+          isError={deleteAttachment.isError}
+          isSuccess={deleteAttachment.isSuccess}
+          errorMessage="Lampiran belum dapat dihapus."
+          successMessage="Lampiran berhasil dihapus."
         />
 
         <section className="space-y-4">
@@ -267,6 +416,17 @@ export function TeacherMaterialsWorkspace() {
                     </p>
                   </div>
                 </div>
+                <MaterialAttachments
+                  materialId={item.id}
+                  attachments={item.attachments ?? []}
+                  onRemove={item.status === "draft" ? (attachmentId) => removeAttachment(item.id, attachmentId) : undefined}
+                  removingAttachmentId={
+                    deleteAttachment.isPending && deleteAttachment.variables?.materialId === item.id
+                      ? deleteAttachment.variables?.attachmentId
+                      : undefined
+                  }
+                  className="mt-4"
+                />
                 <div className="mt-4 flex gap-2">
                   <ActionButton
                     icon={Pencil}

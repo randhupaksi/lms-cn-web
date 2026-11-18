@@ -1,6 +1,6 @@
 import { apiClient } from "@/services/api/client";
 import type { ApiEnvelope, PaginatedEnvelope } from "@/types/api";
-import type { CourseMaterial } from "@/types/lms";
+import type { CourseMaterial, MaterialAttachment } from "@/types/lms";
 
 export type MaterialInput = {
   course_id: string;
@@ -32,6 +32,32 @@ export async function updateMaterial(id: string, input: MaterialInput) {
     input,
   );
   return data.data;
+}
+export async function uploadMaterialAttachment(materialId: string, file: File) {
+  const form = new FormData();
+  form.append("file", file);
+  const { data } = await apiClient.post<ApiEnvelope<MaterialAttachment>>(
+    `/materials/${materialId}/attachments`,
+    form,
+    { headers: { "Content-Type": "multipart/form-data" } },
+  );
+  return data.data;
+}
+export async function downloadMaterialAttachment(
+  materialId: string,
+  attachmentId: string,
+) {
+  const { data } = await apiClient.get<Blob>(
+    `/materials/${materialId}/attachments/${attachmentId}`,
+    { responseType: "blob" },
+  );
+  return data;
+}
+export async function deleteMaterialAttachment(
+  materialId: string,
+  attachmentId: string,
+) {
+  await apiClient.delete(`/materials/${materialId}/attachments/${attachmentId}`);
 }
 export async function publishMaterial(id: string) {
   await apiClient.post(`/materials/${id}/publish`);

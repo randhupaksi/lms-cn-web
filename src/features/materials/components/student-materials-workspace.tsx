@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Pagination } from "@/components/ui/pagination";
 import { cn } from "@/lib/cn";
+import { MaterialAttachments } from "@/features/materials/components/material-attachments";
 
 const PAGE_SIZE = 20;
 export function StudentMaterialsWorkspace() {
@@ -192,6 +193,15 @@ export function StudentMaterialsWorkspace() {
                 ) : null}
               </div>
               <div className="learning-reader-body">{selected.content}</div>
+              {selected.attachments?.length ? (
+                <div className="px-6 pb-6">
+                  <MaterialAttachments
+                    materialId={selected.id}
+                    attachments={selected.attachments}
+                    autoPreviewImages
+                  />
+                </div>
+              ) : null}
               <div className="learning-reader-footer">
                 <p className="text-xs leading-5 text-muted">
                   {selected.completed_at
