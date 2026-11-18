@@ -3,6 +3,7 @@ import { Monitor } from "lucide-react";
 import type { User, UserRole } from "@/types/api";
 import { Button } from "@/components/ui/button";
 import { RadixSelectField } from "@/components/ui/radix-select";
+import { FormDialog } from "@/components/ui/form-dialog";
 import { AsyncFeedback } from "@/components/async-feedback";
 import { ErrorState } from "@/components/data-state";
 import { useAuth } from "@/providers/auth-provider";
@@ -63,17 +64,14 @@ export function CreateManagedUser({
     mutation.mutate(form, { onSuccess: onCreated });
   }
   return (
-    <section className="governance-section">
-      <header className="governance-section-heading">
-        <div>
-          <p className="eyebrow">Akun sekolah</p>
-          <h2 className="section-title">Buat akses baru</h2>
-        </div>
-        <Button variant="ghost" onClick={onClose}>
-          Tutup
-        </Button>
-      </header>
-      <form className="governance-form-grid p-6" onSubmit={submit}>
+    <FormDialog
+      id="managed-user-form"
+      eyebrow="Akun sekolah"
+      title="Buat akses baru"
+      description="Buat akun sekolah dengan peran dan kata sandi sementara."
+      onClose={onClose}
+    >
+      <form className="governance-form-grid" onSubmit={submit}>
         <label className="field-label">
           Nama lengkap
           <input
@@ -143,7 +141,7 @@ export function CreateManagedUser({
           <Feedback mutation={mutation} />
         </div>
       </form>
-    </section>
+    </FormDialog>
   );
 }
 export function UserInspector({

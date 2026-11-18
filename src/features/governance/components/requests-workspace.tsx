@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { FormDialog } from "@/components/ui/form-dialog";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import type { ScheduleRequest } from "@/services/governance.service";
 import {
@@ -17,7 +18,6 @@ import {
 } from "../use-governance";
 import {
   GovernanceBadge,
-  GovernanceSection,
   inputToISO,
   MutationFeedback,
   QueryState,
@@ -53,16 +53,14 @@ function ScheduleForm({
     );
   }
   return (
-    <GovernanceSection
+    <FormDialog
+      id="schedule-request-form"
       eyebrow="Pengajuan baru"
       title="Usulkan perubahan jadwal"
-      action={
-        <Button variant="ghost" onClick={onClose}>
-          Tutup
-        </Button>
-      }
+      description="Pilih ujian, usulkan waktu baru, dan sertakan alasan untuk ditinjau."
+      onClose={onClose}
     >
-      <form className="governance-form-grid p-6" onSubmit={submit}>
+      <form className="governance-form-grid" onSubmit={submit}>
         <label className="field-label">
           Cari ujian
           <input
@@ -143,7 +141,7 @@ function ScheduleForm({
           <MutationFeedback mutation={mutation} />
         </div>
       </form>
-    </GovernanceSection>
+    </FormDialog>
   );
 }
 
@@ -209,7 +207,12 @@ export function RequestsWorkspace() {
         }
         actions={
           !reviewer ? (
-            <Button onClick={() => setCreating(!creating)}>
+            <Button
+              aria-haspopup="dialog"
+              aria-expanded={creating}
+              aria-controls={creating ? "schedule-request-form" : undefined}
+              onClick={() => setCreating(true)}
+            >
               <Plus size={17} aria-hidden="true" />
               Buat pengajuan
             </Button>

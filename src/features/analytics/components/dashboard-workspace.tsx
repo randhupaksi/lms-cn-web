@@ -4,6 +4,8 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import {
   ArrowRight,
+  BookOpenText,
+  ChartNoAxesCombined,
   CheckCircle2,
   ClipboardCheck,
   ClipboardList,
@@ -16,6 +18,13 @@ import { MetricGrid } from "@/components/metric-grid";
 import { StatusBadge } from "@/components/ui/status-badge";
 import type { DashboardMetric, DashboardTask } from "@/types/lms";
 import type { UserRole } from "@/types/api";
+
+const studentMetricIcons = {
+  courses: BookOpenText,
+  available_exams: GraduationCap,
+  published_results: ChartNoAxesCombined,
+  completed_materials: CheckCircle2,
+};
 
 type Action = {
   href: Route;
@@ -42,6 +51,16 @@ const actionByRole: Record<
       href: "/student/materials",
       label: "Lanjutkan materi",
       description: "Akses materi yang tersedia di course Anda.",
+    },
+    {
+      href: "/student/results",
+      label: "Lihat hasil belajar",
+      description: "Periksa nilai dan hasil ujian yang sudah dipublikasikan.",
+    },
+    {
+      href: "/student/materials",
+      label: "Tinjau progres materi",
+      description: "Periksa materi yang selesai dan yang masih perlu dipelajari.",
     },
   ],
   teacher: [
@@ -267,7 +286,7 @@ function QuickActions({
       }
     >
       {actionByRole[role].map(({ href, label, description }, index) => (
-        <Link key={href} href={href} className="quick-action-card">
+        <Link key={`${href}-${label}`} href={href} className="quick-action-card">
           <span className="quick-action-index" aria-hidden="true">
             {String(index + 1).padStart(2, "0")}
           </span>
@@ -325,7 +344,14 @@ export function DashboardWorkspace({
         <p className="section-description">{overview.description}</p>
       </div>
       {metrics.length ? (
-        <MetricGrid metrics={metrics} />
+        <div
+          className={role === "student" ? "dashboard-kpi-surface" : undefined}
+        >
+          <MetricGrid
+            metrics={metrics}
+            iconByKey={role === "student" ? studentMetricIcons : undefined}
+          />
+        </div>
       ) : (
         <EmptyState
           title="Ringkasan belum tersedia"

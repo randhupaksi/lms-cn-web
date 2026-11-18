@@ -124,7 +124,12 @@ export function AccessWorkspace() {
         title="Orang yang tepat, kewenangan yang jelas"
         description="Kelola akun sekolah, administrator, dan sesi aktif dengan jejak perubahan yang terjaga."
         actions={
-          <Button onClick={() => setCreating(!creating)}>
+          <Button
+            aria-haspopup="dialog"
+            aria-expanded={creating}
+            aria-controls={creating ? "managed-user-form" : undefined}
+            onClick={() => setCreating(true)}
+          >
             <Plus size={17} aria-hidden="true" />
             Buat akun
           </Button>

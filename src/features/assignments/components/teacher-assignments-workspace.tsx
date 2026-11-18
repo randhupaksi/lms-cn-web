@@ -20,7 +20,7 @@ import { DateTimePickerField } from "@/components/ui/date-picker";
 import { AsyncFeedback } from "@/components/async-feedback";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
-import { EditorPanel } from "@/components/ui/editor-panel";
+import { FormDialog } from "@/components/ui/form-dialog";
 import { FilterBar } from "@/components/ui/filter-bar";
 const PAGE_SIZE = 20;
 const emptyForm = { title: "", instructions: "", due_at: "", max_score: 100 };
@@ -87,9 +87,9 @@ export function TeacherAssignmentsWorkspace() {
           actions={
             <Button
               id="assignment-editor-trigger"
+              aria-haspopup="dialog"
               aria-expanded={editorOpen}
               aria-controls={editorOpen ? "assignment-editor" : undefined}
-              disabled={editorOpen}
               onClick={() => {
                 save.reset();
                 setEditorOpen(true);
@@ -100,13 +100,13 @@ export function TeacherAssignmentsWorkspace() {
           }
         />
         {editorOpen ? (
-          <EditorPanel
+          <FormDialog
             id="assignment-editor"
             title={"Buat tugas baru"}
             description="Berikan instruksi yang jelas, batas pengumpulan, dan skor maksimal untuk siswa."
             onClose={() => setEditorOpen(false)}
           >
-            <form className="form-grid mt-4" onSubmit={submit}>
+            <form className="form-grid" onSubmit={submit}>
               <label className="field-label md:col-span-2">
                 Course untuk tugas
                 <RadixSelectField
@@ -167,7 +167,7 @@ export function TeacherAssignmentsWorkspace() {
                 {save.isPending ? "Menyimpan…" : "Simpan draft"}
               </Button>
             </form>
-          </EditorPanel>
+          </FormDialog>
         ) : null}
         <AsyncFeedback
           error={save.error}

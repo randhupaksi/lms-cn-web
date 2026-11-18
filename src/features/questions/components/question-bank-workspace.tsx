@@ -18,7 +18,7 @@ import { AsyncFeedback } from "@/components/async-feedback";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 
-import { EditorPanel } from "@/components/ui/editor-panel";
+import { FormDialog } from "@/components/ui/form-dialog";
 import { FilterBar } from "@/components/ui/filter-bar";
 
 const emptyOptions = () =>
@@ -115,9 +115,9 @@ export function QuestionBankWorkspace() {
           actions={
             <Button
               id="question-editor-trigger"
+              aria-haspopup="dialog"
               aria-expanded={editorOpen}
               aria-controls={editorOpen ? "question-editor" : undefined}
-              disabled={editorOpen}
               onClick={() => {
                 if (editingId) reset();
                 save.reset();
@@ -130,14 +130,13 @@ export function QuestionBankWorkspace() {
         />
         <div className="space-y-6">
           {editorOpen ? (
-            <EditorPanel
-              focusKey={editingId ?? "new"}
+            <FormDialog
               id="question-editor"
               title={editingId ? "Perbarui soal" : "Buat soal baru"}
               description="Tulis pertanyaan dan pilih tepat satu jawaban benar. Soal yang sudah digunakan tidak mengubah isi ujian sebelumnya."
               onClose={() => setEditorOpen(false)}
             >
-              <form className="mt-5 space-y-4" onSubmit={submit}>
+              <form className="space-y-4" onSubmit={submit}>
                 <label className="field-label">
                   Course untuk soal
                   <RadixSelectField
@@ -243,7 +242,7 @@ export function QuestionBankWorkspace() {
                       : "Tambah soal"}
                 </Button>
               </form>
-            </EditorPanel>
+            </FormDialog>
           ) : null}
           <AsyncFeedback
             error={save.error}

@@ -71,7 +71,9 @@ grading domain and all score calculations. See the source directory's
 
 The browser keeps the access token in memory. The API refresh token stays in an
 HttpOnly cookie and is used to restore a session after refresh. Axios performs a
-single shared refresh request after a 401 and retries the original request.
+single shared refresh request after a 401 and retries the original request. The
+API expires the server-side session 24 hours after login; refresh-token rotation
+does not extend that lifetime.
 Frontend role boundaries are presentation safeguards only; every sensitive
 decision remains enforced by the API.
 

@@ -6,6 +6,7 @@ import { CheckCircle2, Clock3, Cloud, CloudOff } from "lucide-react";
 import { RoleBoundary } from "@/components/role-boundary";
 import { ErrorState, LoadingState } from "@/components/data-state";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { AsyncFeedback } from "@/components/async-feedback";
 import { Button } from "@/components/ui/button";
 import {
   useAttempt,
@@ -249,11 +250,6 @@ export function AttemptWorkspace({ attemptId }: { attemptId: string }) {
             >
               {timeExpired ? "Coba kumpulkan kembali" : "Kumpulkan ujian"}
             </Button>
-            {submit.isError && !confirmSubmit ? (
-              <p className="form-error" role="alert">
-                Ujian belum dapat dikumpulkan. Periksa koneksi dan coba lagi.
-              </p>
-            ) : null}
             <ConfirmationDialog
               open={confirmSubmit}
               onOpenChange={setConfirmSubmit}
@@ -273,11 +269,13 @@ export function AttemptWorkspace({ attemptId }: { attemptId: string }) {
                 })
               }
             >
-              {submit.isError ? (
-                <p className="form-error" role="alert">
-                  Ujian belum dapat dikumpulkan. Periksa koneksi dan coba lagi.
-                </p>
-              ) : null}
+              <AsyncFeedback
+                error={submit.error}
+                isError={submit.isError}
+                isSuccess={false}
+                errorMessage="Ujian belum dapat dikumpulkan. Periksa koneksi dan coba lagi."
+                successMessage=""
+              />
             </ConfirmationDialog>
           </aside>
         </div>

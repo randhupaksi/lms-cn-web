@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { ActionButton } from "@/components/ui/action-button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { FormDialog } from "@/components/ui/form-dialog";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import type { SchoolEvent } from "@/services/governance.service";
 import {
@@ -14,7 +15,6 @@ import {
 } from "../use-governance";
 import {
   GovernanceBadge,
-  GovernanceSection,
   inputToISO,
   localInput,
   MutationFeedback,
@@ -60,16 +60,18 @@ function EventForm({
     );
   }
   return (
-    <GovernanceSection
+    <FormDialog
+      id="school-event-form"
       eyebrow="Agenda sekolah"
       title={initial ? "Sunting agenda" : "Tambahkan agenda"}
-      action={
-        <Button variant="ghost" onClick={onClose}>
-          Tutup
-        </Button>
+      description={
+        initial
+          ? "Perbarui detail agenda sekolah."
+          : "Tambahkan agenda akademik, rapat, hari libur, atau pengumuman."
       }
+      onClose={onClose}
     >
-      <form className="governance-form-grid p-6" onSubmit={submit}>
+      <form className="governance-form-grid" onSubmit={submit}>
         <label className="field-label">
           Judul agenda
           <input
@@ -132,7 +134,7 @@ function EventForm({
           <MutationFeedback mutation={save} />
         </div>
       </form>
-    </GovernanceSection>
+    </FormDialog>
   );
 }
 
@@ -180,7 +182,12 @@ export function CalendarWorkspace() {
         title="Satu pandangan untuk agenda bersama"
         description="Jadwal ujian terhubung otomatis. Tambahkan agenda akademik, rapat, dan hari libur sekolah."
         actions={
-          <Button onClick={() => setEditor("new")}>
+          <Button
+            aria-haspopup="dialog"
+            aria-expanded={editor !== null}
+            aria-controls={editor ? "school-event-form" : undefined}
+            onClick={() => setEditor("new")}
+          >
             <Plus size={17} aria-hidden="true" />
             Tambah agenda
           </Button>
@@ -330,6 +337,13 @@ export function CalendarWorkspace() {
                     <ActionButton
                       icon={Pencil}
                       label={`Sunting ${event.title}`}
+                      aria-haspopup="dialog"
+                      aria-expanded={editor !== null && editor !== "new" && editor.id === event.id}
+                      aria-controls={
+                        editor !== null && editor !== "new" && editor.id === event.id
+                          ? "school-event-form"
+                          : undefined
+                      }
                       onClick={() => setEditor(event)}
                     />
                     <ActionButton

@@ -14,12 +14,14 @@ Shared patterns:
 - `PageHeader`: one page heading, concise context, and a primary action.
 - `FilterBar`: responsive visible labels and controls; filters and queries stay
   feature-owned.
-- `EditorPanel`: an inline surface for authoring, with focus entry/restoration.
-  The owning feature retains draft state and decides when to close after save.
-  Use `${id}-trigger` on its opener so focus can return after a disabled opener
-  is re-enabled on close.
+- `FormDialog`: Base UI modal for add/edit forms, with a focused title,
+  contained scrolling, keyboard dismissal, and an explicit close control. The
+  owning feature retains draft state and decides when to close after save.
 - `ConfirmationDialog`: Base UI dialog for consequential actions, with cancel
-  focus, pending behavior, and a slot for inline failure feedback.
+  focus and pending behavior. Use `AsyncFeedback` for mutation errors so they
+  share the accessible `ErrorDialog` presentation.
+- `ErrorDialog`: shared modal presentation for action failures. It uses the
+  confirmation dialog surface and semantic danger colors.
 - `MetricGrid`: grid and horizontal strip presentations of real metrics.
 - `ActionButton` / `ActionLink`: compact row controls with a required accessible
   label, Lucide icon, focus/hover tooltip, and button pending state. Tooltips

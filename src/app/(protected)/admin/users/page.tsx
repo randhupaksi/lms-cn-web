@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { EditorPanel } from "@/components/ui/editor-panel";
+import { FormDialog } from "@/components/ui/form-dialog";
 import { RoleBoundary } from "@/components/role-boundary";
 import { UserCreateForm } from "@/features/users/components/user-create-form";
 import { UserDirectory } from "@/features/users/components/user-directory";
@@ -22,9 +22,9 @@ export default function UsersPage() {
           actions={
             <Button
               id="user-editor-trigger"
+              aria-haspopup="dialog"
               aria-expanded={editorOpen}
               aria-controls={editorOpen ? "user-editor" : undefined}
-              disabled={editorOpen}
               onClick={() => setEditorOpen(true)}
             >
               <Plus aria-hidden="true" size={17} /> Tambah pengguna
@@ -32,14 +32,14 @@ export default function UsersPage() {
           }
         />
         {editorOpen ? (
-          <EditorPanel
+          <FormDialog
             id="user-editor"
             title="Tambah pengguna"
             description="Daftarkan akun guru atau siswa dengan kata sandi sementara dari sekolah."
             onClose={() => setEditorOpen(false)}
           >
             <UserCreateForm />
-          </EditorPanel>
+          </FormDialog>
         ) : null}
         <UserDirectory />
       </div>

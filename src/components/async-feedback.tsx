@@ -1,5 +1,8 @@
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+"use client";
+
+import { CheckCircle2 } from "lucide-react";
 import { getApiErrorMessage } from "@/lib/api-error";
+import { ErrorDialog } from "@/components/ui/error-dialog";
 
 type AsyncFeedbackProps = {
   error: unknown;
@@ -18,10 +21,9 @@ export function AsyncFeedback({
 }: AsyncFeedbackProps) {
   if (isError) {
     return (
-      <p className="feedback-message feedback-message-error" role="alert">
-        <AlertCircle aria-hidden="true" size={16} />
-        {getApiErrorMessage(error, errorMessage)}
-      </p>
+      <ErrorDialog
+        message={getApiErrorMessage(error, errorMessage)}
+      />
     );
   }
 

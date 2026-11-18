@@ -6,6 +6,7 @@ import { useAuth } from "@/providers/auth-provider";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { ErrorState, LoadingState } from "@/components/data-state";
+import { AsyncFeedback } from "@/components/async-feedback";
 import { Pagination } from "@/components/ui/pagination";
 import * as service from "@/services/leadership.service";
 
@@ -186,10 +187,13 @@ export function LeadershipActions() {
             <Button type="submit" disabled={create.isPending}>
               Buat tindak lanjut
             </Button>
-            {create.isError && (
-              <p role="alert">Tindak lanjut belum dapat dibuat.</p>
-            )}
-            {create.isSuccess && <p role="status">Tindak lanjut dibuat.</p>}
+            <AsyncFeedback
+              error={create.error}
+              isError={create.isError}
+              isSuccess={create.isSuccess}
+              errorMessage="Tindak lanjut belum dapat dibuat."
+              successMessage="Tindak lanjut dibuat."
+            />
           </div>
         </form>
       )}
@@ -311,12 +315,13 @@ export function LeadershipActions() {
             >
               Simpan perkembangan
             </Button>
-            {update.isError && (
-              <p role="alert">
-                Perubahan belum dapat disimpan. Muat ulang dan coba lagi.
-              </p>
-            )}
-            {update.isSuccess && <p role="status">Perkembangan disimpan.</p>}
+            <AsyncFeedback
+              error={update.error}
+              isError={update.isError}
+              isSuccess={update.isSuccess}
+              errorMessage="Perubahan belum dapat disimpan. Muat ulang dan coba lagi."
+              successMessage="Perkembangan disimpan."
+            />
           </form>}
           <h3>Riwayat</h3>
           {history.isLoading && <p>Memuat riwayat…</p>}

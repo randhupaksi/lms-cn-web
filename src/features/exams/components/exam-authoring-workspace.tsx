@@ -22,7 +22,7 @@ import { Pagination } from "@/components/ui/pagination";
 
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { EditorPanel } from "@/components/ui/editor-panel";
+import { FormDialog } from "@/components/ui/form-dialog";
 import { FilterBar } from "@/components/ui/filter-bar";
 const PAGE_SIZE = 20;
 const emptyForm = {
@@ -90,9 +90,9 @@ export function ExamAuthoringWorkspace() {
           actions={
             <Button
               id="exam-editor-trigger"
+              aria-haspopup="dialog"
               aria-expanded={editorOpen}
               aria-controls={editorOpen ? "exam-editor" : undefined}
-              disabled={editorOpen}
               onClick={() => {
                 create.reset();
                 setEditorOpen(true);
@@ -103,7 +103,7 @@ export function ExamAuthoringWorkspace() {
           }
         />
         {editorOpen ? (
-          <EditorPanel
+          <FormDialog
             id="exam-editor"
             title={"Buat ujian baru"}
             description="Tentukan identitas dan jadwal ujian. Tambahkan soal serta peserta setelah draft tersimpan."
@@ -224,7 +224,7 @@ export function ExamAuthoringWorkspace() {
                 </p>
               ) : null}
             </form>
-          </EditorPanel>
+          </FormDialog>
         ) : null}
         <AsyncFeedback
           error={create.error}

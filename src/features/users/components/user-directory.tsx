@@ -13,6 +13,7 @@ import { RadixSelectField } from "@/components/ui/radix-select";
 import { Pagination } from "@/components/ui/pagination";
 import { AsyncFeedback } from "@/components/async-feedback";
 import { Button } from "@/components/ui/button";
+import { FormDialog } from "@/components/ui/form-dialog";
 
 export function UserDirectory() {
   const [search, setSearch] = useState("");
@@ -38,6 +39,10 @@ export function UserDirectory() {
         },
       },
     );
+  }
+  function closeReset() {
+    setResetUserId(null);
+    setResetPassword("");
   }
 
   return (
@@ -107,6 +112,13 @@ export function UserDirectory() {
                     <ActionButton
                       icon={KeyRound}
                       label={`Atur ulang kata sandi ${user.full_name}`}
+                      aria-haspopup="dialog"
+                      aria-expanded={resetUserId === user.id}
+                      aria-controls={
+                        resetUserId === user.id
+                          ? "credential-reset-form"
+                          : undefined
+                      }
                       onClick={() => {
                         setResetUserId(user.id);
                         setResetPassword("");
@@ -176,37 +188,41 @@ export function UserDirectory() {
         </DataTable>
       </div>
       {resetUserId && (
-        <form
-          className="flex flex-wrap items-end gap-3 border-t border-border bg-surface p-4"
-          onSubmit={submitReset}
-          aria-label="Atur ulang kata sandi sementara"
+        <FormDialog
+          id="credential-reset-form"
+          eyebrow="Akses pengguna"
+          title="Atur ulang kata sandi sementara"
+          description="Tetapkan kata sandi baru. Sesi aktif akun akan dicabut setelah kata sandi diperbarui."
+          onClose={closeReset}
         >
-          <label className="field-label min-w-64 flex-1">
-            Kata sandi sementara baru
-            <input
-              className="field-input"
-              type="password"
-              minLength={8}
-              value={resetPassword}
-              placeholder="Masukkan kata sandi sementara baru"
-              onChange={(event) => setResetPassword(event.target.value)}
-              required
-            />
-            <span className="text-xs font-normal leading-5 text-muted">
-              Sesi aktif pengguna akan dicabut saat kata sandi diperbarui.
-            </span>
-          </label>
-          <Button type="submit" disabled={resetCredential.isPending}>
-            Simpan reset
-          </Button>
-          <Button
-            variant="ghost"
-            type="button"
-            onClick={() => setResetUserId(null)}
+          <form
+            className="flex flex-wrap items-end gap-3"
+            onSubmit={submitReset}
+            aria-label="Atur ulang kata sandi sementara"
           >
-            Batal
-          </Button>
-        </form>
+            <label className="field-label min-w-64 flex-1">
+              Kata sandi sementara baru
+              <input
+                className="field-input"
+                type="password"
+                minLength={8}
+                value={resetPassword}
+                placeholder="Masukkan kata sandi sementara baru"
+                onChange={(event) => setResetPassword(event.target.value)}
+                required
+              />
+              <span className="text-xs font-normal leading-5 text-muted">
+                Sesi aktif pengguna akan dicabut saat kata sandi diperbarui.
+              </span>
+            </label>
+            <Button type="submit" disabled={resetCredential.isPending}>
+              Simpan reset
+            </Button>
+            <Button variant="ghost" type="button" onClick={closeReset}>
+              Batal
+            </Button>
+          </form>
+        </FormDialog>
       )}
       {successMessage ? (
         <p
