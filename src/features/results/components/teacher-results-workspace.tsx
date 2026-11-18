@@ -213,56 +213,51 @@ export function TeacherResultsWorkspace() {
                 errorMessage="File hasil belum dapat diunduh."
                 successMessage="File hasil berhasil disiapkan."
               />
-              <div className="overflow-x-auto">
-                <DataTable className="gradebook-table">
-                  <caption className="sr-only">
-                    Nilai siswa untuk ujian yang dipilih
-                  </caption>
-                  <thead>
-                    <tr>
-                      <th>Ujian</th>
-                      <th>Siswa</th>
-                      <th>Identitas</th>
-                      <th className="numeric-cell">Nilai</th>
-                      <th className="numeric-cell">Persentase</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {results.data.data.map((item) => {
-                      const state = resultStatus[
-                        item.status as keyof typeof resultStatus
-                      ] ?? { label: item.status, tone: "neutral" as const };
-                      return (
-                        <tr key={item.id}>
-                          <td>
-                            {item.exam_title}
-                            <span className="block text-xs text-muted">
-                              {item.course_name ??
-                                courses.data?.find(
-                                  (c) => c.id === item.course_id,
-                                )?.name}
-                            </span>
-                          </td>
-                          <td className="font-semibold">{item.student_name}</td>
-                          <td>{item.identifier}</td>
-                          <td className="numeric-cell">
-                            {item.score} / {item.max_score}
-                          </td>
-                          <td className="numeric-cell">
-                            {item.percentage.toFixed(1)}%
-                          </td>
-                          <td>
-                            <StatusBadge tone={state.tone}>
-                              {state.label}
-                            </StatusBadge>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </DataTable>
-              </div>
+              <DataTable caption="Nilai siswa untuk ujian yang dipilih" className="gradebook-table">
+                <thead>
+                  <tr>
+                    <th>Ujian</th>
+                    <th>Siswa</th>
+                    <th>Identitas</th>
+                    <th className="numeric-cell">Nilai</th>
+                    <th className="numeric-cell">Persentase</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {results.data.data.map((item) => {
+                    const state = resultStatus[
+                      item.status as keyof typeof resultStatus
+                    ] ?? { label: item.status, tone: "neutral" as const };
+                    return (
+                      <tr key={item.id}>
+                        <td>
+                          {item.exam_title}
+                          <span className="block text-xs text-muted">
+                            {item.course_name ??
+                              courses.data?.find(
+                                (c) => c.id === item.course_id,
+                              )?.name}
+                          </span>
+                        </td>
+                        <td className="font-semibold">{item.student_name}</td>
+                        <td>{item.identifier}</td>
+                        <td className="numeric-cell">
+                          {item.score} / {item.max_score}
+                        </td>
+                        <td className="numeric-cell">
+                          {item.percentage.toFixed(1)}%
+                        </td>
+                        <td>
+                          <StatusBadge tone={state.tone}>
+                            {state.label}
+                          </StatusBadge>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </DataTable>
               <Pagination
                 page={page}
                 totalPages={results.data.meta.total_pages}
@@ -316,34 +311,32 @@ export function TeacherResultsWorkspace() {
                     Lihat jumlah jawaban benar dan tingkat akurasi tiap soal.
                   </p>
                 </div>
-                <div className="overflow-x-auto">
-                  <DataTable>
-                    <thead>
-                      <tr>
-                        <th>Soal</th>
-                        <th className="numeric-cell">Dijawab</th>
-                        <th className="numeric-cell">Benar</th>
-                        <th className="numeric-cell">Akurasi</th>
+                <DataTable caption="Analisis butir soal">
+                  <thead>
+                    <tr>
+                      <th>Soal</th>
+                      <th className="numeric-cell">Dijawab</th>
+                      <th className="numeric-cell">Benar</th>
+                      <th className="numeric-cell">Akurasi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {analytics.data.items.map((item) => (
+                      <tr key={item.question_id}>
+                        <td className="max-w-xl whitespace-normal font-semibold">
+                          {item.stem}
+                        </td>
+                        <td className="numeric-cell">
+                          {item.answered_count}
+                        </td>
+                        <td className="numeric-cell">{item.correct_count}</td>
+                        <td className="numeric-cell">
+                          {item.accuracy.toFixed(1)}%
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {analytics.data.items.map((item) => (
-                        <tr key={item.question_id}>
-                          <td className="max-w-xl whitespace-normal font-semibold">
-                            {item.stem}
-                          </td>
-                          <td className="numeric-cell">
-                            {item.answered_count}
-                          </td>
-                          <td className="numeric-cell">{item.correct_count}</td>
-                          <td className="numeric-cell">
-                            {item.accuracy.toFixed(1)}%
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </DataTable>
-                </div>
+                    ))}
+                  </tbody>
+                </DataTable>
               </DataTableShell>
             ) : null}
           </div>

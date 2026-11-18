@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { invalidateSession } from "@/lib/auth-session";
 import { changePassword } from "@/services/auth.service";
@@ -14,12 +14,18 @@ export function ChangePasswordWorkspace() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [error, setError] = useState<string>();
+  const [confirmationInvalid, setConfirmationInvalid] = useState(false);
+  const confirmationInput = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (newPassword !== confirmation)
-      return setError("Konfirmasi kata sandi belum sama.");
+    if (newPassword !== confirmation) {
+      setError(undefined);
+      setConfirmationInvalid(true);
+      confirmationInput.current?.focus();
+      return;
+    }
     setError(undefined);
     setLoading(true);
     try {
@@ -70,23 +76,37 @@ export function ChangePasswordWorkspace() {
             autoComplete="new-password"
             placeholder="Gunakan minimal 8 karakter"
             value={newPassword}
-            onChange={(event) => setNewPassword(event.target.value)}
+            onChange={(event) => {
+              setNewPassword(event.target.value);
+              setConfirmationInvalid(false);
+            }}
             required
           />
         </label>
         <label className="field-label">
           Ulangi kata sandi baru
           <input
+            ref={confirmationInput}
             className="field-input"
             type="password"
             minLength={8}
             autoComplete="new-password"
             placeholder="Ketik ulang kata sandi baru"
             value={confirmation}
-            onChange={(event) => setConfirmation(event.target.value)}
+            aria-invalid={confirmationInvalid || undefined}
+            aria-describedby={confirmationInvalid ? "confirmation-error" : undefined}
+            onChange={(event) => {
+              setConfirmation(event.target.value);
+              setConfirmationInvalid(false);
+            }}
             required
           />
         </label>
+        {confirmationInvalid && (
+          <p id="confirmation-error" className="form-error" role="alert">
+            Konfirmasi kata sandi belum sama.
+          </p>
+        )}
         {error && (
           <p className="form-error" role="alert">
             {error}

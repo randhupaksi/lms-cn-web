@@ -385,10 +385,6 @@
 .governance-form-wide {
   grid-column: 1 / -1;
 }
-.governance-workspace .table-scroll {
-  overflow: auto;
-  max-width: 100%;
-}
 .governance-workspace .data-table {
   width: 100%;
   border-collapse: collapse;

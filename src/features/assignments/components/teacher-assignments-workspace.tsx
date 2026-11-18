@@ -141,6 +141,7 @@ export function TeacherAssignmentsWorkspace() {
               <label className="field-label">
                 Batas pengumpulan
                 <DateTimePickerField
+                  label="Batas pengumpulan"
                   value={form.due_at}
                   onChange={(value) => setForm({ ...form, due_at: value })}
                   required
@@ -380,35 +381,33 @@ export function TeacherAssignmentsWorkspace() {
                 successMessage="Nilai dan feedback berhasil disimpan."
               />
             </div>
-            <div className="overflow-x-auto">
-              <DataTable>
-                <thead>
-                  <tr>
-                    <th>Siswa</th>
-                    <th>Jawaban</th>
-                    <th>Nilai</th>
-                    <th>Feedback</th>
-                    <th className="action-column">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {submissions.data?.data.map((item) => (
-                    <SubmissionRow
-                      key={item.id}
-                      submission={item}
-                      maxScore={selectedAssignment?.max_score ?? 100}
-                      pending={grade.isPending}
-                      onGrade={(score, feedback) =>
-                        grade.mutate({
-                          id: item.id,
-                          input: { score, feedback },
-                        })
-                      }
-                    />
-                  ))}
-                </tbody>
-              </DataTable>
-            </div>
+            <DataTable caption="Pengumpulan tugas siswa">
+              <thead>
+                <tr>
+                  <th>Siswa</th>
+                  <th>Jawaban</th>
+                  <th>Nilai</th>
+                  <th>Feedback</th>
+                  <th className="action-column">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {submissions.data?.data.map((item) => (
+                  <SubmissionRow
+                    key={item.id}
+                    submission={item}
+                    maxScore={selectedAssignment?.max_score ?? 100}
+                    pending={grade.isPending}
+                    onGrade={(score, feedback) =>
+                      grade.mutate({
+                        id: item.id,
+                        input: { score, feedback },
+                      })
+                    }
+                  />
+                ))}
+              </tbody>
+            </DataTable>
             {submissions.data ? (
               <Pagination
                 page={submissionPage}

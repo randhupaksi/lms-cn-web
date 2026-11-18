@@ -143,6 +143,7 @@ export function ExamAuthoringWorkspace() {
               <label className="field-label">
                 Mulai
                 <DateTimePickerField
+                  label="Mulai ujian"
                   value={form.starts_at}
                   onChange={(value) => setForm({ ...form, starts_at: value })}
                   required
@@ -151,6 +152,7 @@ export function ExamAuthoringWorkspace() {
               <label className="field-label">
                 Selesai
                 <DateTimePickerField
+                  label="Selesai ujian"
                   value={form.ends_at}
                   onChange={(value) => setForm({ ...form, ends_at: value })}
                   required
@@ -307,10 +309,7 @@ export function ExamAuthoringWorkspace() {
           ) : null}
           {exams.data?.data.length ? (
             <DataTableShell>
-              <DataTable>
-                <caption className="sr-only">
-                  Daftar ujian, jadwal, kelengkapan, dan tindakan publikasi
-                </caption>
+              <DataTable caption="Daftar ujian, jadwal, kelengkapan, dan tindakan publikasi">
                 <thead>
                   <tr>
                     <th>Ujian & course</th>

@@ -1,4 +1,5 @@
 "use client";
+import { DataTable } from "@/components/ui/data-table";
 import { useState } from "react";
 import {
   KeyRound,
@@ -213,100 +214,95 @@ export function AccessWorkspace() {
           )}
           {query.data && (
             <>
-              <div className="table-scroll">
-                <table className="data-table access-table">
-                  <caption className="sr-only">
-                    Akun sekolah dan status akses
-                  </caption>
-                  <thead>
-                    <tr>
-                      <th>Pengguna</th>
-                      <th>Peran</th>
-                      <th>Status</th>
-                      <th>
-                        <span className="sr-only">Tindakan</span>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {query.data.data.map((user) => (
-                      <tr key={user.id} data-inspected={inspected === user.id}>
-                        <td>
-                          <button
-                            className="access-user-link"
+              <DataTable caption="Akun sekolah dan status akses" className="access-table">
+                <thead>
+                  <tr>
+                    <th>Pengguna</th>
+                    <th>Peran</th>
+                    <th>Status</th>
+                    <th>
+                      <span className="sr-only">Tindakan</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {query.data.data.map((user) => (
+                    <tr key={user.id} data-inspected={inspected === user.id}>
+                      <td>
+                        <button
+                          className="access-user-link"
+                          onClick={() =>
+                            setInspected(inspected === user.id ? "" : user.id)
+                          }
+                          aria-expanded={inspected === user.id}
+                        >
+                          {user.full_name}
+                        </button>
+                        <p className="text-xs text-muted mt-1">
+                          {user.identifier}
+                          {user.id === actor?.id ? " · Anda" : ""}
+                        </p>
+                      </td>
+                      <td>{labels[user.role]}</td>
+                      <td>
+                        <StatusBadge
+                          tone={
+                            user.status === "active" ? "success" : "neutral"
+                          }
+                        >
+                          {user.status === "active" ? "Aktif" : "Nonaktif"}
+                        </StatusBadge>
+                      </td>
+                      <td>
+                        <div className="table-actions">
+                          <ActionButton
+                            icon={Monitor}
+                            label={`Rincian ${user.full_name}`}
                             onClick={() =>
-                              setInspected(inspected === user.id ? "" : user.id)
+                              setInspected(
+                                inspected === user.id ? "" : user.id,
+                              )
                             }
-                            aria-expanded={inspected === user.id}
-                          >
-                            {user.full_name}
-                          </button>
-                          <p className="text-xs text-muted mt-1">
-                            {user.identifier}
-                            {user.id === actor?.id ? " · Anda" : ""}
-                          </p>
-                        </td>
-                        <td>{labels[user.role]}</td>
-                        <td>
-                          <StatusBadge
-                            tone={
-                              user.status === "active" ? "success" : "neutral"
+                          />
+                          {isSuperadmin && (
+                            <ActionButton
+                              icon={ShieldCheck}
+                              label={`Ubah peran ${user.full_name}`}
+                              disabled={user.id === actor?.id}
+                              onClick={() => open(user, "role")}
+                            />
+                          )}
+                          <ActionButton
+                            icon={KeyRound}
+                            label={`Reset kredensial ${user.full_name}`}
+                            disabled={user.id === actor?.id}
+                            onClick={() => open(user, "reset")}
+                          />
+                          <ActionButton
+                            icon={
+                              user.status === "active"
+                                ? UserRoundX
+                                : UserRoundCheck
                             }
-                          >
-                            {user.status === "active" ? "Aktif" : "Nonaktif"}
-                          </StatusBadge>
-                        </td>
-                        <td>
-                          <div className="table-actions">
+                            label={`${user.status === "active" ? "Nonaktifkan" : "Aktifkan"} ${user.full_name}`}
+                            disabled={user.id === actor?.id}
+                            onClick={() => open(user, "toggle")}
+                          />
+                          {isSuperadmin && (
                             <ActionButton
-                              icon={Monitor}
-                              label={`Rincian ${user.full_name}`}
-                              onClick={() =>
-                                setInspected(
-                                  inspected === user.id ? "" : user.id,
-                                )
-                              }
-                            />
-                            {isSuperadmin && (
-                              <ActionButton
-                                icon={ShieldCheck}
-                                label={`Ubah peran ${user.full_name}`}
-                                disabled={user.id === actor?.id}
-                                onClick={() => open(user, "role")}
-                              />
-                            )}
-                            <ActionButton
-                              icon={KeyRound}
-                              label={`Reset kredensial ${user.full_name}`}
+                              icon={LogOut}
+                              tone="danger"
+                              label={`Akhiri seluruh sesi ${user.full_name}`}
                               disabled={user.id === actor?.id}
-                              onClick={() => open(user, "reset")}
+                              onClick={() => open(user, "revoke")}
                             />
-                            <ActionButton
-                              icon={
-                                user.status === "active"
-                                  ? UserRoundX
-                                  : UserRoundCheck
-                              }
-                              label={`${user.status === "active" ? "Nonaktifkan" : "Aktifkan"} ${user.full_name}`}
-                              disabled={user.id === actor?.id}
-                              onClick={() => open(user, "toggle")}
-                            />
-                            {isSuperadmin && (
-                              <ActionButton
-                                icon={LogOut}
-                                tone="danger"
-                                label={`Akhiri seluruh sesi ${user.full_name}`}
-                                disabled={user.id === actor?.id}
-                                onClick={() => open(user, "revoke")}
-                              />
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </DataTable>
               {query.data.data.length === 0 && (
                 <p className="governance-empty">
                   Tidak ada pengguna yang sesuai pencarian.

@@ -204,6 +204,16 @@ Do not use a centered spinner as the only loading design for a full page.
 - Test at approximately 360px, tablet, laptop, and wide desktop widths.
 - The page body must not create horizontal scrolling.
 - Use semantic landmarks and a logical heading order.
+- Give each workspace a descriptive Next.js route title so browser tabs and
+  route announcements identify the current task.
+- Use the shared `DataTable` with a descriptive caption. Its viewport enters
+  the tab order and shows a scroll hint only when its columns overflow.
+- Use the control border token on fields. It provides 3.49:1 contrast against
+  the card surface. Keep the visible keyboard focus outline separate from the
+  border and associate field errors with their inputs.
+- Exam navigation uses a check mark and an accessible name for answered
+  questions. The timer announces the five-minute and one-minute thresholds
+  and expiry without announcing every second.
 
 ## 7. Component discipline
 

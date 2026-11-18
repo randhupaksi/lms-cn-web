@@ -1,5 +1,6 @@
 "use client";
 
+import { DataTable } from "@/components/ui/data-table";
 import { useState, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/providers/auth-provider";
@@ -208,50 +209,48 @@ export function LeadershipActions() {
         <section className="governance-section p-6">
           <h2 className="section-title">Daftar tindak lanjut</h2>
           {actions.data.data.length === 0 && <p>Belum ada tindak lanjut.</p>}
-          <div className="table-scroll">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Judul</th>
-                  <th>Penanggung jawab</th>
-                  <th>Status</th>
-                  <th>Tenggat</th>
+          <DataTable caption="Daftar tindak lanjut sekolah">
+            <thead>
+              <tr>
+                <th>Judul</th>
+                <th>Penanggung jawab</th>
+                <th>Status</th>
+                <th>Tenggat</th>
+              </tr>
+            </thead>
+            <tbody>
+              {actions.data.data.map((item) => (
+                <tr key={item.id}>
+                  <td>
+                    <button
+                      className="access-user-link"
+                      onClick={() => {
+                        setSelected(item.id);
+                        setNote("");
+                      }}
+                    >
+                      {item.title}
+                    </button>
+                    <p>
+                      {labels[item.priority]} · {labels[item.category]}
+                    </p>
+                  </td>
+                  <td>{item.assignee_name || "Belum ditentukan"}</td>
+                  <td>
+                    {labels[item.status]}
+                    {item.overdue ? " · Lewat tenggat" : ""}
+                  </td>
+                  <td>
+                    {item.due_at
+                      ? new Date(item.due_at).toLocaleString("id-ID", {
+                          timeZone: "Asia/Jakarta",
+                        })
+                      : "—"}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {actions.data.data.map((item) => (
-                  <tr key={item.id}>
-                    <td>
-                      <button
-                        className="access-user-link"
-                        onClick={() => {
-                          setSelected(item.id);
-                          setNote("");
-                        }}
-                      >
-                        {item.title}
-                      </button>
-                      <p>
-                        {labels[item.priority]} · {labels[item.category]}
-                      </p>
-                    </td>
-                    <td>{item.assignee_name || "Belum ditentukan"}</td>
-                    <td>
-                      {labels[item.status]}
-                      {item.overdue ? " · Lewat tenggat" : ""}
-                    </td>
-                    <td>
-                      {item.due_at
-                        ? new Date(item.due_at).toLocaleString("id-ID", {
-                            timeZone: "Asia/Jakarta",
-                          })
-                        : "—"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </DataTable>
         </section>
       )}
       {actions.data && (

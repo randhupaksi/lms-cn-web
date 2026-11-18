@@ -83,110 +83,108 @@ export function UserDirectory() {
           />
         </div>
       </div>
-      <div className="overflow-x-auto">
-        <DataTable>
-          <thead>
-            <tr>
-              <th>Nama</th>
-              <th>Identitas</th>
-              <th>Peran</th>
-              <th>Status</th>
-              <th className="action-column">Aksi</th>
+      <DataTable caption="Direktori pengguna sekolah">
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Identitas</th>
+            <th>Peran</th>
+            <th>Status</th>
+            <th className="action-column">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.data?.data.map((user) => (
+            <tr key={user.id}>
+              <td className="font-semibold">{user.full_name}</td>
+              <td>{user.identifier}</td>
+              <td className="capitalize">{user.role}</td>
+              <td>
+                <span
+                  className={`status-badge ${user.status === "active" ? "status-active" : ""}`}
+                >
+                  {user.status}
+                </span>
+              </td>
+              <td>
+                <div className="flex justify-end gap-1">
+                  <ActionButton
+                    icon={KeyRound}
+                    label={`Atur ulang kata sandi ${user.full_name}`}
+                    aria-haspopup="dialog"
+                    aria-expanded={resetUserId === user.id}
+                    aria-controls={
+                      resetUserId === user.id
+                        ? "credential-reset-form"
+                        : undefined
+                    }
+                    onClick={() => {
+                      setResetUserId(user.id);
+                      setResetPassword("");
+                      setSuccessMessage("");
+                    }}
+                  />
+                  <ActionButton
+                    icon={
+                      user.status === "active"
+                        ? UserRoundMinus
+                        : UserRoundCheck
+                    }
+                    label={`${user.status === "active" ? "Nonaktifkan" : "Aktifkan"} akun ${user.full_name}`}
+                    tone={user.status === "active" ? "danger" : "neutral"}
+                    pending={toggle.isPending}
+                    onClick={() =>
+                      toggle.mutate(
+                        {
+                          id: user.id,
+                          status:
+                            user.status === "active" ? "inactive" : "active",
+                        },
+                        {
+                          onSuccess: () =>
+                            setSuccessMessage(
+                              `Status akun ${user.full_name} berhasil diperbarui.`,
+                            ),
+                        },
+                      )
+                    }
+                  />
+                </div>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {users.data?.data.map((user) => (
-              <tr key={user.id}>
-                <td className="font-semibold">{user.full_name}</td>
-                <td>{user.identifier}</td>
-                <td className="capitalize">{user.role}</td>
-                <td>
-                  <span
-                    className={`status-badge ${user.status === "active" ? "status-active" : ""}`}
-                  >
-                    {user.status}
-                  </span>
-                </td>
-                <td>
-                  <div className="flex justify-end gap-1">
-                    <ActionButton
-                      icon={KeyRound}
-                      label={`Atur ulang kata sandi ${user.full_name}`}
-                      aria-haspopup="dialog"
-                      aria-expanded={resetUserId === user.id}
-                      aria-controls={
-                        resetUserId === user.id
-                          ? "credential-reset-form"
-                          : undefined
-                      }
-                      onClick={() => {
-                        setResetUserId(user.id);
-                        setResetPassword("");
-                        setSuccessMessage("");
-                      }}
-                    />
-                    <ActionButton
-                      icon={
-                        user.status === "active"
-                          ? UserRoundMinus
-                          : UserRoundCheck
-                      }
-                      label={`${user.status === "active" ? "Nonaktifkan" : "Aktifkan"} akun ${user.full_name}`}
-                      tone={user.status === "active" ? "danger" : "neutral"}
-                      pending={toggle.isPending}
-                      onClick={() =>
-                        toggle.mutate(
-                          {
-                            id: user.id,
-                            status:
-                              user.status === "active" ? "inactive" : "active",
-                          },
-                          {
-                            onSuccess: () =>
-                              setSuccessMessage(
-                                `Status akun ${user.full_name} berhasil diperbarui.`,
-                              ),
-                          },
-                        )
-                      }
-                    />
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {!users.isLoading && users.data?.data.length === 0 && (
-              <tr>
-                <td colSpan={5} className="empty-cell">
-                  {search || role !== "all"
-                    ? "Tidak ada pengguna yang sesuai. Ubah pencarian atau pilih semua peran."
-                    : "Belum ada pengguna. Tambahkan akun melalui tombol Tambah pengguna."}
-                </td>
-              </tr>
-            )}
-            {users.isLoading ? (
-              <tr>
-                <td colSpan={5} className="empty-cell" role="status">
-                  Memuat daftar pengguna…
-                </td>
-              </tr>
-            ) : null}
-            {users.isError ? (
-              <tr>
-                <td colSpan={5} className="empty-cell text-danger" role="alert">
-                  Daftar pengguna belum dapat dimuat.{" "}
-                  <Button
-                    variant="ghost"
-                    size="compact"
-                    onClick={() => void users.refetch()}
-                  >
-                    Coba lagi
-                  </Button>
-                </td>
-              </tr>
-            ) : null}
-          </tbody>
-        </DataTable>
-      </div>
+          ))}
+          {!users.isLoading && users.data?.data.length === 0 && (
+            <tr>
+              <td colSpan={5} className="empty-cell">
+                {search || role !== "all"
+                  ? "Tidak ada pengguna yang sesuai. Ubah pencarian atau pilih semua peran."
+                  : "Belum ada pengguna. Tambahkan akun melalui tombol Tambah pengguna."}
+              </td>
+            </tr>
+          )}
+          {users.isLoading ? (
+            <tr>
+              <td colSpan={5} className="empty-cell" role="status">
+                Memuat daftar pengguna…
+              </td>
+            </tr>
+          ) : null}
+          {users.isError ? (
+            <tr>
+              <td colSpan={5} className="empty-cell text-danger" role="alert">
+                Daftar pengguna belum dapat dimuat.{" "}
+                <Button
+                  variant="ghost"
+                  size="compact"
+                  onClick={() => void users.refetch()}
+                >
+                  Coba lagi
+                </Button>
+              </td>
+            </tr>
+          ) : null}
+        </tbody>
+      </DataTable>
       {resetUserId && (
         <FormDialog
           id="credential-reset-form"

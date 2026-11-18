@@ -62,10 +62,7 @@ export function StudentResultsWorkspace() {
                 {results.data.meta.total} hasil dipublikasikan
               </span>
             </div>
-            <DataTable className="student-score-table">
-              <caption className="sr-only">
-                Hasil ujian yang telah dipublikasikan guru
-              </caption>
+            <DataTable caption="Hasil ujian yang telah dipublikasikan guru" className="student-score-table">
               <thead>
                 <tr>
                   <th>Ujian</th>

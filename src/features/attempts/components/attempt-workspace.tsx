@@ -111,10 +111,19 @@ export function AttemptWorkspace({ attemptId }: { attemptId: string }) {
 
   const answered = answerMap.size;
   const timeExpired = remaining === 0;
+  const timeNotice =
+    remaining === null ? "" : timeExpired
+      ? "Waktu ujian habis."
+      : remaining <= 60
+        ? "Waktu ujian tersisa satu menit atau kurang."
+        : remaining <= 300
+          ? "Waktu ujian tersisa lima menit atau kurang."
+          : "";
 
   return (
     <RoleBoundary allow={["student"]}>
       <div className="mx-auto max-w-6xl space-y-5">
+        <p className="sr-only" role="status">{timeNotice}</p>
         <header className="exam-toolbar">
           <div>
             <p className="eyebrow">LEMBAR UJIAN</p>
@@ -177,7 +186,7 @@ export function AttemptWorkspace({ attemptId }: { attemptId: string }) {
                       })
                     }
                   />
-                  <span>{option.content}</span>
+                  <span className="min-w-0 wrap-anywhere">{option.content}</span>
                 </label>
               ))}
             </fieldset>
@@ -235,13 +244,13 @@ export function AttemptWorkspace({ attemptId }: { attemptId: string }) {
                   }
                 >
                   {itemIndex + 1}
+                  {answerMap.has(item.id) && <CheckCircle2 aria-hidden="true" size={12} />}
                 </button>
               ))}
             </div>
-            <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted">
-              <span>Hijau: sudah dijawab</span>
-              <span>Putih: belum dijawab</span>
-            </div>
+            <p className="mt-4 flex items-center gap-2 text-xs text-muted">
+              <CheckCircle2 aria-hidden="true" size={14} /> Tanda centang berarti soal sudah dijawab.
+            </p>
 
             <Button
               className="mt-6 w-full"

@@ -104,63 +104,61 @@ export function MonitoringWorkspace() {
         ) : null}
         {exams.data?.data.length ? (
           <DataTableShell>
-            <div className="overflow-x-auto">
-              <DataTable className="monitoring-table">
-                <thead>
-                  <tr>
-                    <th>Ujian</th>
-                    <th>Course</th>
-                    <th>Status</th>
-                    <th>Jadwal</th>
-                    <th className="action-column">Aksi</th>
+            <DataTable caption="Ujian yang dipantau" className="monitoring-table">
+              <thead>
+                <tr>
+                  <th>Ujian</th>
+                  <th>Course</th>
+                  <th>Status</th>
+                  <th>Jadwal</th>
+                  <th className="action-column">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {exams.data.data.map((exam) => (
+                  <tr
+                    key={exam.id}
+                    data-selected={selectedExam?.id === exam.id}
+                  >
+                    <td className="font-semibold">{exam.title}</td>
+                    <td>
+                      {exam.course_name ??
+                        courses.data?.find(
+                          (item) => item.id === exam.course_id,
+                        )?.name}
+                    </td>
+                    <td>
+                      <StatusBadge
+                        tone={
+                          exam.status === "published" ? "success" : "neutral"
+                        }
+                      >
+                        {exam.status}
+                      </StatusBadge>
+                    </td>
+                    <td>
+                      {new Date(exam.starts_at).toLocaleString("id-ID")}
+                    </td>
+                    <td>
+                      <ActionButton
+                        icon={Radar}
+                        label={
+                          selectedExam?.id === exam.id
+                            ? "Ujian sedang dipantau"
+                            : `Pantau peserta ${exam.title}`
+                        }
+                        aria-pressed={selectedExam?.id === exam.id}
+                        onClick={() => {
+                          setSelectedExam(exam);
+                          setParticipantSearch("");
+                          setParticipantPage(1);
+                        }}
+                      />
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {exams.data.data.map((exam) => (
-                    <tr
-                      key={exam.id}
-                      data-selected={selectedExam?.id === exam.id}
-                    >
-                      <td className="font-semibold">{exam.title}</td>
-                      <td>
-                        {exam.course_name ??
-                          courses.data?.find(
-                            (item) => item.id === exam.course_id,
-                          )?.name}
-                      </td>
-                      <td>
-                        <StatusBadge
-                          tone={
-                            exam.status === "published" ? "success" : "neutral"
-                          }
-                        >
-                          {exam.status}
-                        </StatusBadge>
-                      </td>
-                      <td>
-                        {new Date(exam.starts_at).toLocaleString("id-ID")}
-                      </td>
-                      <td>
-                        <ActionButton
-                          icon={Radar}
-                          label={
-                            selectedExam?.id === exam.id
-                              ? "Ujian sedang dipantau"
-                              : `Pantau peserta ${exam.title}`
-                          }
-                          aria-pressed={selectedExam?.id === exam.id}
-                          onClick={() => {
-                            setSelectedExam(exam);
-                            setParticipantSearch("");
-                            setParticipantPage(1);
-                          }}
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </DataTable>
-            </div>
+                ))}
+              </tbody>
+            </DataTable>
             <Pagination
               page={examPage}
               totalPages={exams.data.meta.total_pages}
@@ -238,49 +236,47 @@ export function MonitoringWorkspace() {
                 />
               ) : (
                 <DataTableShell>
-                  <div className="overflow-x-auto">
-                    <DataTable>
-                      <thead>
-                        <tr>
-                          <th>Peserta</th>
-                          <th>Identitas</th>
-                          <th>Status</th>
-                          <th className="numeric-cell">Terjawab</th>
-                          <th>Aktivitas terakhir</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {monitoring.data.data.participants.map(
-                          (participant) => (
-                            <tr key={participant.student_id}>
-                              <td className="font-semibold">
-                                {participant.student_name}
-                              </td>
-                              <td>{participant.identifier}</td>
-                              <td>
-                                <StatusBadge
-                                  tone={statusTones[participant.status]}
-                                >
-                                  {statusLabels[participant.status] ??
-                                    participant.status}
-                                </StatusBadge>
-                              </td>
-                              <td className="numeric-cell">
-                                {participant.answered_count}
-                              </td>
-                              <td>
-                                {participant.last_activity_at
-                                  ? new Date(
-                                      participant.last_activity_at,
-                                    ).toLocaleString("id-ID")
-                                  : "—"}
-                              </td>
-                            </tr>
-                          ),
-                        )}
-                      </tbody>
-                    </DataTable>
-                  </div>
+                  <DataTable caption="Status peserta ujian">
+                    <thead>
+                      <tr>
+                        <th>Peserta</th>
+                        <th>Identitas</th>
+                        <th>Status</th>
+                        <th className="numeric-cell">Terjawab</th>
+                        <th>Aktivitas terakhir</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {monitoring.data.data.participants.map(
+                        (participant) => (
+                          <tr key={participant.student_id}>
+                            <td className="font-semibold">
+                              {participant.student_name}
+                            </td>
+                            <td>{participant.identifier}</td>
+                            <td>
+                              <StatusBadge
+                                tone={statusTones[participant.status]}
+                              >
+                                {statusLabels[participant.status] ??
+                                  participant.status}
+                              </StatusBadge>
+                            </td>
+                            <td className="numeric-cell">
+                              {participant.answered_count}
+                            </td>
+                            <td>
+                              {participant.last_activity_at
+                                ? new Date(
+                                    participant.last_activity_at,
+                                  ).toLocaleString("id-ID")
+                                : "—"}
+                            </td>
+                          </tr>
+                        ),
+                      )}
+                    </tbody>
+                  </DataTable>
                   <Pagination
                     page={participantPage}
                     totalPages={monitoring.data.meta.total_pages}

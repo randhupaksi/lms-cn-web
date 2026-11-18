@@ -137,10 +137,11 @@ export function LoginWorkspace() {
               />
             </label>
 
-            <label className="field-label">
-              Kata sandi
+            <div className="field-label">
+              <label htmlFor="login-password">Kata sandi</label>
               <span className="relative block">
                 <input
+                  id="login-password"
                   className="field-input pr-12"
                   type={showPassword ? "text" : "password"}
                   value={password}
@@ -152,7 +153,7 @@ export function LoginWorkspace() {
                 <button
                   type="button"
                   className="absolute inset-y-0 right-1 my-auto grid size-10 place-items-center rounded-xl text-muted transition-colors hover:bg-primary-soft hover:text-primary"
-                  aria-pressed={showPassword}
+                  aria-controls="login-password"
                   onClick={() => setShowPassword((value) => !value)}
                   aria-label={
                     showPassword
@@ -160,10 +161,10 @@ export function LoginWorkspace() {
                       : "Tampilkan kata sandi"
                   }
                 >
-                  {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                  {showPassword ? <EyeOff aria-hidden="true" size={17} /> : <Eye aria-hidden="true" size={17} />}
                 </button>
               </span>
-            </label>
+            </div>
 
             {error || sessionMessage ? (
               <div

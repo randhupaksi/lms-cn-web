@@ -1,5 +1,6 @@
 "use client";
 
+import { DataTable } from "@/components/ui/data-table";
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { Tooltip } from "@base-ui/react/tooltip";
@@ -180,33 +181,28 @@ function ActivityChart({ data }: { data: DashboardInsights }) {
       )}
       <details className="chart-data">
         <summary>Lihat data harian</summary>
-        <div className="overflow-x-auto">
-          <table className="data-table">
-            <caption className="sr-only">
-              Data pengumpulan selama 14 hari dalam WIB
-            </caption>
-            <thead>
-              <tr>
-                <th>Tanggal</th>
-                <th className="numeric-cell">Ujian</th>
-                <th className="numeric-cell">Tugas</th>
+        <DataTable caption="Data pengumpulan selama 14 hari dalam WIB">
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th className="numeric-cell">Ujian</th>
+              <th className="numeric-cell">Tugas</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.activity.map((day) => (
+              <tr key={day.date}>
+                <td>{schoolDate(day.date)}</td>
+                <td className="numeric-cell">
+                  {number(day.exam_submissions)}
+                </td>
+                <td className="numeric-cell">
+                  {number(day.assignment_submissions)}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {data.activity.map((day) => (
-                <tr key={day.date}>
-                  <td>{schoolDate(day.date)}</td>
-                  <td className="numeric-cell">
-                    {number(day.exam_submissions)}
-                  </td>
-                  <td className="numeric-cell">
-                    {number(day.assignment_submissions)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </DataTable>
       </details>
     </section>
   );

@@ -55,28 +55,26 @@ export function CourseTable() {
           />
         </div>
       ) : null}
-      <div className="overflow-x-auto">
-        <DataTable>
-          <thead>
-            <tr>
-              <th>Course</th>
-              <th>Mata pelajaran</th>
-              <th>Kelas</th>
-              <th>Tahun ajaran</th>
+      <DataTable caption="Daftar course sekolah">
+        <thead>
+          <tr>
+            <th>Course</th>
+            <th>Mata pelajaran</th>
+            <th>Kelas</th>
+            <th>Tahun ajaran</th>
+          </tr>
+        </thead>
+        <tbody>
+          {courses.data?.data.map((item) => (
+            <tr key={item.id}>
+              <td className="font-semibold">{item.name}</td>
+              <td>{item.subject.name}</td>
+              <td>{item.class_group.name}</td>
+              <td>{item.academic_year.name}</td>
             </tr>
-          </thead>
-          <tbody>
-            {courses.data?.data.map((item) => (
-              <tr key={item.id}>
-                <td className="font-semibold">{item.name}</td>
-                <td>{item.subject.name}</td>
-                <td>{item.class_group.name}</td>
-                <td>{item.academic_year.name}</td>
-              </tr>
-            ))}
-          </tbody>
-        </DataTable>
-      </div>
+          ))}
+        </tbody>
+      </DataTable>
       {courses.data ? (
         <Pagination
           page={page}

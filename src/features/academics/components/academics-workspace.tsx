@@ -121,6 +121,7 @@ export function AcademicsWorkspace() {
                   <label className="field-label">
                     Mulai
                     <DatePickerField
+                      label="Mulai tahun ajaran"
                       value={year.starts_on}
                       onChange={(value) =>
                         setYear({ ...year, starts_on: value })
@@ -131,6 +132,7 @@ export function AcademicsWorkspace() {
                   <label className="field-label">
                     Selesai
                     <DatePickerField
+                      label="Selesai tahun ajaran"
                       value={year.ends_on}
                       onChange={(value) => setYear({ ...year, ends_on: value })}
                       required

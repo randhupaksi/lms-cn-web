@@ -65,10 +65,7 @@ export function AuditWorkspace() {
         )}
         {events.data && events.data.data.length > 0 && (
           <DataTableShell>
-            <DataTable className="audit-table">
-              <caption className="sr-only">
-                Riwayat tindakan administrasi terbaru
-              </caption>
+            <DataTable caption="Riwayat tindakan administrasi terbaru" className="audit-table">
               <thead>
                 <tr>
                   <th>Waktu</th>
