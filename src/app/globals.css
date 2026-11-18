@@ -63,6 +63,7 @@
   --text-lead: 0.9375rem;
   --motion-normal: 180ms;
   --dialog-width: 30rem;
+  --form-dialog-width: 56rem;
   --exam-rail-width: 19rem;
   --exam-toolbar-height: 6rem;
   --z-dialog: 100;
@@ -1049,6 +1050,77 @@ input[type="radio"] {
   padding: var(--space-6);
   box-shadow: var(--shadow-lg);
 }
+.form-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: var(--z-dialog);
+  display: flex;
+  width: min(calc(100% - var(--space-8)), var(--form-dialog-width));
+  max-height: calc(100dvh - var(--space-8));
+  flex-direction: column;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-lg);
+  background: hsl(var(--card));
+  box-shadow: var(--shadow-lg);
+}
+.form-dialog-header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  border-bottom: 1px solid hsl(var(--border));
+  background: hsl(var(--card-soft));
+  padding: var(--space-5) var(--space-6);
+}
+.form-dialog-title {
+  margin-top: var(--space-1);
+  font-size: 1.125rem;
+  line-height: 1.4;
+}
+.form-dialog-close {
+  min-width: var(--control-height);
+  flex: 0 0 auto;
+  padding: 0;
+}
+.form-dialog-body {
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-6);
+}
+.form-dialog-body > form {
+  width: 100%;
+  max-width: var(--reading-width);
+  margin-inline: auto;
+}
+.error-dialog-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+.error-dialog-icon {
+  display: grid;
+  place-items: center;
+  width: var(--space-10);
+  height: var(--space-10);
+  flex: 0 0 auto;
+  border-radius: var(--radius-md);
+  background: hsl(var(--danger-soft));
+  color: hsl(var(--danger));
+}
+.error-dialog-copy {
+  min-width: 0;
+}
+.error-dialog-description {
+  margin-top: var(--space-2);
+  color: hsl(var(--muted));
+  font-size: 0.9rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
 .dialog-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1142,27 +1214,6 @@ input[type="radio"] {
 .filter-bar .field-label {
   font-size: var(--text-small);
   font-weight: 500;
-}
-.editor-panel {
-  border: 1px solid hsl(var(--border-strong));
-  border-radius: var(--radius-md);
-  background: hsl(var(--card));
-  overflow: clip;
-}
-.editor-panel-heading {
-  display: flex;
-  align-items: start;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--space-4);
-  padding: var(--space-5) var(--space-6);
-  border-bottom: 1px solid hsl(var(--border));
-  background: hsl(var(--card-soft));
-}
-.editor-panel-body {
-  padding: var(--space-6);
-  max-width: var(--reading-width);
-  margin-inline: auto;
 }
 .record-list {
   display: grid;
@@ -1673,8 +1724,6 @@ input[type="radio"] {
   .page-header-icon {
     display: none;
   }
-  .editor-panel-body,
-  .editor-panel-heading,
   .record-row,
   .exam-question {
     padding: var(--space-4);
@@ -1924,6 +1973,53 @@ input[type="radio"] {
 .dashboard-kpis .metric-value {
   margin-top: var(--space-3);
   font-size: var(--text-metric);
+}
+.dashboard-kpi-surface {
+  overflow: hidden;
+  border: 1px solid hsl(var(--border-strong));
+  border-radius: var(--radius-lg);
+  background: hsl(var(--card));
+}
+.dashboard-kpi-surface .metric-grid {
+  gap: 0;
+}
+.dashboard-kpi-surface .metric-card {
+  display: grid;
+  gap: var(--space-3);
+  border: 0;
+  border-inline-end: 1px solid hsl(var(--border));
+  padding: var(--space-4);
+}
+.dashboard-kpi-surface .metric-card:last-child {
+  border-inline-end: 0;
+}
+.dashboard-kpi-surface .metric-card-label-with-icon {
+  display: flex;
+  min-height: 2rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.dashboard-kpi-icon {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: hsl(var(--primary-soft));
+  color: hsl(var(--primary));
+}
+.dashboard-kpi-surface .metric-value {
+  margin-top: 0;
+}
+@media (max-width: 767px) {
+  .dashboard-kpi-surface .metric-card:nth-child(2n) {
+    border-inline-end: 0;
+  }
+  .dashboard-kpi-surface .metric-card:nth-child(n + 3) {
+    border-block-start: 1px solid hsl(var(--border));
+  }
 }
 .quick-action-grid {
   display: grid;
@@ -2341,6 +2437,14 @@ input[type="radio"] {
   }
 }
 @media (max-width: 639px) {
+  .form-dialog {
+    width: min(calc(100% - var(--space-4)), var(--form-dialog-width));
+    max-height: calc(100dvh - var(--space-4));
+  }
+  .form-dialog-header,
+  .form-dialog-body {
+    padding: var(--space-4);
+  }
   .dashboard-welcome {
     flex-direction: column;
     align-items: start;
@@ -2418,9 +2522,26 @@ input[type="radio"] {
 .dashboard-teacher-focus > * {
   min-width: 0;
 }
+.dashboard-student-focus > .workspace-section {
+  padding: var(--space-5);
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-lg);
+  background: hsl(var(--card));
+}
+.dashboard-student-focus > .workspace-section .workspace-section-header {
+  padding: 0 0 var(--space-3);
+}
+.dashboard-student-focus > .workspace-section .workspace-section-body {
+  padding: 0;
+}
 .dashboard-student-links {
   display: grid;
   gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid hsl(var(--border));
+  border-top: 3px solid hsl(var(--primary));
+  border-radius: var(--radius-lg);
+  background: hsl(var(--card));
 }
 .dashboard-student-links .quick-action-grid {
   grid-template-columns: minmax(0, 1fr);
@@ -2428,6 +2549,26 @@ input[type="radio"] {
 }
 .dashboard-student-links .quick-action-card {
   grid-template-columns: var(--space-8) minmax(0, 1fr) auto;
+  padding: var(--space-3) var(--space-2);
+  border-bottom-color: hsl(var(--border-strong));
+  border-radius: var(--radius-sm);
+}
+.dashboard-student-links .quick-action-card:last-child {
+  border-bottom: 0;
+}
+.dashboard-student-links .quick-action-card:hover {
+  background: hsl(var(--card-soft));
+}
+.dashboard-student-links .quick-action-index {
+  display: grid;
+  width: var(--space-8);
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  background: hsl(var(--card-soft));
+  font-family: var(--font-sans);
+  font-size: var(--text-small);
+  font-weight: 700;
 }
 .dashboard-composition[data-role="teacher"] .dashboard-kpis .metric-card {
   border-top-color: hsl(var(--primary) / 0.48);

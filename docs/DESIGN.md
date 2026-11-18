@@ -32,9 +32,9 @@ Every role dashboard follows the same opening order: welcome header, then a
 compact KPI register. Sections after the metrics vary to fit each role. The
 welcome header uses a narrow leaf-green rule, a role-specific greeting and
 context, and a direct role-specific workspace action. Refresh is a compact
-secondary icon action. KPI groups have their own section heading; each metric
-uses a clear label and tabular value without a decorative icon tile or reserved
-blank label area.
+secondary icon action. KPI groups have their own section heading. Student
+learning metrics use one bordered container with a compact semantic icon beside
+each label and tabular value; other role dashboards keep their open KPI register.
 
 - Admin: KPI register first, followed by the operational priority queue, quick
   actions, a 14-day collection chart, and exam lifecycle distribution.
@@ -49,13 +49,15 @@ blank label area.
   school name and login support information; metadata retains Citra Negara.
 - Teacher: compact teaching KPIs, followed by the assessment queue beside
   quick-action rows, course-scoped activity and exam lifecycle charts.
-  Authoring starts from the collection; long forms open in an inline editor
-  with a focused heading and a return action.
+  Authoring starts from the collection; long forms open in a Base UI form dialog
+  with a focused title, contained scrolling, and an explicit close control.
 - Student: compact learning KPIs, followed by next actions beside learning
   shortcuts, personal activity, material completion, assignment status,
   and published result bars. A zero-material denominator shows a dash, not an invented rate.
-- Materials: a selectable index and one reading surface. On narrower screens,
-  the index precedes the reader; selecting a material focuses its heading.
+- Materials: a selectable index and one reading surface, with inline previews
+  for attached images and protected downloads for supported documents. On
+  narrower screens, the index precedes the reader; selecting a material focuses
+  its heading.
 - Operational comparisons: tables for exams and results; continuous record
   lists for questions, materials, and assignments. Data tables retain common
   controls and density while emphasizing the scan task: identities and selected
@@ -111,7 +113,8 @@ share a legible enterprise sans-serif. Do not add a separate decorative serif
 face or a remote font dependency for dashboard headings.
 
 Composition tokens also define sidebar/content widths, control height,
-reading width, dialog width, and examination toolbar/rail dimensions. Ordinary
+reading width, confirmation and form dialog widths, and examination
+toolbar/rail dimensions. Ordinary
 controls use the small radius; larger radii are reserved for workspaces.
 Shadows are reserved mainly for overlays. Semantic warning, information, and
 secondary text colors must remain readable on their matching soft surfaces.
