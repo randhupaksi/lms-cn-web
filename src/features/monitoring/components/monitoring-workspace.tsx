@@ -13,6 +13,7 @@ import { DataTable, DataTableShell } from "@/components/ui/data-table";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Pagination } from "@/components/ui/pagination";
+import { formatWibDateTime } from "@/lib/date-time";
 import type { Exam } from "@/types/lms";
 const PAGE_SIZE = 20;
 const statusLabels: Record<string, string> = {
@@ -137,7 +138,7 @@ export function MonitoringWorkspace() {
                       </StatusBadge>
                     </td>
                     <td>
-                      {new Date(exam.starts_at).toLocaleString("id-ID")}
+                      {formatWibDateTime(exam.starts_at)}
                     </td>
                     <td>
                       <ActionButton
@@ -267,9 +268,7 @@ export function MonitoringWorkspace() {
                             </td>
                             <td>
                               {participant.last_activity_at
-                                ? new Date(
-                                    participant.last_activity_at,
-                                  ).toLocaleString("id-ID")
+                                ? formatWibDateTime(participant.last_activity_at)
                                 : "—"}
                             </td>
                           </tr>

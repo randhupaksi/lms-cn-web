@@ -207,7 +207,6 @@ export function LeadershipActions() {
       )}
       {actions.data && (
         <section className="governance-section p-6">
-          <h2 className="section-title">Daftar tindak lanjut</h2>
           {actions.data.data.length === 0 && <p>Belum ada tindak lanjut.</p>}
           <DataTable caption="Daftar tindak lanjut sekolah">
             <thead>

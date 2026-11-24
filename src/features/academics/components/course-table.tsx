@@ -6,32 +6,10 @@ import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
 import { useCourses } from "@/features/academics/use-academics";
 const PAGE_SIZE = 20;
 export function CourseTable() {
-  const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const courses = useCourses({ search, page, per_page: PAGE_SIZE });
+  const courses = useCourses({ page, per_page: PAGE_SIZE });
   return (
     <DataTableShell>
-      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border p-5">
-        <div>
-          <h2 className="section-title">Course aktif</h2>
-          <p className="mt-1 text-xs text-muted">
-            {courses.data?.meta.total ?? "—"} course
-          </p>
-        </div>
-        <label className="field-label">
-          Cari course
-          <input
-            className="field-input"
-            type="search"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
-            placeholder="Nama course, kelas, atau mata pelajaran"
-          />
-        </label>
-      </div>
       {courses.isLoading ? (
         <div className="p-5">
           <LoadingState label="Memuat course…" />
@@ -51,7 +29,7 @@ export function CourseTable() {
         <div className="p-5">
           <EmptyState
             title="Belum ada course"
-            description="Belum ada course yang sesuai dengan pencarian."
+            description="Course aktif akan tampil di sini saat tersedia."
           />
         </div>
       ) : null}

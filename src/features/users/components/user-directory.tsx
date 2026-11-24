@@ -9,20 +9,17 @@ import {
   useUsers,
 } from "@/features/users/use-users";
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
-import { RadixSelectField } from "@/components/ui/radix-select";
 import { Pagination } from "@/components/ui/pagination";
 import { AsyncFeedback } from "@/components/async-feedback";
 import { Button } from "@/components/ui/button";
 import { FormDialog } from "@/components/ui/form-dialog";
 
 export function UserDirectory() {
-  const [search, setSearch] = useState("");
-  const [role, setRole] = useState("all");
   const [page, setPage] = useState(1);
   const [resetUserId, setResetUserId] = useState<string | null>(null);
   const [resetPassword, setResetPassword] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const users = useUsers({ search, role: role === "all" ? "" : role, page });
+  const users = useUsers({ page });
   const toggle = useToggleUser();
   const resetCredential = useResetCredential();
 
@@ -47,42 +44,6 @@ export function UserDirectory() {
 
   return (
     <DataTableShell>
-      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border p-5">
-        <div>
-          <h2 className="section-title">Daftar pengguna</h2>
-          <p className="mt-1 text-xs text-muted">
-            {users.data?.meta.total ?? "—"} akun
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <input
-            className="field-input w-56"
-            type="search"
-            placeholder="Cari nama atau identitas…"
-            value={search}
-            aria-label="Cari pengguna berdasarkan nama atau identitas"
-            onChange={(event) => {
-              setSearch(event.target.value);
-              setPage(1);
-            }}
-          />
-          <RadixSelectField
-            value={role}
-            onValueChange={(value) => {
-              setRole(value);
-              setPage(1);
-            }}
-            placeholder="Semua peran"
-            options={[
-              { value: "all", label: "Semua peran" },
-              { value: "teacher", label: "Guru" },
-              { value: "student", label: "Siswa" },
-            ]}
-            ariaLabel="Filter pengguna berdasarkan peran"
-            className="w-36"
-          />
-        </div>
-      </div>
       <DataTable caption="Direktori pengguna sekolah">
         <thead>
           <tr>
@@ -156,9 +117,7 @@ export function UserDirectory() {
           {!users.isLoading && users.data?.data.length === 0 && (
             <tr>
               <td colSpan={5} className="empty-cell">
-                {search || role !== "all"
-                  ? "Tidak ada pengguna yang sesuai. Ubah pencarian atau pilih semua peran."
-                  : "Belum ada pengguna. Tambahkan akun melalui tombol Tambah pengguna."}
+                Belum ada pengguna. Tambahkan akun melalui tombol Tambah pengguna.
               </td>
             </tr>
           )}

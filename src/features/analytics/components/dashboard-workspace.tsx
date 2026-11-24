@@ -3,7 +3,9 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import {
+  Activity,
   ArrowRight,
+  BookOpenCheck,
   BookOpenText,
   ChartNoAxesCombined,
   CheckCircle2,
@@ -11,6 +13,7 @@ import {
   ClipboardList,
   GraduationCap,
   Radar,
+  UsersRound,
 } from "lucide-react";
 import { EmptyState } from "@/components/data-state";
 import { DashboardInsightsWorkspace } from "./dashboard-insights";
@@ -19,8 +22,15 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import type { DashboardMetric, DashboardTask } from "@/types/lms";
 import type { UserRole } from "@/types/api";
 
-const studentMetricIcons = {
+const dashboardMetricIcons = {
+  active_users: UsersRound,
+  active_courses: BookOpenCheck,
+  published_exams: GraduationCap,
+  active_attempts: Activity,
   courses: BookOpenText,
+  questions: ClipboardList,
+  exams: ClipboardCheck,
+  unpublished_results: ChartNoAxesCombined,
   available_exams: GraduationCap,
   published_results: ChartNoAxesCombined,
   completed_materials: CheckCircle2,
@@ -305,6 +315,37 @@ function QuickActions({
   );
 }
 
+function QuickActionPanel({
+  role,
+}: {
+  role: Exclude<UserRole, "superadmin" | "principal" | "student">;
+}) {
+  const copy = {
+    admin: {
+      title: "Kelola sekolah",
+      description: "Akses area utama untuk menjaga operasi sekolah tetap rapi.",
+    },
+    curriculum: {
+      title: "Koordinasi akademik",
+      description: "Buka ruang kerja kurikulum dan kesiapan asesmen.",
+    },
+    teacher: {
+      title: "Akses cepat mengajar",
+      description: "Lanjutkan persiapan materi, tugas, dan penilaian.",
+    },
+  }[role];
+
+  return (
+    <section className="dashboard-quick-panel">
+      <div>
+        <h2 className="section-title">{copy.title}</h2>
+        <p className="section-description">{copy.description}</p>
+      </div>
+      <QuickActions role={role} />
+    </section>
+  );
+}
+
 export function DashboardWorkspace({
   role,
   metrics,
@@ -344,13 +385,8 @@ export function DashboardWorkspace({
         <p className="section-description">{overview.description}</p>
       </div>
       {metrics.length ? (
-        <div
-          className={role === "student" ? "dashboard-kpi-surface" : undefined}
-        >
-          <MetricGrid
-            metrics={metrics}
-            iconByKey={role === "student" ? studentMetricIcons : undefined}
-          />
+        <div className="dashboard-kpi-surface">
+          <MetricGrid metrics={metrics} iconByKey={dashboardMetricIcons} />
         </div>
       ) : (
         <EmptyState
@@ -383,14 +419,14 @@ export function DashboardWorkspace({
         <>
           <div className="dashboard-teacher-focus">
             <PriorityQueue tasks={tasks} role={role} />
-            <QuickActions role={role} />
+            <QuickActionPanel role={role} />
           </div>
           <DashboardInsightsWorkspace role={role} />
         </>
       ) : (
         <>
           <PriorityQueue tasks={tasks} role={role} />
-          <QuickActions role={role} />
+          <QuickActionPanel role={role} />
           <DashboardInsightsWorkspace role={role} />
         </>
       )}

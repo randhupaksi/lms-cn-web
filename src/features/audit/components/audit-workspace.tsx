@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { ShieldCheck } from "lucide-react";
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
 import { Pagination } from "@/components/ui/pagination";
+import { formatWibDateTime } from "@/lib/date-time";
 
 export function AuditWorkspace() {
   const [action, setAction] = useState("");
@@ -79,7 +80,7 @@ export function AuditWorkspace() {
                 {events.data.data.map((event) => (
                   <tr key={event.id}>
                     <td>
-                      {new Date(event.created_at).toLocaleString("id-ID")}
+                      {formatWibDateTime(event.created_at)}
                     </td>
                     <td>{event.actor_name || "Sistem"}</td>
                     <td className="font-semibold">{event.action}</td>
