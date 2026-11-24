@@ -40,8 +40,13 @@ apiClient.interceptors.response.use(undefined, async (error) => {
       setAccessToken(token);
       return token;
     })
-    .catch(() => {
-      invalidateSession();
+    .catch((refreshError: unknown) => {
+      // Only a definitive rejection means the refresh cookie is no longer valid.
+      // A timeout or 5xx response should leave the signed-in UI intact so users
+      // can retry their work when the service is reachable again.
+      if (axios.isAxiosError(refreshError) && refreshError.response?.status === 401) {
+        invalidateSession();
+      }
       return null;
     })
     .finally(() => {

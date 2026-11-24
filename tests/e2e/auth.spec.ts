@@ -60,6 +60,38 @@ test("redirects an unauthenticated visitor from protected pages to login", async
   ).toBeVisible();
 });
 
+test("keeps the signed-in page open when token refresh hits a temporary server error", async ({
+  page,
+}) => {
+  let refreshCalls = 0;
+  await page.route("**/api/v1/auth/refresh", (route) => {
+    refreshCalls += 1;
+    return route.fulfill(
+      refreshCalls === 1
+        ? { json: sessionEnvelope(false) }
+        : {
+            status: 503,
+            json: { success: false, message: "Synthetic temporary outage." },
+          },
+    );
+  });
+  await page.route(/\/api\/v1\/materials(?:\?|$)/, (route) =>
+    route.fulfill({
+      status: 401,
+      json: { success: false, message: "Expired access token." },
+    }),
+  );
+
+  await page.goto("/student/materials");
+
+  await expect(page).toHaveURL(/\/student\/materials$/);
+  await expect(page.getByRole("alert")).toContainText(
+    "Materi belum dapat dimuat.",
+  );
+  await expect(page.getByText(/Synthetic temporary outage/)).toHaveCount(0);
+  expect(refreshCalls).toBe(2);
+});
+
 test("shows a safe message when login fails", async ({ page }) => {
   let refreshCalls = 0;
   page.on("request", (request) => {
@@ -229,7 +261,7 @@ test("lets a teacher choose an exam date with the keyboard inside the form dialo
   );
   await page.goto("/teacher/exams");
   await page.getByRole("button", { name: "Buat ujian" }).click();
-  const trigger = page.getByRole("button", { name: /^Mulai ujian,/ });
+  const trigger = page.getByRole("button", { name: /^Mulai ujian · WIB,/ });
   await trigger.focus();
   await page.keyboard.press("Enter");
   await expect(page.getByRole("grid")).toBeVisible();
@@ -237,7 +269,7 @@ test("lets a teacher choose an exam date with the keyboard inside the form dialo
   await expect(page.getByRole("gridcell").filter({ has: page.locator("button:focus") })).toHaveCount(1);
   await page.keyboard.press("ArrowRight");
   await page.keyboard.press("Enter");
-  await expect(trigger).toHaveAccessibleName(/^Mulai ujian, \d/);
+  await expect(trigger).toHaveAccessibleName(/^Mulai ujian · WIB, \d/);
   await page.keyboard.press("Escape");
   await expect(page.getByRole("grid")).toHaveCount(0);
   await expect(trigger).toBeFocused();
