@@ -8,6 +8,7 @@ import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
 import { FilterBar } from "@/components/ui/filter-bar";
 import { Pagination } from "@/components/ui/pagination";
+import { formatWibDateTime } from "@/lib/date-time";
 const PAGE_SIZE = 20;
 export function StudentResultsWorkspace() {
   const [search, setSearch] = useState("");
@@ -56,12 +57,6 @@ export function StudentResultsWorkspace() {
         ) : null}
         {results.data?.data.length ? (
           <DataTableShell>
-            <div className="flex items-center justify-between gap-4 border-b border-border p-5">
-              <h2 className="section-title">Rekap hasil ujian</h2>
-              <span className="count-label">
-                {results.data.meta.total} hasil dipublikasikan
-              </span>
-            </div>
             <DataTable caption="Hasil ujian yang telah dipublikasikan guru" className="student-score-table">
               <thead>
                 <tr>
@@ -89,7 +84,7 @@ export function StudentResultsWorkspace() {
                       {result.score} / {result.max_score}
                     </td>
                     <td className="text-xs text-muted">
-                      {new Date(result.graded_at).toLocaleString("id-ID")}
+                      {formatWibDateTime(result.graded_at)}
                     </td>
                   </tr>
                 ))}

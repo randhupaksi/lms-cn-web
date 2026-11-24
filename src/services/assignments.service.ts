@@ -11,6 +11,7 @@ export type AssignmentInput = {
 };
 export type SubmissionInput = { content: string; attachment_url: string };
 export type GradeInput = { score: number; feedback: string };
+export type ReturnInput = { feedback: string };
 export type AssignmentFilter = { search?: string; status?: string; page?: number; per_page?: number };
 
 export async function listAssignments(courseId?: string, filter: AssignmentFilter = {}) {
@@ -49,4 +50,7 @@ export async function listSubmissions(id: string, filter: { search?: string; pag
 }
 export async function gradeSubmission(id: string, input: GradeInput) {
   await apiClient.post(`/assignments/submissions/${id}/grade`, input);
+}
+export async function returnSubmission(id: string, input: ReturnInput) {
+  await apiClient.post(`/assignments/submissions/${id}/return`, input);
 }

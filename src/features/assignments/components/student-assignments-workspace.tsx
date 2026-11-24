@@ -15,6 +15,8 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { AsyncFeedback } from "@/components/async-feedback";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
+import { formatWibDateTime } from "@/lib/date-time";
+import { safeExternalHttpUrl } from "@/lib/safe-external-url";
 const PAGE_SIZE = 20;
 const submissionLabel = {
   submitted: "Menunggu penilaian",
@@ -100,20 +102,33 @@ export function StudentAssignmentsWorkspace() {
           />
         ) : null}
         {assignments.data?.data.map((assignment) => {
-          const overdue =
-            !assignment.submission &&
-            new Date(assignment.due_at).getTime() <= now;
+          const submission = assignment.submission;
+          const deadlinePassed = new Date(assignment.due_at).getTime() <= now;
+          const assignmentClosed = assignment.status !== "published";
+          const overdue = !submission && deadlinePassed;
+          const canSubmit =
+            !deadlinePassed &&
+            !assignmentClosed &&
+            (!submission || submission.status === "returned");
+          const showForm = activeId === assignment.id && canSubmit;
+          const attachmentHref = safeExternalHttpUrl(
+            submission?.attachment_url,
+          );
           const label = assignment.submission
             ? submissionLabel[assignment.submission.status]
             : overdue
               ? "Terlambat"
-              : "Belum dikumpulkan";
+              : assignmentClosed
+                ? "Ditutup"
+                : "Belum dikumpulkan";
           const tone = assignment.submission
             ? assignment.submission.status === "graded"
               ? "success"
               : "warning"
             : overdue
               ? "danger"
+              : assignmentClosed
+                ? "neutral"
               : "warning";
           return (
             <article className="assignment-card" key={assignment.id}>
@@ -138,27 +153,45 @@ export function StudentAssignmentsWorkspace() {
               </p>
               <p className="mt-3 text-xs text-muted">
                 Batas pengumpulan{" "}
-                {new Date(assignment.due_at).toLocaleString("id-ID")}
+                {formatWibDateTime(assignment.due_at)}
               </p>
-              {assignment.submission ? (
+              {submission ? (
                 <div className="mt-5 border-t border-border pt-4 text-sm">
                   <p>
-                    <strong>Jawaban:</strong> {assignment.submission.content}
+                    <strong>Jawaban:</strong> {submission.content}
                   </p>
-                  {assignment.submission.score !== null ? (
+                  {submission.attachment_url && attachmentHref ? (
                     <p className="mt-2">
-                      <strong>Nilai:</strong> {assignment.submission.score} /{" "}
+                      <strong>Lampiran:</strong>{" "}
+                      <a
+                        className="text-primary underline underline-offset-4"
+                        href={attachmentHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Buka lampiran tugas
+                      </a>
+                    </p>
+                  ) : submission.attachment_url ? (
+                    <p className="mt-2 text-muted" role="status">
+                      Tautan lampiran tidak valid dan tidak dapat dibuka.
+                    </p>
+                  ) : null}
+                  {submission.score !== null ? (
+                    <p className="mt-2">
+                      <strong>Nilai:</strong> {submission.score} /{" "}
                       {assignment.max_score}
                     </p>
                   ) : null}
-                  {assignment.submission.feedback ? (
+                  {submission.feedback ? (
                     <p className="mt-2">
                       <strong>Feedback:</strong>{" "}
-                      {assignment.submission.feedback}
+                      {submission.feedback}
                     </p>
                   ) : null}
                 </div>
-              ) : activeId === assignment.id ? (
+              ) : null}
+              {showForm ? (
                 <form
                   className="mt-5 space-y-3"
                   onSubmit={(e) => {
@@ -179,7 +212,7 @@ export function StudentAssignmentsWorkspace() {
                   }}
                 >
                   <label className="field-label">
-                    Jawaban
+                    {submission ? "Revisi jawaban" : "Jawaban"}
                     <textarea
                       className="field-input min-h-32"
                       value={draft.content}
@@ -212,10 +245,18 @@ export function StudentAssignmentsWorkspace() {
                     />
                   </label>
                   <div className="record-actions">
-                    <Button type="submit" disabled={submit.isPending}>
-                      {submit.isPending ? "Mengumpulkan…" : "Kumpulkan tugas"}
+                    <Button
+                      type="submit"
+                      disabled={submit.isPending || deadlinePassed}
+                    >
+                      {submit.isPending
+                        ? "Mengumpulkan…"
+                        : submission
+                          ? "Kirim ulang tugas"
+                          : "Kumpulkan tugas"}
                     </Button>
                     <Button
+                      type="button"
                       variant="ghost"
                       disabled={submit.isPending}
                       onClick={() => setActiveId("")}
@@ -235,15 +276,45 @@ export function StudentAssignmentsWorkspace() {
                     successMessage=""
                   />
                 </form>
-              ) : (
+              ) : !submission ? (
                 <Button
                   className="mt-5"
-                  onClick={() => setActiveId(assignment.id)}
-                  disabled={overdue}
+                  onClick={() => {
+                    submit.reset();
+                    setActiveId(assignment.id);
+                  }}
+                  disabled={overdue || assignmentClosed}
                 >
-                  {overdue ? "Deadline terlewati" : "Tulis jawaban"}
+                  {overdue
+                    ? "Deadline terlewati"
+                    : assignmentClosed
+                      ? "Tugas ditutup"
+                      : "Tulis jawaban"}
                 </Button>
-              )}
+              ) : submission.status === "returned" && !deadlinePassed ? (
+                <Button
+                  className="mt-5"
+                  onClick={() => {
+                    submit.reset();
+                    setDrafts((previous) => ({
+                      ...previous,
+                      [assignment.id]: {
+                        content: submission.content,
+                        attachment_url: submission.attachment_url,
+                      },
+                    }));
+                    setActiveId(assignment.id);
+                  }}
+                >
+                  Perbaiki dan kumpulkan ulang
+                </Button>
+              ) : submission.status === "returned" ? (
+                <p className="mt-4 text-sm text-muted" role="status">
+                  {deadlinePassed
+                    ? "Batas pengumpulan sudah terlewati. Hubungi guru untuk arahan selanjutnya."
+                    : "Tugas sudah ditutup. Hubungi guru untuk arahan selanjutnya."}
+                </p>
+              ) : null}
             </article>
           );
         })}

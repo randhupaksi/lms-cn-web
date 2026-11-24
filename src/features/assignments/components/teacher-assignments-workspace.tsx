@@ -1,6 +1,6 @@
 "use client";
 import { ActionButton } from "@/components/ui/action-button";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
 import { useAllCourses } from "@/features/academics";
@@ -8,12 +8,13 @@ import {
   useAssignments,
   useGradeSubmission,
   usePublishAssignment,
+  useReturnSubmission,
   useSaveAssignment,
   useSubmissions,
 } from "@/features/assignments/use-assignments";
 import type { Assignment, AssignmentSubmission } from "@/types/lms";
 import { PageHeader } from "@/components/ui/page-header";
-import { ClipboardList, Plus, Save, Send, Inbox } from "lucide-react";
+import { ClipboardList, Plus, Save, Send, Inbox, RotateCcw } from "lucide-react";
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { DateTimePickerField } from "@/components/ui/date-picker";
@@ -22,9 +23,12 @@ import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import { FormDialog } from "@/components/ui/form-dialog";
 import { FilterBar } from "@/components/ui/filter-bar";
+import { formatWibDateTime, schoolDateTimeToISO } from "@/lib/date-time";
+import { safeExternalHttpUrl } from "@/lib/safe-external-url";
 const PAGE_SIZE = 20;
 const emptyForm = { title: "", instructions: "", due_at: "", max_score: 100 };
 export function TeacherAssignmentsWorkspace() {
+  const [now, setNow] = useState(() => Date.now());
   const [editorOpen, setEditorOpen] = useState(false);
   const courses = useAllCourses();
   const [courseFilter, setCourseFilter] = useState("all");
@@ -35,7 +39,6 @@ export function TeacherAssignmentsWorkspace() {
   const [assignmentId, setAssignmentId] = useState("");
   const [selectedAssignment, setSelectedAssignment] =
     useState<Assignment | null>(null);
-  const [submissionSearch, setSubmissionSearch] = useState("");
   const [submissionPage, setSubmissionPage] = useState(1);
   const [form, setForm] = useState(emptyForm);
   const assignments = useAssignments(
@@ -50,11 +53,15 @@ export function TeacherAssignmentsWorkspace() {
   const save = useSaveAssignment();
   const publish = usePublishAssignment();
   const submissions = useSubmissions(assignmentId, {
-    search: submissionSearch,
     page: submissionPage,
     per_page: PAGE_SIZE,
   });
   const grade = useGradeSubmission(assignmentId);
+  const returnSubmission = useReturnSubmission(assignmentId);
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
   function submit(event: FormEvent) {
     event.preventDefault();
     if (!targetCourseId) return;
@@ -63,7 +70,7 @@ export function TeacherAssignmentsWorkspace() {
         input: {
           ...form,
           course_id: targetCourseId,
-          due_at: new Date(form.due_at).toISOString(),
+          due_at: schoolDateTimeToISO(form.due_at),
         },
       },
       {
@@ -139,9 +146,9 @@ export function TeacherAssignmentsWorkspace() {
                 />
               </label>
               <label className="field-label">
-                Batas pengumpulan
+                Batas pengumpulan · WIB
                 <DateTimePickerField
-                  label="Batas pengumpulan"
+                  label="Batas pengumpulan · WIB"
                   value={form.due_at}
                   onChange={(value) => setForm({ ...form, due_at: value })}
                   required
@@ -286,7 +293,7 @@ export function TeacherAssignmentsWorkspace() {
                 </div>
                 <p className="mt-3 text-sm leading-6 text-muted">
                   Batas pengumpulan{" "}
-                  {new Date(assignment.due_at).toLocaleString("id-ID")}
+                  {formatWibDateTime(assignment.due_at)}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {assignment.status === "draft" ? (
@@ -304,7 +311,6 @@ export function TeacherAssignmentsWorkspace() {
                       setAssignmentId(assignment.id);
                       setSelectedAssignment(assignment);
                       setSubmissionPage(1);
-                      setSubmissionSearch("");
                     }}
                   />
                 </div>
@@ -328,29 +334,6 @@ export function TeacherAssignmentsWorkspace() {
         </section>
         {assignmentId ? (
           <DataTableShell>
-            <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border p-5">
-              <div>
-                <h2 className="section-title">
-                  Pengumpulan siswa · {selectedAssignment?.title}
-                </h2>
-                <p className="mt-1 text-xs text-muted">
-                  {submissions.data?.meta.total ?? "—"} pengumpulan
-                </p>
-              </div>
-              <label className="field-label">
-                Cari siswa
-                <input
-                  className="field-input"
-                  type="search"
-                  value={submissionSearch}
-                  onChange={(e) => {
-                    setSubmissionSearch(e.target.value);
-                    setSubmissionPage(1);
-                  }}
-                  placeholder="Nama atau identifier"
-                />
-              </label>
-            </div>
             {submissions.isLoading ? (
               <div className="p-5">
                 <LoadingState />
@@ -360,7 +343,7 @@ export function TeacherAssignmentsWorkspace() {
               <div className="p-5">
                 <EmptyState
                   title="Belum ada pengumpulan"
-                  description="Tidak ada pengumpulan yang sesuai dengan pencarian."
+                  description="Belum ada pengumpulan untuk tugas ini."
                 />
               </div>
             ) : null}
@@ -380,6 +363,13 @@ export function TeacherAssignmentsWorkspace() {
                 errorMessage="Nilai belum dapat disimpan. Periksa skor dan coba lagi."
                 successMessage="Nilai dan feedback berhasil disimpan."
               />
+              <AsyncFeedback
+                error={returnSubmission.error}
+                isError={returnSubmission.isError}
+                isSuccess={returnSubmission.isSuccess}
+                errorMessage="Tugas belum dapat dikembalikan untuk revisi. Periksa status pengumpulan dan batas waktunya."
+                successMessage="Tugas dikembalikan kepada siswa untuk direvisi."
+              />
             </div>
             <DataTable caption="Pengumpulan tugas siswa">
               <thead>
@@ -394,16 +384,29 @@ export function TeacherAssignmentsWorkspace() {
               <tbody>
                 {submissions.data?.data.map((item) => (
                   <SubmissionRow
-                    key={item.id}
+                    key={`${item.id}-${item.submitted_at}-${item.graded_at ?? "pending"}`}
                     submission={item}
                     maxScore={selectedAssignment?.max_score ?? 100}
-                    pending={grade.isPending}
-                    onGrade={(score, feedback) =>
+                    pending={grade.isPending || returnSubmission.isPending}
+                    canReturn={Boolean(
+                      selectedAssignment?.status === "published" &&
+                        new Date(selectedAssignment.due_at).getTime() >
+                        now,
+                    )}
+                    onGrade={(score, feedback) => {
+                      returnSubmission.reset();
                       grade.mutate({
                         id: item.id,
                         input: { score, feedback },
-                      })
-                    }
+                      });
+                    }}
+                    onReturn={(feedback) => {
+                      grade.reset();
+                      returnSubmission.mutate({
+                        id: item.id,
+                        input: { feedback },
+                      });
+                    }}
                   />
                 ))}
               </tbody>
@@ -425,19 +428,50 @@ function SubmissionRow({
   submission,
   maxScore,
   onGrade,
+  onReturn,
   pending,
+  canReturn,
 }: {
   submission: AssignmentSubmission;
   maxScore: number;
   pending: boolean;
+  canReturn: boolean;
   onGrade: (score: number, feedback: string) => void;
+  onReturn: (feedback: string) => void;
 }) {
   const [score, setScore] = useState(submission.score ?? 0);
   const [feedback, setFeedback] = useState(submission.feedback);
+  const attachmentHref = safeExternalHttpUrl(submission.attachment_url);
+
   return (
     <tr>
-      <td className="font-semibold">{submission.student_name}</td>
-      <td className="max-w-sm whitespace-normal">{submission.content}</td>
+      <td>
+        <p className="font-semibold">{submission.student_name}</p>
+        <p className="mt-1 text-xs text-muted">
+          {submission.status === "returned"
+            ? "Menunggu revisi siswa"
+            : submission.status === "graded"
+              ? "Sudah dinilai"
+              : "Menunggu penilaian"}
+        </p>
+      </td>
+      <td className="max-w-sm whitespace-normal">
+        <p>{submission.content}</p>
+        {submission.attachment_url && attachmentHref ? (
+          <a
+            className="mt-2 inline-block text-primary underline underline-offset-4"
+            href={attachmentHref}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Buka tautan lampiran
+          </a>
+        ) : submission.attachment_url ? (
+          <p className="mt-2 text-xs text-muted" role="status">
+            Tautan lampiran tidak valid.
+          </p>
+        ) : null}
+      </td>
       <td>
         <input
           aria-label="Nilai"
@@ -463,9 +497,30 @@ function SubmissionRow({
           icon={Save}
           label={`Simpan nilai ${submission.student_name ?? "siswa"}`}
           pending={pending}
-          disabled={pending || score < 0 || score > maxScore}
+          disabled={
+            pending ||
+            score < 0 ||
+            score > maxScore ||
+            submission.status === "returned"
+          }
           onClick={() => onGrade(score, feedback)}
         />
+        {submission.status === "submitted" ? (
+          <ActionButton
+            className="ml-1"
+            icon={RotateCcw}
+            label={
+              !canReturn
+                ? "Tugas sudah ditutup; revisi tidak tersedia"
+                : !feedback.trim()
+                  ? `Isi feedback sebelum meminta revisi dari ${submission.student_name ?? "siswa"}`
+                  : `Minta revisi dari ${submission.student_name ?? "siswa"}`
+            }
+            pending={pending}
+            disabled={pending || !canReturn || !feedback.trim()}
+            onClick={() => onReturn(feedback)}
+          />
+        ) : null}
       </td>
     </tr>
   );

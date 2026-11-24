@@ -161,109 +161,108 @@ export function TeacherResultsWorkspace() {
             />
           ) : null}
           {results.data ? (
-            <DataTableShell>
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-5">
-                <div>
-                  <h2 className="section-title">Daftar nilai</h2>
-                  <p className="mt-1 text-xs text-muted">
-                    {results.data.meta.total} hasil
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
+            <>
+              <div className="flex flex-wrap justify-end gap-2">
+                <Button
+                  variant="ghost"
+                  onClick={() => void downloadExport()}
+                  disabled={
+                    !selectedExam ||
+                    exportState.isPending ||
+                    !results.data.data.length
+                  }
+                >
+                  {exportState.isPending
+                    ? "Menyiapkan…"
+                    : "Unduh CSV ujian terpilih"}
+                </Button>
+                {canPublish && (
                   <Button
-                    variant="ghost"
-                    onClick={() => void downloadExport()}
                     disabled={
                       !selectedExam ||
-                      exportState.isPending ||
+                      publish.isPending ||
                       !results.data.data.length
                     }
+                    onClick={() => publish.mutate()}
                   >
-                    {exportState.isPending
-                      ? "Menyiapkan…"
-                      : "Unduh CSV ujian terpilih"}
+                    {publish.isPending
+                      ? "Mempublikasikan…"
+                      : "Publikasikan hasil ujian terpilih"}
                   </Button>
-                  {canPublish && (
-                    <Button
-                      disabled={
-                        !selectedExam ||
-                        publish.isPending ||
-                        !results.data.data.length
-                      }
-                      onClick={() => publish.mutate()}
-                    >
-                      {publish.isPending
-                        ? "Mempublikasikan…"
-                        : "Publikasikan hasil ujian terpilih"}
-                    </Button>
-                  )}
-                </div>
+                )}
               </div>
-              <AsyncFeedback
-                error={publish.error}
-                isError={publish.isError}
-                isSuccess={publish.isSuccess}
-                errorMessage="Hasil belum dapat dipublikasikan."
-                successMessage="Hasil berhasil dipublikasikan kepada siswa."
-              />
-              <AsyncFeedback
-                error={exportState.error}
-                isError={exportState.isError}
-                isSuccess={exportState.isSuccess}
-                errorMessage="File hasil belum dapat diunduh."
-                successMessage="File hasil berhasil disiapkan."
-              />
-              <DataTable caption="Nilai siswa untuk ujian yang dipilih" className="gradebook-table">
-                <thead>
-                  <tr>
-                    <th>Ujian</th>
-                    <th>Siswa</th>
-                    <th>Identitas</th>
-                    <th className="numeric-cell">Nilai</th>
-                    <th className="numeric-cell">Persentase</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {results.data.data.map((item) => {
-                    const state = resultStatus[
-                      item.status as keyof typeof resultStatus
-                    ] ?? { label: item.status, tone: "neutral" as const };
-                    return (
-                      <tr key={item.id}>
-                        <td>
-                          {item.exam_title}
-                          <span className="block text-xs text-muted">
-                            {item.course_name ??
-                              courses.data?.find(
-                                (c) => c.id === item.course_id,
-                              )?.name}
-                          </span>
-                        </td>
-                        <td className="font-semibold">{item.student_name}</td>
-                        <td>{item.identifier}</td>
-                        <td className="numeric-cell">
-                          {item.score} / {item.max_score}
-                        </td>
-                        <td className="numeric-cell">
-                          {item.percentage.toFixed(1)}%
-                        </td>
-                        <td>
-                          <StatusBadge tone={state.tone}>
-                            {state.label}
-                          </StatusBadge>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </DataTable>
-              <Pagination
-                page={page}
-                totalPages={results.data.meta.total_pages}
-                onPageChange={setPage}
-              />
-            </DataTableShell>
+              <DataTableShell>
+                <AsyncFeedback
+                  error={publish.error}
+                  isError={publish.isError}
+                  isSuccess={publish.isSuccess}
+                  errorMessage="Hasil belum dapat dipublikasikan."
+                  successMessage="Hasil berhasil dipublikasikan kepada siswa."
+                />
+                <AsyncFeedback
+                  error={exportState.error}
+                  isError={exportState.isError}
+                  isSuccess={exportState.isSuccess}
+                  errorMessage="File hasil belum dapat diunduh."
+                  successMessage="File hasil berhasil disiapkan."
+                />
+                <DataTable
+                  caption="Nilai siswa untuk ujian yang dipilih"
+                  className="gradebook-table"
+                >
+                  <thead>
+                    <tr>
+                      <th>Ujian</th>
+                      <th>Siswa</th>
+                      <th>Identitas</th>
+                      <th className="numeric-cell">Nilai</th>
+                      <th className="numeric-cell">Persentase</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {results.data.data.map((item) => {
+                      const state = resultStatus[
+                        item.status as keyof typeof resultStatus
+                      ] ?? { label: item.status, tone: "neutral" as const };
+                      return (
+                        <tr key={item.id}>
+                          <td>
+                            {item.exam_title}
+                            <span className="block text-xs text-muted">
+                              {item.course_name ??
+                                courses.data?.find(
+                                  (c) => c.id === item.course_id,
+                                )?.name}
+                            </span>
+                          </td>
+                          <td className="font-semibold">
+                            {item.student_name}
+                          </td>
+                          <td>{item.identifier}</td>
+                          <td className="numeric-cell">
+                            {item.score} / {item.max_score}
+                          </td>
+                          <td className="numeric-cell">
+                            {item.percentage.toFixed(1)}%
+                          </td>
+                          <td>
+                            <StatusBadge tone={state.tone}>
+                              {state.label}
+                            </StatusBadge>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </DataTable>
+                <Pagination
+                  page={page}
+                  totalPages={results.data.meta.total_pages}
+                  onPageChange={setPage}
+                />
+              </DataTableShell>
+            </>
           ) : null}
         </section>
         {selectedExam ? (
@@ -305,12 +304,6 @@ export function TeacherResultsWorkspace() {
             ) : null}
             {analytics.data && analytics.data.items.length > 0 ? (
               <DataTableShell>
-                <div className="border-b border-border p-5">
-                  <h2 className="section-title">Analisis butir soal</h2>
-                  <p className="mt-1 text-xs text-muted">
-                    Lihat jumlah jawaban benar dan tingkat akurasi tiap soal.
-                  </p>
-                </div>
                 <DataTable caption="Analisis butir soal">
                   <thead>
                     <tr>

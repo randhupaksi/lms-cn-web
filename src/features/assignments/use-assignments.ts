@@ -67,3 +67,15 @@ export function useGradeSubmission(assignmentId: string) {
       client.invalidateQueries({ queryKey: keys.submissions(assignmentId) }),
   });
 }
+export function useReturnSubmission(assignmentId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: service.ReturnInput }) =>
+      service.returnSubmission(id, input),
+    onSuccess: () =>
+      Promise.all([
+        client.invalidateQueries({ queryKey: keys.submissions(assignmentId) }),
+        client.invalidateQueries({ queryKey: keys.all }),
+      ]),
+  });
+}

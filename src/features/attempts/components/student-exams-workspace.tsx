@@ -14,6 +14,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { AsyncFeedback } from "@/components/async-feedback";
 import { Button } from "@/components/ui/button";
+import { formatWibDateTime } from "@/lib/date-time";
 
 export function StudentExamsWorkspace() {
   const exams = useAvailableExams();
@@ -108,10 +109,10 @@ export function StudentExamsWorkspace() {
                       <div>
                         <dt className="text-xs text-muted">Jendela ujian</dt>
                         <dd className="mt-1 text-xs leading-6">
-                          {new Date(exam.starts_at).toLocaleString("id-ID")}
+                          {formatWibDateTime(exam.starts_at)}
                           <br />
                           hingga{" "}
-                          {new Date(exam.ends_at).toLocaleString("id-ID")}
+                          {formatWibDateTime(exam.ends_at)}
                         </dd>
                       </div>
                     </div>

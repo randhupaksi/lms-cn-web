@@ -24,6 +24,7 @@ import { DataTable, DataTableShell } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { FormDialog } from "@/components/ui/form-dialog";
 import { FilterBar } from "@/components/ui/filter-bar";
+import { formatWibDateTime, schoolDateTimeToISO } from "@/lib/date-time";
 const PAGE_SIZE = 20;
 const emptyForm = {
   title: "",
@@ -63,8 +64,8 @@ export function ExamAuthoringWorkspace() {
       {
         ...form,
         course_id: targetCourseId,
-        starts_at: new Date(form.starts_at).toISOString(),
-        ends_at: new Date(form.ends_at).toISOString(),
+        starts_at: schoolDateTimeToISO(form.starts_at),
+        ends_at: schoolDateTimeToISO(form.ends_at),
       },
       {
         onSuccess: () => {
@@ -76,7 +77,8 @@ export function ExamAuthoringWorkspace() {
   }
   const scheduleInvalid =
     Boolean(form.starts_at && form.ends_at) &&
-    new Date(form.ends_at).getTime() <= new Date(form.starts_at).getTime();
+    new Date(schoolDateTimeToISO(form.ends_at)).getTime() <=
+      new Date(schoolDateTimeToISO(form.starts_at)).getTime();
   const courseOptions =
     courses.data?.map((item) => ({ value: item.id, label: item.name })) ?? [];
   return (
@@ -141,18 +143,18 @@ export function ExamAuthoringWorkspace() {
                 />
               </label>
               <label className="field-label">
-                Mulai
+                Mulai · WIB
                 <DateTimePickerField
-                  label="Mulai ujian"
+                  label="Mulai ujian · WIB"
                   value={form.starts_at}
                   onChange={(value) => setForm({ ...form, starts_at: value })}
                   required
                 />
               </label>
               <label className="field-label">
-                Selesai
+                Selesai · WIB
                 <DateTimePickerField
-                  label="Selesai ujian"
+                  label="Selesai ujian · WIB"
                   value={form.ends_at}
                   onChange={(value) => setForm({ ...form, ends_at: value })}
                   required
@@ -338,11 +340,11 @@ export function ExamAuthoringWorkspace() {
                       </td>
                       <td>
                         <p>
-                          {new Date(exam.starts_at).toLocaleString("id-ID")}
+                          {formatWibDateTime(exam.starts_at)}
                         </p>
                         <p className="mt-1 text-xs text-muted">
                           {exam.duration_minutes} menit · hingga{" "}
-                          {new Date(exam.ends_at).toLocaleString("id-ID")}
+                          {formatWibDateTime(exam.ends_at)}
                         </p>
                       </td>
                       <td>
