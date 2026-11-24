@@ -9,12 +9,10 @@ designing or changing a component, page, layout, or interaction.
 
 ## 1. Design direction
 
-The LMS uses the visual language of a modern academic register: precise,
-considered, readable, and confident. A consistent sans-serif family keeps the
-interface legible and enterprise-ready; size and weight create hierarchy.
-Deep evergreen navigation, a warm paper canvas, small leaf-green identity
-details, and open rules give the product a recognizable character without
-slowing operational work.
+The LMS combines a dependable enterprise workspace with a more expressive
+academic identity. A consistent sans-serif family keeps the interface legible;
+strong green surfaces, crisp white work cards, warm canvas tones, and a small
+set of role accents add energy without obscuring tasks or status.
 
 The LMS has its own academic identity within the Citra Negara product family.
 Keep the school name and role language visible while letting learning,
@@ -25,20 +23,25 @@ principles without copying their brands or layouts.
 
 ### Role and task compositions
 
-Role compositions share evergreen, paper, and leaf-green token roles. Variation
-comes from each role's work order, useful density, and emphasis.
+Role compositions share evergreen, paper, and leaf-green token roles. Each
+workspace may use one restrained supporting accent for orientation: teal for
+curriculum and school leadership, blue for teaching, leaf for student learning,
+and violet for school-wide administration. Status and chart colors keep their
+own semantic meaning. Variation also comes from each role's work order, useful
+density, and emphasis.
 
 Every role dashboard follows the same opening order: welcome header, then a
 compact KPI register. Sections after the metrics vary to fit each role. The
-welcome header uses a narrow leaf-green rule, a role-specific greeting and
-context, and a direct role-specific workspace action. Refresh is a compact
-secondary icon action. KPI groups have their own section heading. Student
-learning metrics use one bordered container with a compact semantic icon beside
-each label and tabular value; other role dashboards keep their open KPI register.
+welcome header uses a deep evergreen surface, a lime identity accent, a
+role-specific greeting and context, and a direct role-specific workspace
+action. Refresh is a compact secondary icon action. KPI groups have their own
+section heading and white bordered container; each metric uses an icon, a
+tabular value, and a restrained accent tint. Keep dashboard support panels
+white so they stay distinct from the green welcome surface.
 
 - Admin: KPI register first, followed by the operational priority queue, quick
   actions, a 14-day collection chart, and exam lifecycle distribution.
-- School superadmin: compact command header and neutral KPI register,
+- School superadmin: compact command header and accented KPI register,
   followed by decision/quality priorities, school-wide exam-cycle segments, upcoming exams,
   agenda, and role ledger. Dedicated workspaces use an index/detail decision
   comparison, numbered quality groups, month calendar + agenda, aggregate report
@@ -60,9 +63,10 @@ each label and tabular value; other role dashboards keep their open KPI register
   its heading.
 - Operational comparisons: tables for exams and results; continuous record
   lists for questions, materials, and assignments. Data tables retain common
-  controls and density while emphasizing the scan task: identities and selected
-  records for access, numeric alignment for grades, time and action for audit,
-  and warning context for exam readiness.
+  density while emphasizing the scan task: identities and selected records for
+  access, numeric alignment for grades, time and action for audit, and warning
+  context for exam readiness. Omit table-section title/filter toolbars; keep
+  independent task-level filters, column headings, and accessible captions.
 - Examination: a dedicated shell, sticky time/progress toolbar, readable
   question area, and question navigation. Starting and final submission use
   the shared confirmation dialog; the server remains authoritative for time,
@@ -99,12 +103,15 @@ Token families:
 - radius and elevation;
 - focus, motion, and breakpoint values.
 
-The current light palette uses paper `--background: 44 32% 96%`, green-tinted
-ink `--foreground: 156 24% 15%`, evergreen action `--primary: 152 48% 28%`,
-sage soft surface `--primary-soft: 145 32% 91%`, leaf identity detail
-`--brand-accent: 88 46% 60%`, and forest navigation
-`--sidebar-end: 155 43% 14%`. Semantic success, warning, danger, information,
-and chart roles remain separate from the identity accent.
+The current light palette uses a warm near-white canvas
+`--background: 48 38% 97%`, forest ink `--foreground: 160 28% 13%`, vivid
+evergreen action `--primary: 153 62% 27%`, soft sage `--primary-soft: 145 45% 91%`,
+lime identity detail `--brand-accent: 82 75% 52%`, and deep forest
+navigation `--sidebar-end: 158 58% 11%`. Supporting role accents use the named
+`--accent-teal`, `--accent-blue`, `--accent-leaf`, and `--accent-violet` token
+families. Their soft variants are for low-emphasis surfaces and icon tiles.
+Semantic success, warning, danger, information, and chart roles remain separate
+from identity and role accents.
 
 Typography uses the system `--font-sans` stack (`Segoe UI Variable`, `Segoe UI`,
 Inter, and standard platform fallbacks). `--font-display` aliases the same
@@ -125,13 +132,14 @@ components or page JSX.
 
 ## 3. Visual rules
 
-- Use evergreen for actions and navigation, warm neutrals for most surfaces,
-  and leaf green only for small identity details. Keep status and chart colors
-  semantic.
+- Use evergreen for primary actions and navigation. Use white cards over a warm
+  canvas for work surfaces, and apply role accents to small indicators, headers,
+  and icon tiles. Keep status and chart colors semantic.
 - Keep scrollbars clearly visible: use a strong evergreen thumb on a sage track
   and the leaf accent at full opacity within the dark sidebar.
-- Use borders and surface contrast for hierarchy; keep shadows subtle and
-  limited to a small approved scale.
+- Use a small approved shadow scale with clear borders and surface contrast.
+  Reserve deep evergreen gradients for the dashboard welcome and governance
+  command header; keep routine workspaces calm and easy to scan.
 - Keep content aligned to a clear grid. Do not center everything.
 - Cards group related content or actions; do not wrap every small element in a
   card.
@@ -208,8 +216,8 @@ Do not use a centered spinner as the only loading design for a full page.
   route announcements identify the current task.
 - Use the shared `DataTable` with a descriptive caption. Its viewport enters
   the tab order and shows a scroll hint only when its columns overflow.
-- Use the control border token on fields. It provides 3.49:1 contrast against
-  the card surface. Keep the visible keyboard focus outline separate from the
+- Use the soft control border token on fields. It provides about 3.23:1 contrast
+  against the card surface. Keep the visible keyboard focus outline separate from the
   border and associate field errors with their inputs.
 - Exam navigation uses a check mark and an accessible name for answered
   questions. The timer announces the five-minute and one-minute thresholds
@@ -231,8 +239,8 @@ Before adding a component, answer:
 ## 8. Visual review checklist
 
 - [ ] Values come from tokens; no raw visual values in JSX.
-- [ ] Gradients are limited to approved shell and surface primitives; no glow,
-      excessive glassmorphism, or excessive shadow.
+- [ ] Gradients are limited to the workspace background and approved hero
+      surfaces; no glow, excessive glassmorphism, or excessive shadow.
 - [ ] Layout has clear hierarchy and alignment.
 - [ ] Primary action is obvious and not duplicated.
 - [ ] Typography is restrained and readable.

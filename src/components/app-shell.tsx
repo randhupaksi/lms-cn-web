@@ -109,7 +109,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
 
   if (pathname.startsWith("/student/attempts/")) {
     return (
-      <div className="workspace-shell">
+      <div className="workspace-shell" data-role={user.role}>
         <a href="#exam-content" className="skip-link button-primary">
           Langsung ke soal ujian
         </a>
@@ -167,7 +167,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
   const mobileDrawerOpen = isMobileViewport === true && sidebarOpen;
 
   return (
-    <div className="workspace-shell">
+    <div className="workspace-shell" data-role={user.role}>
       <a
         href="#main-content"
         className="skip-link button-primary"
