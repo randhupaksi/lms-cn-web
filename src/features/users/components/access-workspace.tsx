@@ -1,5 +1,6 @@
 "use client";
 import { DataTable } from "@/components/ui/data-table";
+import { DataTableSkeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import {
   KeyRound,
@@ -9,6 +10,7 @@ import {
   Search,
   ShieldCheck,
   UserRoundCheck,
+  UserRoundMinus,
   UserRoundX,
 } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
@@ -26,7 +28,7 @@ import { RadixSelectField } from "@/components/ui/radix-select";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Pagination } from "@/components/ui/pagination";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { LoadingState, ErrorState } from "@/components/data-state";
+import { ErrorState } from "@/components/data-state";
 import {
   useChangeUserRole,
   useResetCredential,
@@ -149,9 +151,7 @@ export function AccessWorkspace() {
           onClose={() => setCreating(false)}
           onCreated={() => {
             setCreating(false);
-            setNotice(
-              "Akun baru berhasil dibuat dan wajib mengganti kata sandi saat masuk.",
-            );
+            setNotice("");
           }}
         />
       )}
@@ -205,7 +205,19 @@ export function AccessWorkspace() {
               {query.data?.meta.total ?? "—"} pengguna
             </span>
           </div>
-          {query.isLoading && <LoadingState label="Memuat pengguna sekolah…" />}
+          {query.isLoading && (
+            <DataTableSkeleton
+              label="Memuat akses pengguna"
+              className="access-table"
+              rows={6}
+              columns={[
+                { label: "Pengguna", kind: "stack" },
+                { label: "Peran", kind: "badge" },
+                { label: "Status", kind: "badge" },
+                { label: "Tindakan", kind: "actions", align: "center" },
+              ]}
+            />
+          )}
           {query.isError && (
             <ErrorState
               label="Pengguna belum dapat dimuat."
@@ -341,13 +353,45 @@ export function AccessWorkspace() {
                   ? "Nonaktifkan akun?"
                   : "Aktifkan akun?"
         }
-        description={action?.user.full_name ?? ""}
+        description={
+          action?.kind === "toggle"
+            ? action.user.status === "active"
+              ? `Akun ${action.user.full_name} akan dinonaktifkan dan seluruh sesi aktifnya dicabut. Pengguna tidak dapat masuk sampai akun diaktifkan kembali.`
+              : `Akun ${action.user.full_name} akan diaktifkan agar pengguna dapat masuk kembali.`
+            : action?.user.full_name ?? ""
+        }
+        icon={
+          action?.kind === "toggle"
+            ? action.user.status === "active"
+              ? UserRoundMinus
+              : UserRoundCheck
+            : undefined
+        }
+        intent={
+          action?.kind === "toggle"
+            ? action.user.status === "active"
+              ? "danger"
+              : "success"
+            : "neutral"
+        }
         confirmLabel={
           action?.kind === "role"
             ? "Simpan peran"
             : action?.kind === "reset"
               ? "Reset kredensial"
-              : "Lanjutkan"
+              : action?.kind === "toggle"
+                ? action.user.status === "active"
+                  ? "Nonaktifkan akun"
+                  : "Aktifkan akun"
+                : action?.kind === "revoke"
+                  ? "Akhiri sesi"
+                  : "Lanjutkan"
+        }
+        confirmVariant={
+          (action?.kind === "toggle" && action.user.status === "active") ||
+          action?.kind === "revoke"
+            ? "danger"
+            : "primary"
         }
         pending={pending}
         confirmDisabled={disabled}

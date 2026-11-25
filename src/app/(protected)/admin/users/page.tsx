@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FormDialog } from "@/components/ui/form-dialog";
 import { RoleBoundary } from "@/components/role-boundary";
 import { UserCreateForm } from "@/features/users/components/user-create-form";
 import { UserDirectory } from "@/features/users/components/user-directory";
@@ -32,14 +31,7 @@ export default function UsersPage() {
           }
         />
         {editorOpen ? (
-          <FormDialog
-            id="user-editor"
-            title="Tambah pengguna"
-            description="Daftarkan akun guru atau siswa dengan kata sandi sementara dari sekolah."
-            onClose={() => setEditorOpen(false)}
-          >
-            <UserCreateForm />
-          </FormDialog>
+          <UserCreateForm onClose={() => setEditorOpen(false)} />
         ) : null}
         <UserDirectory />
       </div>

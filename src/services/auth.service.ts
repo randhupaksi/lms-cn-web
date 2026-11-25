@@ -1,4 +1,4 @@
-import { apiClient } from "@/services/api/client";
+import { apiClient, refreshAuthSession } from "@/services/api/client";
 import type { ApiEnvelope, Session, User } from "@/types/api";
 
 export type LoginInput = { identifier: string; password: string };
@@ -12,8 +12,7 @@ export async function login(input: LoginInput) {
 }
 
 export async function refreshSession() {
-  const response = await apiClient.post<ApiEnvelope<Session>>("/auth/refresh");
-  return response.data.data;
+  return refreshAuthSession();
 }
 
 export async function getCurrentUser() {

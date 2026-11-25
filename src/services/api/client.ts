@@ -5,6 +5,7 @@ import {
   invalidateSession,
   setAccessToken,
 } from "@/lib/auth-session";
+import type { ApiEnvelope, Session } from "@/types/api";
 
 export const apiClient = axios.create({
   baseURL: publicEnv.apiBaseUrl,
@@ -19,7 +20,21 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-let refreshRequest: Promise<string | null> | null = null;
+let refreshRequest: Promise<Session> | null = null;
+
+export function refreshAuthSession() {
+  refreshRequest ??= apiClient
+    .post<ApiEnvelope<Session>>("/auth/refresh")
+    .then(({ data }) => {
+      setAccessToken(data.data.access_token);
+      return data.data;
+    })
+    .finally(() => {
+      refreshRequest = null;
+    });
+
+  return refreshRequest;
+}
 
 apiClient.interceptors.response.use(undefined, async (error) => {
   const request = error.config;
@@ -33,26 +48,16 @@ apiClient.interceptors.response.use(undefined, async (error) => {
     return Promise.reject(error);
   }
   request._retry = true;
-  refreshRequest ??= apiClient
-    .post("/auth/refresh")
-    .then(({ data }) => {
-      const token = data.data.access_token as string;
-      setAccessToken(token);
-      return token;
-    })
-    .catch((refreshError: unknown) => {
-      // Only a definitive rejection means the refresh cookie is no longer valid.
-      // A timeout or 5xx response should leave the signed-in UI intact so users
-      // can retry their work when the service is reachable again.
-      if (axios.isAxiosError(refreshError) && refreshError.response?.status === 401) {
-        invalidateSession();
-      }
-      return null;
-    })
-    .finally(() => {
-      refreshRequest = null;
-    });
-  const token = await refreshRequest;
+  const session = await refreshAuthSession().catch((refreshError: unknown) => {
+    // Only a definitive rejection means the refresh cookie is no longer valid.
+    // A timeout or 5xx response should leave the signed-in UI intact so users
+    // can retry their work when the service is reachable again.
+    if (axios.isAxiosError(refreshError) && refreshError.response?.status === 401) {
+      invalidateSession();
+    }
+    return null;
+  });
+  const token = session?.access_token;
   if (!token) return Promise.reject(error);
   request.headers.Authorization = `Bearer ${token}`;
   return apiClient(request);
