@@ -5,12 +5,11 @@ import { useRouter } from "next/navigation";
 import {
   Eye,
   EyeOff,
-  GraduationCap,
   LockKeyhole,
   LogIn,
-  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BrandMark } from "@/components/brand-mark";
 import { useAuth } from "@/providers/auth-provider";
 import { useSchoolProfile } from "@/providers/school-provider";
 
@@ -44,10 +43,8 @@ export function LoginWorkspace() {
     setError(null);
     setLoading(true);
     try {
-      const user = await login({ identifier, password });
-      router.replace(
-        user.must_change_password ? "/change-password" : "/dashboard",
-      );
+      await login({ identifier, password });
+      router.replace("/dashboard");
     } catch {
       setError("Identitas atau kata sandi tidak valid.");
     } finally {
@@ -64,7 +61,7 @@ export function LoginWorkspace() {
         <div className="login-brand-content">
           <div className="flex items-center gap-4">
             <span className="workspace-brand-mark">
-              <GraduationCap aria-hidden="true" size={24} />
+              <BrandMark size={36} />
             </span>
             <div>
               <p className="text-base font-semibold">{school.school_name}</p>
@@ -76,7 +73,7 @@ export function LoginWorkspace() {
           <div className="login-brand-statement">
             <p className="login-brand-caption mb-5">PORTAL PEMBELAJARAN</p>
             <h2 className="login-brand-title">
-              Materi, tugas, dan ujian dalam satu alur belajar.
+              Materi, tugas, dan ujian dalam satu alur belajar
             </h2>
             <p className="mt-6 max-w-md text-sm leading-7 opacity-90">
               Masuk untuk membuka materi, meninjau tugas, atau mengelola
@@ -96,16 +93,15 @@ export function LoginWorkspace() {
               ))}
             </ol>
           </div>
-          <p className="login-brand-caption">
-            Portal resmi pembelajaran Citra Negara
-          </p>
         </div>
       </section>
 
       <section className="login-form-panel">
         <div className="login-card">
-          <div className="mb-8 flex items-center gap-3 lg:hidden">
-            <span className="workspace-user-avatar size-12">CN</span>
+          <div className="login-mobile-brand mb-8 flex items-center gap-3 lg:hidden">
+            <span className="workspace-user-avatar size-12" aria-hidden="true">
+              <BrandMark size={32} />
+            </span>
             <div>
               <p className="text-sm font-bold text-foreground">
                 {school.school_name} LMS
@@ -114,12 +110,15 @@ export function LoginWorkspace() {
             </div>
           </div>
 
-          <div className="mb-8">
-            <p className="eyebrow">
-              <ShieldCheck size={14} /> Akses akun
-            </p>
-            <h1 className="page-title mt-3">Masuk ke ruang belajar</h1>
-            <p className="page-description mt-2">
+          <div className="login-form-intro">
+            <div className="login-form-kicker">
+              <span className="login-form-mark" aria-hidden="true">
+                <BrandMark size={28} />
+              </span>
+              <p className="eyebrow">Akses akun</p>
+            </div>
+            <h1 className="login-form-title">Selamat Datang!</h1>
+            <p className="login-form-description">
               Gunakan NIS, NIP, atau username yang telah terdaftar.
             </p>
           </div>
@@ -180,18 +179,6 @@ export function LoginWorkspace() {
               <LogIn size={17} /> {loading ? "Memverifikasi…" : "Masuk ke LMS"}
             </Button>
           </form>
-          <p className="login-help">
-            {school.support_message}
-            {school.contact_email && (
-              <>
-                {" "}
-                <a href={`mailto:${school.contact_email}`}>
-                  {school.contact_email}
-                </a>
-              </>
-            )}
-          </p>
-
           <div className="mt-6 flex items-center justify-center gap-2 border-t border-border pt-5 text-xs text-muted">
             <LockKeyhole size={14} /> Gunakan akun yang diberikan sekolah.
           </div>

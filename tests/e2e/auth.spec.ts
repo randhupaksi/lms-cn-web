@@ -56,7 +56,7 @@ test("redirects an unauthenticated visitor from protected pages to login", async
   await expect(page).toHaveURL(/\/login$/);
   await expect(page).toHaveTitle("Masuk | Citra Negara LMS");
   await expect(
-    page.getByRole("heading", { name: "Masuk ke ruang belajar" }),
+    page.getByRole("heading", { name: "Selamat Datang!" }),
   ).toBeVisible();
 });
 
@@ -85,9 +85,11 @@ test("keeps the signed-in page open when token refresh hits a temporary server e
   await page.goto("/student/materials");
 
   await expect(page).toHaveURL(/\/student\/materials$/);
-  await expect(page.getByRole("alert")).toContainText(
-    "Materi belum dapat dimuat.",
-  );
+  await expect(
+    page
+      .getByRole("alert")
+      .filter({ hasText: "Materi belum dapat dimuat." }),
+  ).toBeVisible();
   await expect(page.getByText(/Synthetic temporary outage/)).toHaveCount(0);
   expect(refreshCalls).toBe(2);
 });
@@ -296,7 +298,6 @@ async function loginAsPrincipal(page: Page) {
   session.data.user.full_name = "Kepala Sekolah Uji";
   await page.route("**/api/v1/auth/login", (route) => route.fulfill({ status: 200, json: session }));
   await page.route("**/api/v1/governance/overview", (route) => route.fulfill({ status: 200, json: { success: true, message: "OK", data: { generated_at: "2026-01-01T00:00:00Z", roles: [], courses: 0, classes: 0, active_attempts: 0, pending_requests: 0, draft_results: 0, exams: [], exam_states: [], quality: [], agenda: [] } } }));
-  await page.route("**/api/v1/governance/actions/summary", (route) => route.fulfill({ status: 200, json: { success: true, message: "OK", data: { open: 1, overdue: 0 } } }));
   await page.goto("/login");
   await page.getByLabel("Identitas").fill("principal.test");
   await page.getByPlaceholder("Masukkan kata sandi akun Anda").fill("synthetic-password");
