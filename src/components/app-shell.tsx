@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ChevronRight, KeyRound, LogOut, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { BrandMark } from "@/components/brand-mark";
 import { cn } from "@/lib/cn";
 import { useAuth } from "@/providers/auth-provider";
 import { useSchoolProfile } from "@/providers/school-provider";
@@ -38,13 +39,22 @@ function resolvePageLocation(pathname: string, items: NavigationItem[]) {
 
 const MOBILE_VIEWPORT_QUERY = "(max-width: 1023px)";
 
-export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
+export function AppShell({
+  children,
+  sidebarCollapsed,
+  onSidebarCollapsedChange,
+  onChangePassword,
+}: Readonly<{
+  children: ReactNode;
+  sidebarCollapsed: boolean;
+  onSidebarCollapsedChange: (collapsed: boolean) => void;
+  onChangePassword: () => void;
+}>) {
   const school = useSchoolProfile();
   const { user, logout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobileViewport, setIsMobileViewport] = useState<boolean | null>(
     null,
   );
@@ -115,7 +125,9 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
         </a>
         <header className="workspace-topbar">
           <div className="flex items-center gap-3">
-            <span className="workspace-user-avatar">CN</span>
+            <span className="workspace-user-avatar" aria-hidden="true">
+              <BrandMark size={25} />
+            </span>
             <div>
               <p className="eyebrow">Mode ujian</p>
               <p className="text-sm font-bold text-foreground">
@@ -155,7 +167,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
       setSidebarOpen((open) => !open);
       return;
     }
-    setSidebarCollapsed((collapsed) => !collapsed);
+    onSidebarCollapsedChange(!sidebarCollapsed);
   }
 
   const sidebarExpanded =
@@ -208,7 +220,9 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
         }
       >
         <div className="workspace-brand">
-          <div className="workspace-brand-mark">CN</div>
+          <div className="workspace-brand-mark">
+            <BrandMark size={34} />
+          </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-bold text-white">
               {school.school_name} LMS
@@ -275,15 +289,18 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
               <p className="workspace-role-label mt-0.5">{roleLabel}</p>
             </div>
           </div>
-          <Link
-            href="/change-password"
-            onClick={() => setSidebarOpen(false)}
+          <button
+            type="button"
+            onClick={() => {
+              onChangePassword();
+              setSidebarOpen(false);
+            }}
             className="workspace-account-link mb-2"
           >
             <span className="flex items-center gap-2">
               <KeyRound aria-hidden="true" size={14} /> Ubah kata sandi
             </span>
-          </Link>
+          </button>
           <button
             type="button"
             onClick={() => void handleLogout()}
@@ -349,9 +366,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
                 aria-current="page"
                 className="truncate font-semibold text-foreground"
               >
-                {pathname === "/change-password"
-                  ? "Ubah kata sandi"
-                  : pageLocation.title}
+                {pageLocation.title}
               </span>
             </nav>
           </div>

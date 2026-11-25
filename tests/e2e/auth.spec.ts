@@ -147,19 +147,19 @@ test("requires matching password confirmation before submitting a password chang
     .fill("synthetic-current-password");
   await page.getByRole("button", { name: "Masuk ke LMS" }).click();
 
-  await expect(page).toHaveURL(/\/change-password$/);
+  await expect(page).toHaveURL(/\/dashboard$/);
   await expect(
     page.getByRole("heading", { name: "Perbarui kata sandi" }),
   ).toBeVisible();
 
   await page
-    .getByRole("textbox", { name: "Kata sandi saat ini", exact: true })
+    .getByLabel("Kata sandi saat ini", { exact: true })
     .fill("synthetic-current-password");
   await page
-    .getByRole("textbox", { name: "Kata sandi baru", exact: true })
+    .getByLabel("Kata sandi baru", { exact: true })
     .fill("synthetic-new-password");
   await page
-    .getByRole("textbox", { name: "Ulangi kata sandi baru", exact: true })
+    .getByLabel("Ulangi kata sandi baru", { exact: true })
     .fill("synthetic-other-password");
   await page.getByRole("button", { name: "Perbarui kata sandi" }).click();
 
@@ -172,7 +172,7 @@ test("requires matching password confirmation before submitting a password chang
   expect(passwordChangeRequests).toBe(0);
 
   await page
-    .getByRole("textbox", { name: "Ulangi kata sandi baru", exact: true })
+    .getByLabel("Ulangi kata sandi baru", { exact: true })
     .fill("synthetic-new-password");
   await page.getByRole("button", { name: "Perbarui kata sandi" }).click();
 
