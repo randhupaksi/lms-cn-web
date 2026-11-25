@@ -45,14 +45,8 @@ export const navigation: Record<UserRole, NavigationItem[]> = {
       group: "Pengawasan sekolah",
     },
     {
-      href: "/governance/actions",
-      label: "Tindak lanjut",
-      icon: ClipboardList,
-      group: "Pengawasan sekolah",
-    },
-    {
       href: "/superadmin/calendar",
-      label: "Kalender sekolah",
+      label: "Jadwal ujian",
       icon: CalendarDays,
       group: "Akademik & mutu",
     },
@@ -148,12 +142,6 @@ export const navigation: Record<UserRole, NavigationItem[]> = {
       icon: ClipboardCheck,
       group: "Koordinasi sekolah",
     },
-    {
-      href: "/governance/actions",
-      label: "Tindak lanjut saya",
-      icon: ClipboardList,
-      group: "Koordinasi sekolah",
-    },
   ],
   principal: [
     {
@@ -175,14 +163,8 @@ export const navigation: Record<UserRole, NavigationItem[]> = {
       group: "Kepemimpinan sekolah",
     },
     {
-      href: "/governance/actions",
-      label: "Tindak lanjut",
-      icon: ClipboardList,
-      group: "Kepemimpinan sekolah",
-    },
-    {
       href: "/principal/calendar",
-      label: "Kalender sekolah",
+      label: "Jadwal ujian",
       icon: CalendarDays,
       group: "Akademik & mutu",
     },
@@ -239,7 +221,7 @@ export const navigation: Record<UserRole, NavigationItem[]> = {
     { href: "/dashboard", label: "Ringkasan kurikulum", icon: LayoutDashboard, group: "Koordinasi akademik" },
     { href: "/admin/academics", label: "Struktur akademik", icon: School, group: "Koordinasi akademik" },
     { href: "/curriculum/exams", label: "Kesiapan ujian", icon: BookOpenCheck, group: "Koordinasi akademik" },
-    { href: "/curriculum/calendar", label: "Kalender akademik", icon: CalendarDays, group: "Koordinasi akademik" },
+    { href: "/curriculum/calendar", label: "Jadwal ujian", icon: CalendarDays, group: "Koordinasi akademik" },
     { href: "/curriculum/quality", label: "Kualitas data", icon: Database, group: "Koordinasi akademik" },
     { href: "/curriculum/reports", label: "Laporan akademik", icon: ChartNoAxesCombined, group: "Koordinasi akademik" },
     { href: "/teacher/questions", label: "Bank soal", icon: BookOpenCheck, group: "Pengajaran saya" },
@@ -249,7 +231,6 @@ export const navigation: Record<UserRole, NavigationItem[]> = {
     { href: "/teacher/results", label: "Hasil", icon: School, group: "Pengajaran saya" },
     { href: "/teacher/monitoring", label: "Monitoring", icon: Activity, group: "Pengajaran saya" },
     { href: "/governance/requests", label: "Pengajuan jadwal", icon: ClipboardCheck, group: "Koordinasi sekolah" },
-    { href: "/governance/actions", label: "Tindak lanjut saya", icon: ClipboardList, group: "Koordinasi sekolah" },
   ],
   teacher: [
     {
@@ -298,12 +279,6 @@ export const navigation: Record<UserRole, NavigationItem[]> = {
       href: "/governance/requests",
       label: "Pengajuan jadwal",
       icon: ClipboardCheck,
-      group: "Koordinasi sekolah",
-    },
-    {
-      href: "/governance/actions",
-      label: "Tindak lanjut saya",
-      icon: ClipboardList,
       group: "Koordinasi sekolah",
     },
   ],

@@ -94,10 +94,6 @@ export const useDecideScheduleRequest = () =>
   useGovernanceMutation(service.decideScheduleRequest);
 export const useCancelScheduleRequest = () =>
   useGovernanceMutation(service.cancelScheduleRequest);
-export const useSaveSchoolEvent = () =>
-  useGovernanceMutation(service.saveEvent);
-export const useArchiveSchoolEvent = () =>
-  useGovernanceMutation(service.archiveEvent);
 export const useSaveSchoolSettings = () =>
   useGovernanceMutation(service.saveSettings);
 export function useExportSchoolReports() {

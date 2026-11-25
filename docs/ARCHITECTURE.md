@@ -92,9 +92,10 @@ contracts for command overview, readiness, quality, schedule requests, calendar,
 reports and settings. Protected account management remains in `features/users`.
 Role routes and navigation are composed in the protected application shell.
 Governance workspaces expose distinct `superadmin`, `principal`, and
-`curriculum` capabilities; shared requests and leadership-action pages have
-their own staff and assignment scopes. These frontend checks control
-presentation only. The API enforces every role, ownership, and mutation rule.
+`curriculum` capabilities; shared schedule requests have staff and assignment
+scopes. The calendar reads only published exam schedules. These frontend
+checks control presentation only. The API enforces every role, ownership, and
+mutation rule.
 A school-profile provider supplies the public whitelisted branding/support
 contract to the shell and login.
 

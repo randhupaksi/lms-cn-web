@@ -27,20 +27,13 @@ export type QualityGroup = {
   count: number;
   samples: { id: string; label: string }[];
 };
-export type SchoolEvent = {
+export type AgendaItem = {
   id: string;
   title: string;
-  description: string;
   category: string;
   starts_at: string;
   ends_at: string;
-  status: string;
-  version: number;
 };
-export type EventInput = Pick<
-  SchoolEvent,
-  "title" | "description" | "category" | "starts_at" | "ends_at" | "version"
->;
 export type SchoolSettings = {
   school_name: string;
   motto: string;
@@ -72,7 +65,7 @@ export type GovernanceOverview = {
   exams: ExamReadiness[];
   exam_states: { key: string; count: number }[];
   quality: QualityGroup[];
-  agenda: SchoolEvent[];
+  agenda: AgendaItem[];
 };
 export type ScheduleRequest = {
   id: string;
@@ -142,7 +135,7 @@ export const getExams = (
 export const getRequests = (params: { page?: number; status?: string }) =>
   list<ScheduleRequest>("requests", params);
 export const getAgenda = (from: string, to: string) =>
-  get<SchoolEvent[]>("events", { from, to });
+  get<AgendaItem[]>("agenda", { from, to });
 export const getSettings = () => get<SchoolSettings>("settings");
 export const getSettingHistory = () => get<SettingChange[]>("settings/history");
 export const getReports = (params: ReportFilter) =>
@@ -160,16 +153,6 @@ export async function decideScheduleRequest(input: {
 }
 export async function cancelScheduleRequest(id: string) {
   await apiClient.post(`/governance/requests/${id}/cancel`);
-}
-export async function saveEvent(input: { id?: string; body: EventInput }) {
-  if (input.id)
-    await apiClient.put(`/governance/events/${input.id}`, input.body);
-  else await apiClient.post("/governance/events", input.body);
-}
-export async function archiveEvent(input: { id: string; version: number }) {
-  await apiClient.post(`/governance/events/${input.id}/archive`, {
-    version: input.version,
-  });
 }
 export async function saveSettings(input: SettingsInput) {
   await apiClient.put("/governance/settings", input);
