@@ -13,9 +13,12 @@ import { Pagination } from "@/components/ui/pagination";
 import {
   EmptyState,
   ErrorState,
-  LoadingState,
   SelectionState,
 } from "@/components/data-state";
+import {
+  FilterOptionsSkeleton,
+  MemberListSkeleton,
+} from "@/components/ui/skeleton-patterns";
 const PAGE_SIZE = 20;
 export function CourseAssignments() {
   const courses = useAllCourses();
@@ -69,6 +72,9 @@ export function CourseAssignments() {
           }
         />
       </label>
+      {courses.isLoading ? (
+        <FilterOptionsSkeleton label="Memuat pilihan course" />
+      ) : null}
       {courses.isError ? (
         <ErrorState
           label="Daftar course belum dapat dimuat."
@@ -82,9 +88,6 @@ export function CourseAssignments() {
       ) : null}
       {courseId ? (
         <>
-          {members.isLoading ? (
-            <LoadingState label="Memuat keanggotaan course…" />
-          ) : null}
           {members.isError ? (
             <ErrorState
               label="Keanggotaan course belum dapat dimuat."
@@ -118,7 +121,7 @@ export function CourseAssignments() {
               page={teacherPage}
               totalPages={teachers.data?.meta.total_pages ?? 1}
               onPageChange={setTeacherPage}
-              loading={teachers.isLoading}
+              loading={members.isLoading || teachers.isLoading}
             />
             <MemberSelector
               title="Siswa peserta"
@@ -134,7 +137,7 @@ export function CourseAssignments() {
               page={studentPage}
               totalPages={students.data?.meta.total_pages ?? 1}
               onPageChange={setStudentPage}
-              loading={students.isLoading}
+              loading={members.isLoading || students.isLoading}
             />
           </div>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -225,7 +228,9 @@ function MemberSelector({
         onChange={(e) => onSearch(e.target.value)}
       />
       <div className="mt-3 max-h-72 space-y-2 overflow-y-auto">
-        {loading ? <LoadingState label="Memuat daftar pengguna…" /> : null}
+        {loading ? (
+          <MemberListSkeleton label="Memuat daftar pengguna" rows={5} />
+        ) : null}
         {!loading && !users.length ? (
           <EmptyState
             title="Tidak ada pengguna"

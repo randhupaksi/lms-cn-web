@@ -10,7 +10,8 @@ import {
   useCreateSubject,
 } from "@/features/academics/use-academics";
 import { CourseAssignments } from "@/features/academics/components/course-assignments";
-import { ErrorState, LoadingState } from "@/components/data-state";
+import { ErrorState } from "@/components/data-state";
+import { AcademicStructureSkeleton } from "@/components/ui/skeleton-patterns";
 import { CourseTable } from "@/features/academics/components/course-table";
 import { PageHeader } from "@/components/ui/page-header";
 import { School, List, Layers, UsersRound } from "lucide-react";
@@ -26,6 +27,7 @@ export function AcademicsWorkspace() {
   const createClass = useCreateClassGroup();
   const createSubject = useCreateSubject();
   const createCourse = useCreateCourse();
+  const structureLoading = Object.values(data).some((query) => query.isLoading);
   const [year, setYear] = useState({
     name: "",
     starts_on: "",
@@ -81,10 +83,7 @@ export function AcademicsWorkspace() {
         </div>
         {view === "courses" ? <CourseTable /> : null}
         {view === "structure" ? (
-          <div className="space-y-5">
-            {Object.values(data).some((query) => query.isLoading) ? (
-              <LoadingState label="Memuat struktur akademik…" />
-            ) : null}
+          <div className="space-y-5" hidden={structureLoading}>
             {Object.values(data).some((query) => query.isError) ? (
               <ErrorState
                 label="Sebagian struktur akademik belum dapat dimuat."
@@ -381,6 +380,9 @@ export function AcademicsWorkspace() {
               </section>
             </div>
           </div>
+        ) : null}
+        {view === "structure" && structureLoading ? (
+          <AcademicStructureSkeleton />
         ) : null}
         {view === "members" ? <CourseAssignments /> : null}
       </div>

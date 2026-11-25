@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { BookOpenText, CheckCircle2, ArrowRight } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
-import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
+import { EmptyState, ErrorState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
 import { useAllCourses } from "@/features/academics";
 import {
@@ -18,6 +18,10 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { Pagination } from "@/components/ui/pagination";
 import { cn } from "@/lib/cn";
 import { MaterialAttachments } from "@/features/materials/components/material-attachments";
+import {
+  FilterOptionsSkeleton,
+  ReadingWorkspaceSkeleton,
+} from "@/components/ui/skeleton-patterns";
 
 const PAGE_SIZE = 20;
 export function StudentMaterialsWorkspace() {
@@ -78,6 +82,9 @@ export function StudentMaterialsWorkspace() {
             />
           </label>
         </FilterBar>
+        {courses.isLoading ? (
+          <FilterOptionsSkeleton label="Memuat pilihan course" />
+        ) : null}
         {courses.isError ? (
           <ErrorState
             label="Pilihan course belum dapat dimuat."
@@ -85,7 +92,7 @@ export function StudentMaterialsWorkspace() {
           />
         ) : null}
         {materials.isLoading ? (
-          <LoadingState label="Menyiapkan ruang baca…" />
+          <ReadingWorkspaceSkeleton label="Menyiapkan ruang baca" />
         ) : null}
         {materials.isError ? (
           <ErrorState
