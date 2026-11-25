@@ -13,13 +13,18 @@ import type { Question } from "@/types/lms";
 import { PageHeader } from "@/components/ui/page-header";
 import { BookOpenCheck, Plus, Pencil, Archive } from "lucide-react";
 import { RadixSelectField } from "@/components/ui/radix-select";
-import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
+import { EmptyState, ErrorState } from "@/components/data-state";
 import { AsyncFeedback } from "@/components/async-feedback";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
+import {
+  FilterOptionsSkeleton,
+  QuestionListSkeleton,
+} from "@/components/ui/skeleton-patterns";
 
 import { FormDialog } from "@/components/ui/form-dialog";
 import { FilterBar } from "@/components/ui/filter-bar";
+import { useToast } from "@/providers/toast-provider";
 
 const emptyOptions = () =>
   Array.from({ length: 4 }, (_, index) => ({
@@ -29,6 +34,7 @@ const emptyOptions = () =>
 const PAGE_SIZE = 20;
 
 export function QuestionBankWorkspace() {
+  const { success: notifySuccess } = useToast();
   const courses = useAllCourses();
   const [editorOpen, setEditorOpen] = useState(false);
   const [courseFilter, setCourseFilter] = useState("all");
@@ -97,7 +103,16 @@ export function QuestionBankWorkspace() {
           options,
         },
       },
-      { onSuccess: reset },
+      {
+        onSuccess: () => {
+          notifySuccess(
+            editingId
+              ? "Soal berhasil diperbarui."
+              : "Soal berhasil ditambahkan.",
+          );
+          reset();
+        },
+      },
     );
   }
 
@@ -132,11 +147,39 @@ export function QuestionBankWorkspace() {
           {editorOpen ? (
             <FormDialog
               id="question-editor"
+              icon={BookOpenCheck}
+              eyebrow="Bank soal · Penulisan"
               title={editingId ? "Perbarui soal" : "Buat soal baru"}
               description="Tulis pertanyaan dan pilih tepat satu jawaban benar. Soal yang sudah digunakan tidak mengubah isi ujian sebelumnya."
               onClose={() => setEditorOpen(false)}
+              footer={
+                <>
+                  <Button
+                    variant="secondary"
+                    type="button"
+                    onClick={() => setEditorOpen(false)}
+                  >
+                    Batal
+                  </Button>
+                  <Button
+                    type="submit"
+                    form="question-editor-fields"
+                    disabled={save.isPending || !targetCourseId}
+                  >
+                    {save.isPending
+                      ? "Menyimpan…"
+                      : editingId
+                        ? "Simpan perubahan"
+                        : "Tambah soal"}
+                  </Button>
+                </>
+              }
             >
-              <form className="space-y-4" onSubmit={submit}>
+              <form
+                id="question-editor-fields"
+                className="space-y-4"
+                onSubmit={submit}
+              >
                 <label className="field-label">
                   Course untuk soal
                   <RadixSelectField
@@ -231,25 +274,15 @@ export function QuestionBankWorkspace() {
                     </div>
                   ))}
                 </fieldset>
-                <Button
-                  type="submit"
-                  disabled={save.isPending || !targetCourseId}
-                >
-                  {save.isPending
-                    ? "Menyimpan…"
-                    : editingId
-                      ? "Simpan perubahan"
-                      : "Tambah soal"}
-                </Button>
               </form>
             </FormDialog>
           ) : null}
           <AsyncFeedback
             error={save.error}
             isError={save.isError}
-            isSuccess={save.isSuccess}
+            isSuccess={false}
             errorMessage="Soal belum dapat disimpan. Pastikan tepat satu jawaban benar."
-            successMessage="Soal berhasil disimpan di bank soal."
+            successMessage=""
           />
 
           <section className="space-y-4">
@@ -298,58 +331,61 @@ export function QuestionBankWorkspace() {
                 />
               </label>
             </FilterBar>
+            {courses.isLoading ? (
+              <FilterOptionsSkeleton label="Memuat pilihan course" />
+            ) : null}
             {courses.isError ? (
               <ErrorState
                 label="Daftar course belum dapat dimuat."
                 onRetry={() => void courses.refetch()}
               />
             ) : null}
-            {questions.isLoading ? (
-              <LoadingState label="Memuat bank soal…" />
-            ) : null}
+            {questions.isLoading ? <QuestionListSkeleton /> : null}
             {questions.isError ? (
               <ErrorState
                 label="Bank soal belum dapat dimuat."
                 onRetry={() => void questions.refetch()}
               />
             ) : null}
-            <div className="record-list">
-              {questions.data?.data.map((question, index) => (
-                <article className="record-row" key={question.id}>
-                  <p className="text-xs font-bold text-muted">
-                    SOAL {(page - 1) * PAGE_SIZE + index + 1} ·{" "}
-                    {question.default_points} POIN ·{" "}
-                    {courses.data?.find(
-                      (course) => course.id === question.course_id,
-                    )?.name ?? "Course"}
-                  </p>
-                  {question.category || question.tags.length > 0 ? (
-                    <p className="mt-2 text-xs text-muted">
-                      {[question.category, ...question.tags]
-                        .filter(Boolean)
-                        .join(" · ")}
+            {questions.data?.data.length ? (
+              <div className="record-list">
+                {questions.data?.data.map((question, index) => (
+                  <article className="record-row" key={question.id}>
+                    <p className="text-xs font-bold text-muted">
+                      SOAL {(page - 1) * PAGE_SIZE + index + 1} ·{" "}
+                      {question.default_points} POIN ·{" "}
+                      {courses.data?.find(
+                        (course) => course.id === question.course_id,
+                      )?.name ?? "Course"}
                     </p>
-                  ) : null}
-                  <p className="mt-2 font-semibold leading-6">
-                    {question.stem}
-                  </p>
-                  <div className="mt-4 flex gap-2">
-                    <ActionButton
-                      icon={Pencil}
-                      label="Edit soal"
-                      onClick={() => edit(question)}
-                    />
-                    <ActionButton
-                      icon={Archive}
-                      label="Arsipkan soal"
-                      tone="danger"
-                      pending={archive.isPending}
-                      onClick={() => archive.mutate(question.id)}
-                    />
-                  </div>
-                </article>
-              ))}
-            </div>
+                    {question.category || question.tags.length > 0 ? (
+                      <p className="mt-2 text-xs text-muted">
+                        {[question.category, ...question.tags]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </p>
+                    ) : null}
+                    <p className="mt-2 font-semibold leading-6">
+                      {question.stem}
+                    </p>
+                    <div className="mt-4 flex gap-2">
+                      <ActionButton
+                        icon={Pencil}
+                        label="Edit soal"
+                        onClick={() => edit(question)}
+                      />
+                      <ActionButton
+                        icon={Archive}
+                        label="Arsipkan soal"
+                        tone="danger"
+                        pending={archive.isPending}
+                        onClick={() => archive.mutate(question.id)}
+                      />
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : null}
             {!questions.isLoading &&
             !questions.isError &&
             questions.data?.data.length === 0 ? (

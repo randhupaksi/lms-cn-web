@@ -1,12 +1,14 @@
 import { useState, type FormEvent } from "react";
-import { Monitor } from "lucide-react";
+import { Monitor, UserRoundPlus } from "lucide-react";
 import type { User, UserRole } from "@/types/api";
 import { Button } from "@/components/ui/button";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { FormDialog } from "@/components/ui/form-dialog";
 import { AsyncFeedback } from "@/components/async-feedback";
 import { ErrorState } from "@/components/data-state";
+import { SessionRowsSkeleton } from "@/components/ui/skeleton-patterns";
 import { useAuth } from "@/providers/auth-provider";
+import { useToast } from "@/providers/toast-provider";
 import {
   useCreateUser,
   useUpdateManagedUser,
@@ -29,13 +31,16 @@ const when = (value: string) =>
 export function Feedback({
   mutation,
   success = "Perubahan berhasil disimpan.",
+  showSuccess = true,
 }: {
   mutation: { error: unknown; isError: boolean; isSuccess: boolean };
   success?: string;
+  showSuccess?: boolean;
 }) {
   return (
     <AsyncFeedback
       {...mutation}
+      isSuccess={showSuccess && mutation.isSuccess}
       errorMessage="Perubahan belum dapat disimpan."
       successMessage={success}
     />
@@ -50,6 +55,7 @@ export function CreateManagedUser({
   onCreated: () => void;
 }) {
   const mutation = useCreateUser();
+  const { success: notifySuccess } = useToast();
   const actorRole = useAuth().user?.role;
   const isSuperadmin = actorRole === "superadmin";
   const canCreateCurriculum = isSuperadmin || actorRole === "principal";
@@ -61,17 +67,41 @@ export function CreateManagedUser({
   });
   function submit(e: FormEvent) {
     e.preventDefault();
-    mutation.mutate(form, { onSuccess: onCreated });
+    mutation.mutate(form, {
+      onSuccess: () => {
+        notifySuccess("Akun sekolah berhasil dibuat.");
+        onCreated();
+      },
+    });
   }
   return (
     <FormDialog
       id="managed-user-form"
+      icon={UserRoundPlus}
       eyebrow="Akun sekolah"
       title="Buat akses baru"
       description="Buat akun sekolah dengan peran dan kata sandi sementara."
       onClose={onClose}
+      footer={
+        <>
+          <Button variant="secondary" type="button" onClick={onClose}>
+            Batal
+          </Button>
+          <Button
+            type="submit"
+            form="managed-user-fields"
+            disabled={mutation.isPending}
+          >
+            {mutation.isPending ? "Membuat akun…" : "Buat akun"}
+          </Button>
+        </>
+      }
     >
-      <form className="governance-form-grid" onSubmit={submit}>
+      <form
+        id="managed-user-fields"
+        className="governance-form-grid"
+        onSubmit={submit}
+      >
         <label className="field-label">
           Nama lengkap
           <input
@@ -135,10 +165,7 @@ export function CreateManagedUser({
             superadmin dilakukan melalui tindakan perubahan peran dengan
             konfirmasi kata sandi Anda.
           </p>
-          <Button type="submit" disabled={mutation.isPending}>
-            {mutation.isPending ? "Membuat akun…" : "Buat akun"}
-          </Button>
-          <Feedback mutation={mutation} />
+          <Feedback mutation={mutation} showSuccess={false} />
         </div>
       </form>
     </FormDialog>
@@ -201,9 +228,7 @@ export function UserInspector({
             <Monitor size={17} aria-hidden="true" />
             Sesi aktif
           </h3>
-          {sessions.isLoading && (
-            <p className="text-sm text-muted">Memuat sesi…</p>
-          )}
+          {sessions.isLoading && <SessionRowsSkeleton />}
           {sessions.isError && (
             <ErrorState
               label="Sesi belum dapat dimuat."

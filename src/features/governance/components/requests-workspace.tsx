@@ -1,6 +1,6 @@
 "use client";
 import { useState, type FormEvent } from "react";
-import { ArrowDown, Check, Plus, X, Ban } from "lucide-react";
+import { ArrowDown, Ban, CalendarClock, Check, Plus, X } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { FormDialog } from "@/components/ui/form-dialog";
 import { RadixSelectField } from "@/components/ui/radix-select";
+import { useToast } from "@/providers/toast-provider";
 import type { ScheduleRequest } from "@/services/governance.service";
 import {
   useRequests,
@@ -24,6 +25,10 @@ import {
   schoolTime,
   stateLabels,
 } from "./governance-shared";
+import {
+  DecisionListSkeleton,
+  FieldOptionsSkeleton,
+} from "./governance-skeletons";
 
 function ScheduleForm({
   onClose,
@@ -35,6 +40,7 @@ function ScheduleForm({
   const [search, setSearch] = useState("");
   const exams = useReadiness({ search, per_page: 100 }, true);
   const mutation = useCreateScheduleRequest();
+  const { success: notifySuccess } = useToast();
   const [examId, setExamId] = useState("");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
@@ -49,18 +55,42 @@ function ScheduleForm({
         proposed_starts_at: inputToISO(start),
         proposed_ends_at: inputToISO(end),
       },
-      { onSuccess: onCreated },
+      {
+        onSuccess: () => {
+          notifySuccess("Pengajuan jadwal berhasil dikirim kepada pimpinan sekolah.");
+          onCreated();
+        },
+      },
     );
   }
   return (
     <FormDialog
       id="schedule-request-form"
+      icon={CalendarClock}
       eyebrow="Pengajuan baru"
       title="Usulkan perubahan jadwal"
       description="Pilih ujian, usulkan waktu baru, dan sertakan alasan untuk ditinjau."
       onClose={onClose}
+      footer={
+        <>
+          <Button variant="secondary" type="button" onClick={onClose}>
+            Batal
+          </Button>
+          <Button
+            type="submit"
+            form="schedule-request-fields"
+            disabled={!examId || mutation.isPending}
+          >
+            {mutation.isPending ? "Mengajukan…" : "Kirim pengajuan"}
+          </Button>
+        </>
+      }
     >
-      <form className="governance-form-grid" onSubmit={submit}>
+      <form
+        id="schedule-request-fields"
+        className="governance-form-grid"
+        onSubmit={submit}
+      >
         <label className="field-label">
           Cari ujian
           <input
@@ -88,7 +118,10 @@ function ScheduleForm({
               }))}
           />
         </label>
-        <QueryState query={exams} />
+        <QueryState
+          query={exams}
+          skeleton={<FieldOptionsSkeleton label="Memuat daftar ujian" />}
+        />
         {selected && (
           <p className="governance-form-wide text-sm text-muted">
             Jadwal saat ini: {schoolTime(selected.starts_at)} –{" "}
@@ -130,15 +163,12 @@ function ScheduleForm({
           />
         </label>
         <div className="governance-form-wide flex flex-wrap gap-3 items-center">
-          <Button type="submit" disabled={!examId || mutation.isPending}>
-            {mutation.isPending ? "Mengajukan…" : "Kirim pengajuan"}
-          </Button>
           <p className="text-xs text-muted">
             Jadwal berlaku setelah disetujui pimpinan sekolah.
           </p>
         </div>
         <div className="governance-form-wide">
-          <MutationFeedback mutation={mutation} />
+          <MutationFeedback mutation={mutation} showSuccess={false} />
         </div>
       </form>
     </FormDialog>
@@ -224,7 +254,7 @@ export function RequestsWorkspace() {
           onClose={() => setCreating(false)}
           onCreated={() => {
             setCreating(false);
-            setNotice("Pengajuan jadwal berhasil dikirim kepada pimpinan sekolah.");
+            setNotice("");
           }}
         />
       )}
@@ -253,7 +283,7 @@ export function RequestsWorkspace() {
           </button>
         ))}
       </div>
-      <QueryState query={query} />
+      <QueryState query={query} skeleton={<DecisionListSkeleton />} />
       {query.data && (
         <div className="decision-layout">
           <section className="decision-index" aria-label="Daftar pengajuan">

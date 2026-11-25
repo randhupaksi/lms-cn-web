@@ -15,16 +15,19 @@ import { PageHeader } from "@/components/ui/page-header";
 import { GraduationCap, Plus, Settings2, Send, Undo2 } from "lucide-react";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { DateTimePickerField } from "@/components/ui/date-picker";
-import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
+import { EmptyState, ErrorState } from "@/components/data-state";
 import { AsyncFeedback } from "@/components/async-feedback";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
+import { DataTableSkeleton } from "@/components/ui/skeleton";
+import { FilterOptionsSkeleton } from "@/components/ui/skeleton-patterns";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { FormDialog } from "@/components/ui/form-dialog";
 import { FilterBar } from "@/components/ui/filter-bar";
 import { formatWibDateTime, schoolDateTimeToISO } from "@/lib/date-time";
+import { useToast } from "@/providers/toast-provider";
 const PAGE_SIZE = 20;
 const emptyForm = {
   title: "",
@@ -38,6 +41,7 @@ const emptyForm = {
 };
 
 export function ExamAuthoringWorkspace() {
+  const { success: notifySuccess } = useToast();
   const [editorOpen, setEditorOpen] = useState(false);
   const courses = useAllCourses();
   const [courseFilter, setCourseFilter] = useState("all");
@@ -71,6 +75,7 @@ export function ExamAuthoringWorkspace() {
         onSuccess: () => {
           setForm(emptyForm);
           setEditorOpen(false);
+          notifySuccess("Draft ujian berhasil disimpan.");
         },
       },
     );
@@ -107,11 +112,41 @@ export function ExamAuthoringWorkspace() {
         {editorOpen ? (
           <FormDialog
             id="exam-editor"
+            icon={GraduationCap}
+            eyebrow="Asesmen · Penjadwalan"
             title={"Buat ujian baru"}
             description="Tentukan identitas dan jadwal ujian. Tambahkan soal serta peserta setelah draft tersimpan."
             onClose={() => setEditorOpen(false)}
+            footer={
+              <>
+                <Button
+                  variant="secondary"
+                  type="button"
+                  onClick={() => setEditorOpen(false)}
+                >
+                  Batal
+                </Button>
+                <Button
+                  type="submit"
+                  form="exam-editor-fields"
+                  disabled={
+                    create.isPending ||
+                    !targetCourseId ||
+                    !form.starts_at ||
+                    !form.ends_at ||
+                    scheduleInvalid
+                  }
+                >
+                  {create.isPending ? "Menyimpan…" : "Simpan draft"}
+                </Button>
+              </>
+            }
           >
-            <form className="form-grid" onSubmit={submit}>
+            <form
+              id="exam-editor-fields"
+              className="form-grid"
+              onSubmit={submit}
+            >
               <label className="field-label md:col-span-2">
                 Course
                 <RadixSelectField
@@ -209,19 +244,6 @@ export function ExamAuthoringWorkspace() {
                 />{" "}
                 Acak opsi jawaban per attempt
               </label>
-              <Button
-                type="submit"
-                className="md:col-span-2"
-                disabled={
-                  create.isPending ||
-                  !targetCourseId ||
-                  !form.starts_at ||
-                  !form.ends_at ||
-                  scheduleInvalid
-                }
-              >
-                {create.isPending ? "Menyimpan…" : "Simpan draft"}
-              </Button>
               {scheduleInvalid ? (
                 <p className="form-error md:col-span-2" role="alert">
                   Waktu selesai harus setelah waktu mulai.
@@ -233,9 +255,9 @@ export function ExamAuthoringWorkspace() {
         <AsyncFeedback
           error={create.error}
           isError={create.isError}
-          isSuccess={create.isSuccess}
+          isSuccess={false}
           errorMessage="Draft ujian belum dapat disimpan."
-          successMessage="Draft ujian berhasil disimpan. Lanjutkan dengan menetapkan soal dan peserta."
+          successMessage=""
         />
 
         <section className="space-y-4">
@@ -285,6 +307,9 @@ export function ExamAuthoringWorkspace() {
               />
             </label>
           </FilterBar>
+          {courses.isLoading ? (
+            <FilterOptionsSkeleton label="Memuat pilihan course" />
+          ) : null}
           <h2 className="section-title">
             Daftar ujian ({exams.data?.meta.total ?? "—"})
           </h2>
@@ -294,7 +319,21 @@ export function ExamAuthoringWorkspace() {
               onRetry={() => void courses.refetch()}
             />
           ) : null}
-          {exams.isLoading ? <LoadingState label="Memuat ujian…" /> : null}
+          {exams.isLoading ? (
+            <DataTableShell>
+              <DataTableSkeleton
+                label="Memuat daftar ujian"
+                rows={5}
+                columns={[
+                  { label: "Ujian & course", kind: "stack" },
+                  { label: "Jadwal", kind: "stack" },
+                  { label: "Kelengkapan", kind: "stack" },
+                  { label: "Status", kind: "badge" },
+                  { label: "Aksi", kind: "actions", align: "center" },
+                ]}
+              />
+            </DataTableShell>
+          ) : null}
           {exams.isError ? (
             <ErrorState
               label="Ujian belum dapat dimuat."

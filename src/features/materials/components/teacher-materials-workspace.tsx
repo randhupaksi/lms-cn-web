@@ -1,7 +1,7 @@
 "use client";
 import { ActionButton } from "@/components/ui/action-button";
 import { useState, type FormEvent } from "react";
-import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
+import { EmptyState, ErrorState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
 import { useAllCourses } from "@/features/academics";
 import {
@@ -21,12 +21,18 @@ import { Pagination } from "@/components/ui/pagination";
 import { FormDialog } from "@/components/ui/form-dialog";
 import { FilterBar } from "@/components/ui/filter-bar";
 import { MaterialAttachments } from "@/features/materials/components/material-attachments";
+import {
+  FilterOptionsSkeleton,
+  RecordListSkeleton,
+} from "@/components/ui/skeleton-patterns";
+import { useToast } from "@/providers/toast-provider";
 const PAGE_SIZE = 20;
 const MAX_ATTACHMENT_COUNT = 5;
 const MAX_ATTACHMENT_BYTES = 8 * 1024 * 1024;
 const MAX_ATTACHMENT_TOTAL_BYTES = 20 * 1024 * 1024;
 const emptyForm = { title: "", description: "", content: "", position: 1 };
 export function TeacherMaterialsWorkspace() {
+  const { success: notifySuccess } = useToast();
   const [editorOpen, setEditorOpen] = useState(false);
   const courses = useAllCourses();
   const [courseFilter, setCourseFilter] = useState("all");
@@ -93,10 +99,15 @@ export function TeacherMaterialsWorkspace() {
       setAttachmentSelectionError("Ukuran setiap lampiran maksimal 8 MiB.");
       return;
     }
-    const currentBytes = attachments.reduce((total, file) => total + file.size_bytes, 0);
+    const currentBytes = attachments.reduce(
+      (total, file) => total + file.size_bytes,
+      0,
+    );
     const selectedBytes = files.reduce((total, file) => total + file.size, 0);
     if (currentBytes + selectedBytes > MAX_ATTACHMENT_TOTAL_BYTES) {
-      setAttachmentSelectionError("Total ukuran lampiran satu materi maksimal 20 MiB.");
+      setAttachmentSelectionError(
+        "Total ukuran lampiran satu materi maksimal 20 MiB.",
+      );
       return;
     }
     setAttachmentSelectionError("");
@@ -107,7 +118,9 @@ export function TeacherMaterialsWorkspace() {
       {
         onSuccess: () => {
           if (materialId === editingId) {
-            setAttachments((current) => current.filter((item) => item.id !== attachmentId));
+            setAttachments((current) =>
+              current.filter((item) => item.id !== attachmentId),
+            );
           }
         },
       },
@@ -132,6 +145,11 @@ export function TeacherMaterialsWorkspace() {
           setAttachments(material.attachments ?? []);
           if (pendingFiles.length === 0) {
             reset();
+            notifySuccess(
+              editingId
+                ? "Materi berhasil diperbarui."
+                : "Draft materi berhasil disimpan.",
+            );
             return;
           }
 
@@ -143,7 +161,9 @@ export function TeacherMaterialsWorkspace() {
                 materialId: material.id,
                 file,
               });
-              remainingFiles = remainingFiles.filter((candidate) => candidate !== file);
+              remainingFiles = remainingFiles.filter(
+                (candidate) => candidate !== file,
+              );
               setSelectedFiles(remainingFiles);
               setAttachments((current) =>
                 current.some((item) => item.id === uploaded.id)
@@ -152,6 +172,7 @@ export function TeacherMaterialsWorkspace() {
               );
             }
             reset();
+            notifySuccess("Materi dan lampiran berhasil disimpan.");
           } catch {
             // Keep the draft and remaining files in the dialog so the teacher can retry.
           } finally {
@@ -189,11 +210,40 @@ export function TeacherMaterialsWorkspace() {
         {editorOpen ? (
           <FormDialog
             id="material-editor"
+            icon={BookOpenText}
+            eyebrow="Pembelajaran · Materi"
             title={editingId ? "Perbarui materi" : "Buat materi baru"}
             description="Susun isi materi dan tambahkan gambar atau dokumen. Draft serta lampirannya tersedia bagi siswa setelah dipublikasikan."
             onClose={closeEditor}
+            footer={
+              <>
+                <Button variant="secondary" type="button" onClick={closeEditor}>
+                  Batal
+                </Button>
+                <Button
+                  type="submit"
+                  form="material-editor-fields"
+                  disabled={
+                    save.isPending ||
+                    isUploadingAttachments ||
+                    !targetCourseId ||
+                    Boolean(attachmentSelectionError)
+                  }
+                >
+                  {isUploadingAttachments
+                    ? "Mengunggah lampiran…"
+                    : save.isPending
+                      ? "Menyimpan…"
+                      : "Simpan draft"}
+                </Button>
+              </>
+            }
           >
-            <form className="grid gap-4 md:grid-cols-2" onSubmit={submit}>
+            <form
+              id="material-editor-fields"
+              className="grid gap-4 md:grid-cols-2"
+              onSubmit={submit}
+            >
               <label className="field-label md:col-span-2">
                 Course untuk materi
                 <RadixSelectField
@@ -243,17 +293,30 @@ export function TeacherMaterialsWorkspace() {
                   type="file"
                   accept=".jpg,.jpeg,.png,.pdf,.docx"
                   multiple
-                  onChange={(event) => selectFiles(Array.from(event.currentTarget.files ?? []))}
-                  disabled={save.isPending || isUploadingAttachments || attachments.length >= MAX_ATTACHMENT_COUNT}
+                  onChange={(event) =>
+                    selectFiles(Array.from(event.currentTarget.files ?? []))
+                  }
+                  disabled={
+                    save.isPending ||
+                    isUploadingAttachments ||
+                    attachments.length >= MAX_ATTACHMENT_COUNT
+                  }
                 />
                 <span className="mt-1 block text-xs font-normal leading-5 text-muted">
-                  JPG, PNG, PDF, atau DOCX · maksimal 8 MiB per file · 5 file dan total 20 MiB per materi.
+                  JPG, PNG, PDF, atau DOCX · maksimal 8 MiB per file · 5 file
+                  dan total 20 MiB per materi.
                 </span>
               </label>
               {selectedFiles.length ? (
-                <ul className="space-y-1 text-xs leading-5 text-muted md:col-span-2" aria-label="File yang akan diunggah">
+                <ul
+                  className="space-y-1 text-xs leading-5 text-muted md:col-span-2"
+                  aria-label="File yang akan diunggah"
+                >
                   {selectedFiles.map((file) => (
-                    <li key={`${file.name}-${file.lastModified}`} className="break-all">
+                    <li
+                      key={`${file.name}-${file.lastModified}`}
+                      className="break-all"
+                    >
                       {file.name} · {(file.size / (1024 * 1024)).toFixed(1)} MiB
                     </li>
                   ))}
@@ -275,8 +338,17 @@ export function TeacherMaterialsWorkspace() {
                 <MaterialAttachments
                   materialId={editingId ?? "new-material"}
                   attachments={attachments}
-                  onRemove={editingId ? (attachmentId) => removeAttachment(editingId, attachmentId) : undefined}
-                  removingAttachmentId={deleteAttachment.isPending ? deleteAttachment.variables?.attachmentId : undefined}
+                  onRemove={
+                    editingId
+                      ? (attachmentId) =>
+                          removeAttachment(editingId, attachmentId)
+                      : undefined
+                  }
+                  removingAttachmentId={
+                    deleteAttachment.isPending
+                      ? deleteAttachment.variables?.attachmentId
+                      : undefined
+                  }
                   className="md:col-span-2"
                 />
               ) : null}
@@ -292,27 +364,15 @@ export function TeacherMaterialsWorkspace() {
                   }
                 />
               </label>
-              <div className="self-end">
-                <Button
-                  type="submit"
-                  disabled={save.isPending || isUploadingAttachments || !targetCourseId || Boolean(attachmentSelectionError)}
-                >
-                  {isUploadingAttachments
-                    ? "Mengunggah lampiran…"
-                    : save.isPending
-                      ? "Menyimpan…"
-                      : "Simpan draft"}
-                </Button>
-              </div>
             </form>
           </FormDialog>
         ) : null}
         <AsyncFeedback
           error={save.error}
           isError={save.isError}
-          isSuccess={save.isSuccess}
+          isSuccess={false}
           errorMessage="Materi belum dapat disimpan."
-          successMessage="Draft materi berhasil disimpan."
+          successMessage=""
         />
         <AsyncFeedback
           error={deleteAttachment.error}
@@ -369,13 +429,18 @@ export function TeacherMaterialsWorkspace() {
               />
             </label>
           </FilterBar>
+          {courses.isLoading ? (
+            <FilterOptionsSkeleton label="Memuat pilihan course" />
+          ) : null}
           {courses.isError ? (
             <ErrorState
               label="Daftar course belum dapat dimuat."
               onRetry={() => void courses.refetch()}
             />
           ) : null}
-          {materials.isLoading ? <LoadingState label="Memuat materi…" /> : null}
+          {materials.isLoading ? (
+            <RecordListSkeleton label="Memuat daftar materi" rows={4} />
+          ) : null}
           {materials.isError ? (
             <ErrorState
               label="Materi belum dapat dimuat."
@@ -390,63 +455,71 @@ export function TeacherMaterialsWorkspace() {
               description="Belum ada materi yang sesuai dengan filter ini."
             />
           ) : null}
-          <div className="record-list">
-            {materials.data?.data.map((item) => (
-              <article className="record-row" key={item.id}>
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <span
-                      className={
-                        "status-badge " +
-                        (item.status === "published" ? "status-active" : "")
-                      }
-                    >
-                      {item.status}
-                    </span>
-                    <h2 className="mt-3 text-lg font-semibold">
-                      {item.position}. {item.title}
-                    </h2>
-                    <p className="mt-1 text-xs text-muted">
-                      {item.course_name ??
-                        courses.data?.find((c) => c.id === item.course_id)
-                          ?.name}
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-muted">
-                      {item.description}
-                    </p>
+          {materials.data?.data.length ? (
+            <div className="record-list">
+              {materials.data?.data.map((item) => (
+                <article className="record-row" key={item.id}>
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <span
+                        className={
+                          "status-badge " +
+                          (item.status === "published" ? "status-active" : "")
+                        }
+                      >
+                        {item.status}
+                      </span>
+                      <h2 className="mt-3 text-lg font-semibold">
+                        {item.position}. {item.title}
+                      </h2>
+                      <p className="mt-1 text-xs text-muted">
+                        {item.course_name ??
+                          courses.data?.find((c) => c.id === item.course_id)
+                            ?.name}
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-muted">
+                        {item.description}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <MaterialAttachments
-                  materialId={item.id}
-                  attachments={item.attachments ?? []}
-                  onRemove={item.status === "draft" ? (attachmentId) => removeAttachment(item.id, attachmentId) : undefined}
-                  removingAttachmentId={
-                    deleteAttachment.isPending && deleteAttachment.variables?.materialId === item.id
-                      ? deleteAttachment.variables?.attachmentId
-                      : undefined
-                  }
-                  className="mt-4"
-                />
-                <div className="mt-4 flex gap-2">
-                  <ActionButton
-                    icon={Pencil}
-                    label={`Edit ${item.title}`}
-                    onClick={() => edit(item)}
-                    disabled={item.status !== "draft"}
+                  <MaterialAttachments
+                    materialId={item.id}
+                    attachments={item.attachments ?? []}
+                    onRemove={
+                      item.status === "draft"
+                        ? (attachmentId) =>
+                            removeAttachment(item.id, attachmentId)
+                        : undefined
+                    }
+                    removingAttachmentId={
+                      deleteAttachment.isPending &&
+                      deleteAttachment.variables?.materialId === item.id
+                        ? deleteAttachment.variables?.attachmentId
+                        : undefined
+                    }
+                    className="mt-4"
                   />
-                  {item.status === "draft" ? (
+                  <div className="mt-4 flex gap-2">
                     <ActionButton
-                      icon={Send}
-                      label={`Publikasikan ${item.title}`}
-                      pending={publish.isPending}
-                      onClick={() => publish.mutate(item.id)}
-                      disabled={publish.isPending}
+                      icon={Pencil}
+                      label={`Edit ${item.title}`}
+                      onClick={() => edit(item)}
+                      disabled={item.status !== "draft"}
                     />
-                  ) : null}
-                </div>
-              </article>
-            ))}
-          </div>
+                    {item.status === "draft" ? (
+                      <ActionButton
+                        icon={Send}
+                        label={`Publikasikan ${item.title}`}
+                        pending={publish.isPending}
+                        onClick={() => publish.mutate(item.id)}
+                        disabled={publish.isPending}
+                      />
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : null}
           {materials.data ? (
             <Pagination
               page={page}

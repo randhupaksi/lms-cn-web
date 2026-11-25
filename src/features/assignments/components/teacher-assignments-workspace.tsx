@@ -1,7 +1,7 @@
 "use client";
 import { ActionButton } from "@/components/ui/action-button";
 import { useEffect, useState, type FormEvent } from "react";
-import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
+import { EmptyState, ErrorState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
 import { useAllCourses } from "@/features/academics";
 import {
@@ -14,7 +14,14 @@ import {
 } from "@/features/assignments/use-assignments";
 import type { Assignment, AssignmentSubmission } from "@/types/lms";
 import { PageHeader } from "@/components/ui/page-header";
-import { ClipboardList, Plus, Save, Send, Inbox, RotateCcw } from "lucide-react";
+import {
+  ClipboardList,
+  Plus,
+  Save,
+  Send,
+  Inbox,
+  RotateCcw,
+} from "lucide-react";
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { DateTimePickerField } from "@/components/ui/date-picker";
@@ -25,9 +32,16 @@ import { FormDialog } from "@/components/ui/form-dialog";
 import { FilterBar } from "@/components/ui/filter-bar";
 import { formatWibDateTime, schoolDateTimeToISO } from "@/lib/date-time";
 import { safeExternalHttpUrl } from "@/lib/safe-external-url";
+import { DataTableSkeleton } from "@/components/ui/skeleton";
+import {
+  FilterOptionsSkeleton,
+  RecordListSkeleton,
+} from "@/components/ui/skeleton-patterns";
+import { useToast } from "@/providers/toast-provider";
 const PAGE_SIZE = 20;
 const emptyForm = { title: "", instructions: "", due_at: "", max_score: 100 };
 export function TeacherAssignmentsWorkspace() {
+  const { success: notifySuccess } = useToast();
   const [now, setNow] = useState(() => Date.now());
   const [editorOpen, setEditorOpen] = useState(false);
   const courses = useAllCourses();
@@ -39,6 +53,7 @@ export function TeacherAssignmentsWorkspace() {
   const [assignmentId, setAssignmentId] = useState("");
   const [selectedAssignment, setSelectedAssignment] =
     useState<Assignment | null>(null);
+  const [submissionSearch, setSubmissionSearch] = useState("");
   const [submissionPage, setSubmissionPage] = useState(1);
   const [form, setForm] = useState(emptyForm);
   const assignments = useAssignments(
@@ -53,6 +68,7 @@ export function TeacherAssignmentsWorkspace() {
   const save = useSaveAssignment();
   const publish = usePublishAssignment();
   const submissions = useSubmissions(assignmentId, {
+    search: submissionSearch,
     page: submissionPage,
     per_page: PAGE_SIZE,
   });
@@ -77,6 +93,7 @@ export function TeacherAssignmentsWorkspace() {
         onSuccess: () => {
           setForm(emptyForm);
           setEditorOpen(false);
+          notifySuccess("Draft tugas berhasil disimpan.");
         },
       },
     );
@@ -109,11 +126,35 @@ export function TeacherAssignmentsWorkspace() {
         {editorOpen ? (
           <FormDialog
             id="assignment-editor"
+            icon={ClipboardList}
+            eyebrow="Pembelajaran · Tugas"
             title={"Buat tugas baru"}
             description="Berikan instruksi yang jelas, batas pengumpulan, dan skor maksimal untuk siswa."
             onClose={() => setEditorOpen(false)}
+            footer={
+              <>
+                <Button
+                  variant="secondary"
+                  type="button"
+                  onClick={() => setEditorOpen(false)}
+                >
+                  Batal
+                </Button>
+                <Button
+                  type="submit"
+                  form="assignment-editor-fields"
+                  disabled={save.isPending || !targetCourseId || !form.due_at}
+                >
+                  {save.isPending ? "Menyimpan…" : "Simpan draft"}
+                </Button>
+              </>
+            }
           >
-            <form className="form-grid" onSubmit={submit}>
+            <form
+              id="assignment-editor-fields"
+              className="form-grid"
+              onSubmit={submit}
+            >
               <label className="field-label md:col-span-2">
                 Course untuk tugas
                 <RadixSelectField
@@ -167,22 +208,15 @@ export function TeacherAssignmentsWorkspace() {
                   required
                 />
               </label>
-              <Button
-                type="submit"
-                className="md:col-span-2"
-                disabled={save.isPending || !targetCourseId || !form.due_at}
-              >
-                {save.isPending ? "Menyimpan…" : "Simpan draft"}
-              </Button>
             </form>
           </FormDialog>
         ) : null}
         <AsyncFeedback
           error={save.error}
           isError={save.isError}
-          isSuccess={save.isSuccess}
+          isSuccess={false}
           errorMessage="Tugas belum dapat disimpan. Periksa data dan jadwal pengumpulan."
-          successMessage="Draft tugas berhasil disimpan."
+          successMessage=""
         />
 
         <section className="space-y-4">
@@ -237,6 +271,9 @@ export function TeacherAssignmentsWorkspace() {
               />
             </label>
           </FilterBar>
+          {courses.isLoading ? (
+            <FilterOptionsSkeleton label="Memuat pilihan course" />
+          ) : null}
           <h2 className="section-title">
             Daftar tugas ({assignments.data?.meta.total ?? "—"})
           </h2>
@@ -247,7 +284,7 @@ export function TeacherAssignmentsWorkspace() {
             />
           ) : null}
           {assignments.isLoading ? (
-            <LoadingState label="Memuat tugas…" />
+            <RecordListSkeleton label="Memuat daftar tugas" rows={4} />
           ) : null}
           {assignments.isError ? (
             <ErrorState
@@ -263,60 +300,63 @@ export function TeacherAssignmentsWorkspace() {
               description="Belum ada tugas yang sesuai dengan filter ini."
             />
           ) : null}
-          <div className="record-list">
-            {assignments.data?.data.map((assignment) => (
-              <article className="record-row" key={assignment.id}>
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <span
-                      className={
-                        "status-badge " +
-                        (assignment.status === "published"
-                          ? "status-active"
-                          : "")
-                      }
-                    >
-                      {assignment.status}
+          {assignments.data?.data.length ? (
+            <div className="record-list">
+              {assignments.data?.data.map((assignment) => (
+                <article className="record-row" key={assignment.id}>
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <span
+                        className={
+                          "status-badge " +
+                          (assignment.status === "published"
+                            ? "status-active"
+                            : "")
+                        }
+                      >
+                        {assignment.status}
+                      </span>
+                      <h2 className="mt-3 text-lg font-semibold">
+                        {assignment.title}
+                      </h2>
+                      <p className="mt-1 text-xs text-muted">
+                        {assignment.course_name ??
+                          courses.data?.find(
+                            (c) => c.id === assignment.course_id,
+                          )?.name}
+                      </p>
+                    </div>
+                    <span className="text-sm font-semibold">
+                      {assignment.max_score} poin
                     </span>
-                    <h2 className="mt-3 text-lg font-semibold">
-                      {assignment.title}
-                    </h2>
-                    <p className="mt-1 text-xs text-muted">
-                      {assignment.course_name ??
-                        courses.data?.find((c) => c.id === assignment.course_id)
-                          ?.name}
-                    </p>
                   </div>
-                  <span className="text-sm font-semibold">
-                    {assignment.max_score} poin
-                  </span>
-                </div>
-                <p className="mt-3 text-sm leading-6 text-muted">
-                  Batas pengumpulan{" "}
-                  {formatWibDateTime(assignment.due_at)}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {assignment.status === "draft" ? (
+                  <p className="mt-3 text-sm leading-6 text-muted">
+                    Batas pengumpulan {formatWibDateTime(assignment.due_at)}
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {assignment.status === "draft" ? (
+                      <ActionButton
+                        icon={Send}
+                        label={`Publikasikan ${assignment.title}`}
+                        pending={publish.isPending}
+                        onClick={() => publish.mutate(assignment.id)}
+                      />
+                    ) : null}
                     <ActionButton
-                      icon={Send}
-                      label={`Publikasikan ${assignment.title}`}
-                      pending={publish.isPending}
-                      onClick={() => publish.mutate(assignment.id)}
+                      icon={Inbox}
+                      label={`Lihat pengumpulan ${assignment.title}`}
+                      onClick={() => {
+                        setAssignmentId(assignment.id);
+                        setSelectedAssignment(assignment);
+                        setSubmissionSearch("");
+                        setSubmissionPage(1);
+                      }}
                     />
-                  ) : null}
-                  <ActionButton
-                    icon={Inbox}
-                    label={`Lihat pengumpulan ${assignment.title}`}
-                    onClick={() => {
-                      setAssignmentId(assignment.id);
-                      setSelectedAssignment(assignment);
-                      setSubmissionPage(1);
-                    }}
-                  />
-                </div>
-              </article>
-            ))}
-          </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : null}
           {assignments.data ? (
             <Pagination
               page={page}
@@ -334,16 +374,47 @@ export function TeacherAssignmentsWorkspace() {
         </section>
         {assignmentId ? (
           <DataTableShell>
+            <FilterBar>
+              <label className="field-label">
+                Cari pengumpulan
+                <input
+                  className="field-input"
+                  type="search"
+                  value={submissionSearch}
+                  onChange={(event) => {
+                    setSubmissionSearch(event.target.value);
+                    setSubmissionPage(1);
+                  }}
+                  placeholder="Nama siswa atau isi jawaban"
+                />
+              </label>
+            </FilterBar>
             {submissions.isLoading ? (
-              <div className="p-5">
-                <LoadingState />
-              </div>
+              <DataTableSkeleton
+                label="Memuat pengumpulan tugas"
+                rows={5}
+                columns={[
+                  { label: "Siswa", kind: "stack" },
+                  { label: "Jawaban", kind: "stack" },
+                  { label: "Nilai", kind: "numeric", align: "right" },
+                  { label: "Feedback", kind: "stack" },
+                  { label: "Aksi", kind: "actions", align: "center" },
+                ]}
+              />
             ) : null}
             {!submissions.isLoading && submissions.data?.data.length === 0 ? (
               <div className="p-5">
                 <EmptyState
-                  title="Belum ada pengumpulan"
-                  description="Belum ada pengumpulan untuk tugas ini."
+                  title={
+                    submissionSearch
+                      ? "Pengumpulan tidak ditemukan"
+                      : "Belum ada pengumpulan"
+                  }
+                  description={
+                    submissionSearch
+                      ? "Coba kata kunci lain untuk menemukan pengumpulan siswa."
+                      : "Belum ada pengumpulan untuk tugas ini."
+                  }
                 />
               </div>
             ) : null}
@@ -371,46 +442,47 @@ export function TeacherAssignmentsWorkspace() {
                 successMessage="Tugas dikembalikan kepada siswa untuk direvisi."
               />
             </div>
-            <DataTable caption="Pengumpulan tugas siswa">
-              <thead>
-                <tr>
-                  <th>Siswa</th>
-                  <th>Jawaban</th>
-                  <th>Nilai</th>
-                  <th>Feedback</th>
-                  <th className="action-column">Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {submissions.data?.data.map((item) => (
-                  <SubmissionRow
-                    key={`${item.id}-${item.submitted_at}-${item.graded_at ?? "pending"}`}
-                    submission={item}
-                    maxScore={selectedAssignment?.max_score ?? 100}
-                    pending={grade.isPending || returnSubmission.isPending}
-                    canReturn={Boolean(
-                      selectedAssignment?.status === "published" &&
-                        new Date(selectedAssignment.due_at).getTime() >
-                        now,
-                    )}
-                    onGrade={(score, feedback) => {
-                      returnSubmission.reset();
-                      grade.mutate({
-                        id: item.id,
-                        input: { score, feedback },
-                      });
-                    }}
-                    onReturn={(feedback) => {
-                      grade.reset();
-                      returnSubmission.mutate({
-                        id: item.id,
-                        input: { feedback },
-                      });
-                    }}
-                  />
-                ))}
-              </tbody>
-            </DataTable>
+            {submissions.data?.data.length ? (
+              <DataTable caption="Pengumpulan tugas siswa">
+                <thead>
+                  <tr>
+                    <th>Siswa</th>
+                    <th>Jawaban</th>
+                    <th>Nilai</th>
+                    <th>Feedback</th>
+                    <th className="action-column">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {submissions.data?.data.map((item) => (
+                    <SubmissionRow
+                      key={`${item.id}-${item.submitted_at}-${item.graded_at ?? "pending"}`}
+                      submission={item}
+                      maxScore={selectedAssignment?.max_score ?? 100}
+                      pending={grade.isPending || returnSubmission.isPending}
+                      canReturn={Boolean(
+                        selectedAssignment?.status === "published" &&
+                        new Date(selectedAssignment.due_at).getTime() > now,
+                      )}
+                      onGrade={(score, feedback) => {
+                        returnSubmission.reset();
+                        grade.mutate({
+                          id: item.id,
+                          input: { score, feedback },
+                        });
+                      }}
+                      onReturn={(feedback) => {
+                        grade.reset();
+                        returnSubmission.mutate({
+                          id: item.id,
+                          input: { feedback },
+                        });
+                      }}
+                    />
+                  ))}
+                </tbody>
+              </DataTable>
+            ) : null}
             {submissions.data ? (
               <Pagination
                 page={submissionPage}

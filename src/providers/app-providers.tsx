@@ -6,6 +6,7 @@ import { useState } from "react";
 import { AuthProvider } from "@/providers/auth-provider";
 import { Tooltip } from "@base-ui/react/tooltip";
 import { SchoolProvider } from "@/providers/school-provider";
+import { ToastProvider } from "@/providers/toast-provider";
 
 type AppProvidersProps = Readonly<{ children: ReactNode }>;
 
@@ -23,9 +24,11 @@ export function AppProviders({ children }: AppProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <Tooltip.Provider delay={300}>
-        <SchoolProvider>
-          <AuthProvider>{children}</AuthProvider>
-        </SchoolProvider>
+        <ToastProvider>
+          <SchoolProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </SchoolProvider>
+        </ToastProvider>
       </Tooltip.Provider>
     </QueryClientProvider>
   );

@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { UserRoundPlus } from "lucide-react";
 import { useCreateUser } from "@/features/users/use-users";
 import type { UserRole } from "@/types/api";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { AsyncFeedback } from "@/components/async-feedback";
 import { Button } from "@/components/ui/button";
+import { FormDialog } from "@/components/ui/form-dialog";
+import { useToast } from "@/providers/toast-provider";
 
 const initialForm = {
   identifier: "",
@@ -14,18 +17,49 @@ const initialForm = {
   temporary_password: "",
 };
 
-export function UserCreateForm() {
+export function UserCreateForm({ onClose }: { onClose: () => void }) {
   const create = useCreateUser();
+  const { success: notifySuccess } = useToast();
   const [form, setForm] = useState(initialForm);
 
   function submit(event: FormEvent) {
     event.preventDefault();
-    create.mutate(form, { onSuccess: () => setForm(initialForm) });
+    create.mutate(form, {
+      onSuccess: () => {
+        setForm(initialForm);
+        onClose();
+        notifySuccess("Pengguna berhasil ditambahkan.");
+      },
+    });
   }
 
   return (
-    <div>
-      <form className="mt-5 grid gap-4 md:grid-cols-2" onSubmit={submit}>
+    <FormDialog
+      id="user-editor"
+      icon={UserRoundPlus}
+      title="Tambah pengguna"
+      description="Daftarkan akun guru atau siswa dengan kata sandi sementara dari sekolah."
+      onClose={onClose}
+      footer={
+        <>
+          <Button variant="secondary" type="button" onClick={onClose}>
+            Batal
+          </Button>
+          <Button
+            type="submit"
+            form="user-create-form"
+            disabled={create.isPending}
+          >
+            {create.isPending ? "Menyimpan…" : "Tambah pengguna"}
+          </Button>
+        </>
+      }
+    >
+      <form
+        id="user-create-form"
+        className="grid gap-4 md:grid-cols-2"
+        onSubmit={submit}
+      >
         <label className="field-label">
           NIS, NIP, atau username
           <input
@@ -78,19 +112,14 @@ export function UserCreateForm() {
             required
           />
         </label>
-        <div className="md:col-span-2">
-          <Button type="submit" disabled={create.isPending}>
-            {create.isPending ? "Menyimpan…" : "Tambah pengguna"}
-          </Button>
-        </div>
       </form>
       <AsyncFeedback
         error={create.error}
         isError={create.isError}
-        isSuccess={create.isSuccess}
+        isSuccess={false}
         errorMessage="Pengguna belum dapat dibuat. Periksa kembali data."
-        successMessage="Pengguna berhasil ditambahkan dan siap menerima credential sementara."
+        successMessage=""
       />
-    </div>
+    </FormDialog>
   );
 }
