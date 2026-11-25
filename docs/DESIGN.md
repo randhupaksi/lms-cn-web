@@ -9,17 +9,18 @@ designing or changing a component, page, layout, or interaction.
 
 ## 1. Design direction
 
-The LMS combines a dependable enterprise workspace with a more expressive
-academic identity. A consistent sans-serif family keeps the interface legible;
-strong green surfaces, crisp white work cards, warm canvas tones, and a small
-set of role accents add energy without obscuring tasks or status.
+The LMS combines a dependable enterprise workspace with an expressive academic
+identity. Warm paper surfaces and evergreen structure carry the everyday work;
+editorial labels, fine rules, deliberate spacing, and restrained role accents
+give each area character without obscuring tasks or status. Reserve dark green
+surfaces for the dashboard welcome and high-level governance orientation.
 
 The LMS has its own academic identity within the Citra Negara product family.
 Keep the school name and role language visible while letting learning,
 assessment, and school operations shape the page composition. Reference
-qualities: editorial publications for hierarchy and spacing, Linear for clear
-work hierarchy, and serious academic portals for trust and focus. Adapt their
-principles without copying their brands or layouts.
+qualities: academic registers and editorial publications for hierarchy and
+spacing, Linear for clear work hierarchy, and serious academic portals for
+trust and focus. Adapt their principles without copying their brands or layouts.
 
 ### Role and task compositions
 
@@ -30,33 +31,36 @@ and violet for school-wide administration. Status and chart colors keep their
 own semantic meaning. Variation also comes from each role's work order, useful
 density, and emphasis.
 
-Every role dashboard follows the same opening order: welcome header, then a
-compact KPI register. Sections after the metrics vary to fit each role. The
-welcome header uses a deep evergreen surface, a lime identity accent, a
-role-specific greeting and context, and a direct role-specific workspace
-action. Refresh is a compact secondary icon action. KPI groups have their own
-section heading and white bordered container; each metric uses an icon, a
-tabular value, and a restrained accent tint. Keep dashboard support panels
-white so they stay distinct from the green welcome surface.
+Every dashboard opens with the role-specific welcome, then shows KPI cards,
+role-specific charts and analysis, and finally its action, notification, or
+quick-action sections. The welcome uses a compact deep evergreen surface, a
+lime identity accent, role-specific context, and a direct workspace action.
+Refresh is a compact secondary icon action. KPI groups have their own heading
+and a neutral bordered register; keep values tabular and use the role accent
+only for small orientation cues. Support panels use paper and white surfaces
+with clear rules rather than a stack of floating cards.
 
-- Admin: KPI register first, followed by the operational priority queue, quick
-  actions, a 14-day collection chart, and exam lifecycle distribution.
+- Admin: KPI register, 14-day collection chart and exam lifecycle distribution,
+  then operational priorities and quick actions.
 - School superadmin: compact command header and accented KPI register,
-  followed by decision/quality priorities, school-wide exam-cycle segments, upcoming exams,
-  agenda, and role ledger. Dedicated workspaces use an index/detail decision
-  comparison, numbered quality groups, month calendar + agenda, aggregate report
-  table, settings form + live preview/history, and account/session inspector.
+  followed by school-wide exam-cycle segments, decision/quality priorities,
+  upcoming exams, published exam schedules, and role ledger. Dedicated
+  workspaces use an index/detail decision comparison, numbered quality groups,
+  read-only month calendar and exam list, aggregate report table, settings form
+  with live preview/history, and
+  account/session inspector.
   Reuse shared tokens and controls while varying composition by responsibility.
   All role decisions remain authoritative in the API. Result publication stays
   visible to teachers only. The school profile provider displays the saved
   school name and login support information; metadata retains Citra Negara.
-- Teacher: compact teaching KPIs, followed by the assessment queue beside
-  quick-action rows, course-scoped activity and exam lifecycle charts.
+- Teacher: compact teaching KPIs and course-scoped activity/exam lifecycle
+  charts, then assessment queue beside quick-action rows.
   Authoring starts from the collection; long forms open in a Base UI form dialog
   with a focused title, contained scrolling, and an explicit close control.
-- Student: compact learning KPIs, followed by next actions beside learning
-  shortcuts, personal activity, material completion, assignment status,
-  and published result bars. A zero-material denominator shows a dash, not an invented rate.
+- Student: compact learning KPIs, personal activity, material completion,
+  assignment status, and published result bars, then next actions beside
+  learning shortcuts. A zero-material denominator shows a dash, not an invented
+  rate.
 - Materials: a selectable index and one reading surface, with inline previews
   for attached images and protected downloads for supported documents. On
   narrower screens, the index precedes the reader; selecting a material focuses
@@ -110,8 +114,11 @@ lime identity detail `--brand-accent: 82 75% 52%`, and deep forest
 navigation `--sidebar-end: 158 58% 11%`. Supporting role accents use the named
 `--accent-teal`, `--accent-blue`, `--accent-leaf`, and `--accent-violet` token
 families. Their soft variants are for low-emphasis surfaces and icon tiles.
-Semantic success, warning, danger, information, and chart roles remain separate
-from identity and role accents.
+Role accents stay within small role-orientation cues and role-specific
+analytics. Shared form states, generic hover/focus feedback, page-heading
+eyebrows and icons, and brand marks use evergreen or identity tokens across
+roles. Semantic success, warning, danger, information, and chart roles remain
+separate from identity and role accents.
 
 Typography uses the system `--font-sans` stack (`Segoe UI Variable`, `Segoe UI`,
 Inter, and standard platform fallbacks). `--font-display` aliases the same
@@ -132,15 +139,19 @@ components or page JSX.
 
 ## 3. Visual rules
 
-- Use evergreen for primary actions and navigation. Use white cards over a warm
-  canvas for work surfaces, and apply role accents to small indicators, headers,
-  and icon tiles. Keep status and chart colors semantic.
+- Use evergreen for primary actions, navigation, shared interaction feedback,
+  and page-heading accents. Use paper and white surfaces over the warm canvas
+  for work areas, and apply role accents only to small role-orientation cues
+  and role-specific analytics. Keep status and chart colors semantic.
 - Keep scrollbars clearly visible: use a strong evergreen thumb on a sage track
   and the leaf accent at full opacity within the dark sidebar.
-- Use a small approved shadow scale with clear borders and surface contrast.
-  Reserve deep evergreen gradients for the dashboard welcome and governance
-  command header; keep routine workspaces calm and easy to scan.
+- Keep routine surfaces flat with clear borders and surface contrast. Shadows
+  are mainly for overlays. Avoid gradients and decorative glow in workspaces;
+  use the dashboard welcome and governance command header for concentrated
+  evergreen color.
 - Keep content aligned to a clear grid. Do not center everything.
+- Page headers do not add a divider; the content section below owns its
+  boundary, avoiding two closely spaced rules.
 - Cards group related content or actions; do not wrap every small element in a
   card.
 - Keep one clear primary action per context. Secondary actions should not
@@ -155,8 +166,9 @@ components or page JSX.
   relevant icons, stable accessible names, and Base UI tooltips on focus/hover.
   Keep primary form and page actions explicit. Pending row actions are disabled
   and show progress without changing their accessible purpose.
-- Motion is short and functional: color, opacity, border, or small transforms;
-  respect `prefers-reduced-motion`.
+- Motion is short and functional: color, opacity, border, or small transforms.
+  Form controls use a gentle 260ms focus/hover transition. All motion respects
+  `prefers-reduced-motion`.
 
 ## 4. Product areas
 
@@ -216,9 +228,8 @@ Do not use a centered spinner as the only loading design for a full page.
   route announcements identify the current task.
 - Use the shared `DataTable` with a descriptive caption. Its viewport enters
   the tab order and shows a scroll hint only when its columns overflow.
-- Use the soft control border token on fields. It provides about 3.23:1 contrast
-  against the card surface. Keep the visible keyboard focus outline separate from the
-  border and associate field errors with their inputs.
+- Use a soft blue-gray control border on fields. Keep the keyboard focus ring
+  separate and high contrast, and associate field errors with their inputs.
 - Exam navigation uses a check mark and an accessible name for answered
   questions. The timer announces the five-minute and one-minute thresholds
   and expiry without announcing every second.
@@ -239,8 +250,8 @@ Before adding a component, answer:
 ## 8. Visual review checklist
 
 - [ ] Values come from tokens; no raw visual values in JSX.
-- [ ] Gradients are limited to the workspace background and approved hero
-      surfaces; no glow, excessive glassmorphism, or excessive shadow.
+- [ ] Routine work surfaces stay flat; expressive color is concentrated in the
+      dashboard welcome or governance command header.
 - [ ] Layout has clear hierarchy and alignment.
 - [ ] Primary action is obvious and not duplicated.
 - [ ] Typography is restrained and readable.

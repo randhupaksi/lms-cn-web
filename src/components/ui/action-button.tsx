@@ -43,7 +43,7 @@ export function ActionButton({
   label: string;
   icon: LucideIcon;
   pending?: boolean;
-  tone?: "neutral" | "danger";
+  tone?: "neutral" | "info" | "success" | "danger";
 }) {
   return (
     <ActionTooltip label={pending ? "Memproses…" : label}>
@@ -53,6 +53,8 @@ export function ActionButton({
         }
         className={cn(
           "row-action",
+          tone === "info" && "row-action-info",
+          tone === "success" && "row-action-success",
           tone === "danger" && "row-action-danger",
           className,
         )}
@@ -61,9 +63,13 @@ export function ActionButton({
         {...props}
       >
         {pending ? (
-          <LoaderCircle size={17} aria-hidden="true" className="animate-spin" />
+          <LoaderCircle
+            size={16}
+            aria-hidden="true"
+            className="animate-spin"
+          />
         ) : (
-          <Icon size={17} aria-hidden="true" />
+          <Icon size={16} aria-hidden="true" />
         )}
       </Tooltip.Trigger>
     </ActionTooltip>
@@ -86,7 +92,7 @@ export function ActionLink<T extends string>({
         className="row-action"
         aria-label={label}
       >
-        <Icon size={17} aria-hidden="true" />
+        <Icon size={16} aria-hidden="true" />
       </Tooltip.Trigger>
     </ActionTooltip>
   );

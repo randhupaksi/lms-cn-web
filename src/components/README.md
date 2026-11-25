@@ -14,9 +14,10 @@ Shared patterns:
 - `PageHeader`: one page heading, concise context, and a primary action.
 - `FilterBar`: responsive visible labels and controls; filters and queries stay
   feature-owned.
-- `FormDialog`: Base UI modal for add/edit forms, with a focused title,
-  contained scrolling, keyboard dismissal, and an explicit close control. The
-  owning feature retains draft state and decides when to close after save.
+- `FormDialog`: Base UI modal for add/edit forms, with a context icon, a pinned
+  action footer, contained body scrolling, keyboard dismissal, and an explicit
+  close control. The owning feature retains draft state and decides when to
+  close after save.
 - `ConfirmationDialog`: Base UI dialog for consequential actions, with cancel
   focus and pending behavior. Use `AsyncFeedback` for mutation errors so they
   share the accessible `ErrorDialog` presentation.
@@ -24,9 +25,14 @@ Shared patterns:
   confirmation dialog surface and semantic danger colors.
 - `MetricGrid`: grid and horizontal strip presentations of real metrics.
 - `ActionButton` / `ActionLink`: compact row controls with a required accessible
-  label, Lucide icon, focus/hover tooltip, and button pending state. Tooltips
+  label, Lucide icon, focus/hover tooltip, and button pending state. Action
+  buttons support semantic neutral, info, success, and danger tones. Tooltips
   share the Base UI provider in `AppProviders`.
-- `LoadingState`: content-shaped loading rows, with reduced-motion support.
+- `ui/skeleton` and `ui/skeleton-patterns`: accessible loading regions, table
+  placeholders, and repeated content layouts. Prefer a feature-specific
+  composition that preserves the loaded section's geometry over a generic
+  loading list. A single shimmer runs per region and is disabled for reduced
+  motion.
 
 Prefer the smallest shared primitive that represents a real repeated pattern.
 Keep domain filters, business actions, API calls, permissions, and route
