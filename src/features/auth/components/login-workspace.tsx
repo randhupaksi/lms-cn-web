@@ -123,7 +123,11 @@ export function LoginWorkspace() {
             </p>
           </div>
 
-          <form className="space-y-5" onSubmit={handleSubmit}>
+          <form
+            className="space-y-5"
+            aria-label="Formulir masuk"
+            onSubmit={handleSubmit}
+          >
             <label className="field-label">
               Identitas
               <input

@@ -45,6 +45,22 @@ function sessionEnvelope(mustChangePassword: boolean) {
   };
 }
 
+function getLoginForm(page: Page) {
+  return page.getByRole("form", { name: "Formulir masuk" }).first();
+}
+
+async function submitLoginForm(
+  page: Page,
+  identifier: string,
+  password: string,
+) {
+  const form = getLoginForm(page);
+  await expect(form).toBeVisible();
+  await form.getByLabel("Identitas", { exact: true }).fill(identifier);
+  await form.getByLabel("Kata sandi", { exact: true }).fill(password);
+  await form.getByRole("button", { name: "Masuk ke LMS" }).click();
+}
+
 test.beforeEach(async ({ page }) => {
   await prepareUnauthenticatedPage(page);
 });
@@ -64,6 +80,7 @@ test("keeps the signed-in page open when token refresh hits a temporary server e
   page,
 }) => {
   let refreshCalls = 0;
+  let materialCalls = 0;
   await page.route("**/api/v1/auth/refresh", (route) => {
     refreshCalls += 1;
     return route.fulfill(
@@ -75,12 +92,13 @@ test("keeps the signed-in page open when token refresh hits a temporary server e
           },
     );
   });
-  await page.route(/\/api\/v1\/materials(?:\?|$)/, (route) =>
-    route.fulfill({
+  await page.route(/\/api\/v1\/materials(?:\?|$)/, (route) => {
+    materialCalls += 1;
+    return route.fulfill({
       status: 401,
       json: { success: false, message: "Expired access token." },
-    }),
-  );
+    });
+  });
 
   await page.goto("/student/materials");
 
@@ -92,6 +110,7 @@ test("keeps the signed-in page open when token refresh hits a temporary server e
   ).toBeVisible();
   await expect(page.getByText(/Synthetic temporary outage/)).toHaveCount(0);
   expect(refreshCalls).toBe(2);
+  expect(materialCalls).toBe(1);
 });
 
 test("shows a safe message when login fails", async ({ page }) => {
@@ -112,13 +131,9 @@ test("shows a safe message when login fails", async ({ page }) => {
   );
 
   await page.goto("/login");
-  await page.getByLabel("Identitas").fill("invalid.e2e.user");
-  await page
-    .getByPlaceholder("Masukkan kata sandi akun Anda")
-    .fill("synthetic-invalid-password");
-  await page.getByRole("button", { name: "Masuk ke LMS" }).click();
+  await submitLoginForm(page, "invalid.e2e.user", "synthetic-invalid-password");
 
-  await expect(page.locator("form [role=alert]")).toHaveText(
+  await expect(getLoginForm(page).getByRole("alert")).toHaveText(
     "Identitas atau kata sandi tidak valid.",
   );
   await expect(page.getByText(/Synthetic backend diagnostic/)).toHaveCount(0);
@@ -141,11 +156,7 @@ test("requires matching password confirmation before submitting a password chang
   });
 
   await page.goto("/login");
-  await page.getByLabel("Identitas").fill("e2e.student");
-  await page
-    .getByPlaceholder("Masukkan kata sandi akun Anda")
-    .fill("synthetic-current-password");
-  await page.getByRole("button", { name: "Masuk ke LMS" }).click();
+  await submitLoginForm(page, "e2e.student", "synthetic-current-password");
 
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(
@@ -299,16 +310,15 @@ async function loginAsPrincipal(page: Page) {
   await page.route("**/api/v1/auth/login", (route) => route.fulfill({ status: 200, json: session }));
   await page.route("**/api/v1/governance/overview", (route) => route.fulfill({ status: 200, json: { success: true, message: "OK", data: { generated_at: "2026-01-01T00:00:00Z", roles: [], courses: 0, classes: 0, active_attempts: 0, pending_requests: 0, draft_results: 0, exams: [], exam_states: [], quality: [], agenda: [] } } }));
   await page.goto("/login");
-  await page.getByLabel("Identitas").fill("principal.test");
-  await page.getByPlaceholder("Masukkan kata sandi akun Anda").fill("synthetic-password");
-  await page.getByRole("button", { name: "Masuk ke LMS" }).click();
+  await submitLoginForm(page, "principal.test", "synthetic-password");
   await expect(page.getByRole("heading", { name: "Kepemimpinan sekolah" })).toBeVisible();
 }
 
 test("opens the principal control center with collapsible desktop navigation", async ({ page }) => {
   await loginAsPrincipal(page);
   await expect(page.getByRole("link", { name: /Laporan sekolah/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Tindak lanjut sekolah/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Jadwal ujian/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Tindak lanjut sekolah/ })).toHaveCount(0);
   await page.getByRole("button", { name: "Sembunyikan navigasi" }).click();
   await expect(page.getByRole("link", { name: /Laporan sekolah/ })).toHaveCount(0);
   await page.getByRole("button", { name: "Tampilkan navigasi" }).click();
