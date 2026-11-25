@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { EmptyState, ErrorState } from "@/components/data-state";
 import { Button } from "@/components/ui/button";
-import { useDashboardInsights } from "@/features/analytics/use-analytics";
+import { DashboardInsightsSkeleton } from "./dashboard-skeletons";
 import type { DashboardInsights } from "@/types/lms";
 import type { UserRole } from "@/types/api";
 
@@ -415,55 +415,33 @@ function RecentResults({ data }: { data: DashboardInsights }) {
 
 export function DashboardInsightsWorkspace({
   role,
+  data,
+  hasError,
+  onRetry,
 }: {
   role: Exclude<UserRole, "superadmin" | "principal">;
+  data?: DashboardInsights;
+  hasError: boolean;
+  onRetry: () => void;
 }) {
-  const insights = useDashboardInsights();
-  if (insights.isLoading)
-    return (
-      <div className="dashboard-insights" aria-busy="true">
-        <p role="status" className="text-sm text-muted">
-          Menyiapkan grafik dan analisis…
-        </p>
-        <div className="insight-metrics" aria-hidden="true">
-          {[0, 1, 2].map((index) => (
-            <div key={index}>
-              <span className="skeleton skeleton-square" />
-              <span className="skeleton skeleton-title" />
-            </div>
-          ))}
-        </div>
-        <div className="insights-grid" aria-hidden="true">
-          <div className="insight-surface p-6">
-            <span className="skeleton skeleton-title mb-6" />
-            <span className="skeleton insight-skeleton-chart" />
-          </div>
-          <div className="insight-surface p-6">
-            <span className="skeleton skeleton-title mb-6" />
-            <span className="skeleton insight-skeleton-ring" />
-          </div>
-        </div>
-      </div>
-    );
-  if (insights.isError && !insights.data)
+  if (!data && hasError)
     return (
       <ErrorState
         label="Grafik dan analisis belum dapat dimuat."
-        onRetry={() => void insights.refetch()}
+        onRetry={onRetry}
       />
     );
-  if (!insights.data) return null;
-  const data = insights.data;
+  if (!data) return <DashboardInsightsSkeleton role={role} />;
   const icons =
     role === "admin"
       ? [GraduationCap, UsersRound, Clock3]
       : [BookOpenText, BarChart3, TrendingUp];
   return (
     <div className="dashboard-insights">
-      {insights.isError ? (
+      {hasError ? (
         <div className="insight-refresh-error" role="alert">
           <p>Pembaruan gagal. Grafik masih menampilkan data terakhir.</p>
-          <Button variant="ghost" onClick={() => void insights.refetch()}>
+          <Button variant="ghost" onClick={onRetry}>
             Coba lagi
           </Button>
         </div>
@@ -474,7 +452,7 @@ export function DashboardInsightsWorkspace({
           return (
             <div key={metric.key}>
               <span className="insight-metric-icon">
-                <Icon size={19} aria-hidden="true" />
+                <Icon size={22} aria-hidden="true" />
               </span>
               <div>
                 <dt>{metric.label}</dt>

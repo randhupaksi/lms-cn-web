@@ -23,7 +23,7 @@ export function MetricGrid({
               <span>{metric.label}</span>
               {Icon ? (
                 <span className="dashboard-kpi-icon" aria-hidden="true">
-                  <Icon size={18} />
+                  <Icon size={22} />
                 </span>
               ) : null}
             </dt>

@@ -1,7 +1,5 @@
 import type { Route } from "next";
 import Link from "next/link";
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
 import {
   Activity,
   ArrowRight,
@@ -19,7 +17,12 @@ import { EmptyState } from "@/components/data-state";
 import { DashboardInsightsWorkspace } from "./dashboard-insights";
 import { MetricGrid } from "@/components/metric-grid";
 import { StatusBadge } from "@/components/ui/status-badge";
-import type { DashboardMetric, DashboardTask } from "@/types/lms";
+import { formatWibDateTime } from "@/lib/date-time";
+import type {
+  DashboardInsights,
+  DashboardMetric,
+  DashboardTask,
+} from "@/types/lms";
 import type { UserRole } from "@/types/api";
 
 const dashboardMetricIcons = {
@@ -67,11 +70,6 @@ const actionByRole: Record<
       label: "Lihat hasil belajar",
       description: "Periksa nilai dan hasil ujian yang sudah dipublikasikan.",
     },
-    {
-      href: "/student/materials",
-      label: "Tinjau progres materi",
-      description: "Periksa materi yang selesai dan yang masih perlu dipelajari.",
-    },
   ],
   teacher: [
     {
@@ -116,7 +114,7 @@ const actionByRole: Record<
     {
       href: "/curriculum/exams",
       label: "Periksa kesiapan ujian",
-      description: "Tinjau kelengkapan ujian dan koordinasikan tindak lanjut.",
+      description: "Tinjau kelengkapan ujian dan koordinasikan persiapan berikutnya.",
     },
     {
       href: "/curriculum/quality",
@@ -176,7 +174,7 @@ function taskTimeLabel(task: DashboardTask) {
         : task.kind === "grading" || task.kind === "results"
           ? "Aktivitas terakhir"
           : "Berakhir";
-  return `${prefix} ${format(new Date(task.attention_at), "d MMM, HH.mm", { locale: id })}`;
+  return `${prefix} ${formatWibDateTime(task.attention_at)}`;
 }
 
 function taskCountLabel(task: DashboardTask) {
@@ -350,10 +348,16 @@ export function DashboardWorkspace({
   role,
   metrics,
   tasks,
+  insightsData,
+  insightsError,
+  onRetryInsights,
 }: {
   role: Exclude<UserRole, "superadmin" | "principal">;
   metrics: DashboardMetric[];
   tasks: DashboardTask[];
+  insightsData?: DashboardInsights;
+  insightsError: boolean;
+  onRetryInsights: () => void;
 }) {
   const overview = {
     admin: {
@@ -399,35 +403,34 @@ export function DashboardWorkspace({
   return (
     <div className="dashboard-composition" data-role={role}>
       {summary}
+      <DashboardInsightsWorkspace
+        role={role}
+        data={insightsData}
+        hasError={insightsError}
+        onRetry={onRetryInsights}
+      />
       {role === "student" ? (
-        <>
-          <div className="dashboard-student-focus">
-            <PriorityQueue tasks={tasks} role={role} />
-            <div className="dashboard-student-links">
-              <div>
-                <h2 className="section-title">Jelajahi pembelajaran</h2>
-                <p className="section-description">
-                  Pilih tempat untuk melanjutkan kegiatan Anda.
-                </p>
-              </div>
-              <QuickActions role={role} />
+        <div className="dashboard-student-focus">
+          <PriorityQueue tasks={tasks} role={role} />
+          <div className="dashboard-student-links">
+            <div>
+              <h2 className="section-title">Jelajahi pembelajaran</h2>
+              <p className="section-description">
+                Pilih tempat untuk melanjutkan kegiatan Anda.
+              </p>
             </div>
+            <QuickActions role={role} />
           </div>
-          <DashboardInsightsWorkspace role={role} />
-        </>
+        </div>
       ) : role === "teacher" ? (
-        <>
-          <div className="dashboard-teacher-focus">
-            <PriorityQueue tasks={tasks} role={role} />
-            <QuickActionPanel role={role} />
-          </div>
-          <DashboardInsightsWorkspace role={role} />
-        </>
+        <div className="dashboard-teacher-focus">
+          <PriorityQueue tasks={tasks} role={role} />
+          <QuickActionPanel role={role} />
+        </div>
       ) : (
         <>
           <PriorityQueue tasks={tasks} role={role} />
           <QuickActionPanel role={role} />
-          <DashboardInsightsWorkspace role={role} />
         </>
       )}
     </div>
