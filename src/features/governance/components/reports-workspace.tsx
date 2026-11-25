@@ -12,6 +12,10 @@ import {
   useSchoolReports,
 } from "../use-governance";
 import { MutationFeedback, QueryState } from "./governance-shared";
+import {
+  FieldOptionsSkeleton,
+  ReportsTableSkeleton,
+} from "./governance-skeletons";
 
 export function ReportsWorkspace() {
   const [year, setYear] = useState("");
@@ -88,9 +92,15 @@ export function ReportsWorkspace() {
             {query.data?.meta.total ?? "—"} course
           </span>
         </div>
-        <QueryState query={filters.years} />
-        <QueryState query={filters.classes} />
-        <QueryState query={query} />
+        <QueryState
+          query={filters.years}
+          skeleton={<FieldOptionsSkeleton label="Memuat pilihan tahun ajaran" />}
+        />
+        <QueryState
+          query={filters.classes}
+          skeleton={<FieldOptionsSkeleton label="Memuat pilihan kelas" />}
+        />
+        <QueryState query={query} skeleton={<ReportsTableSkeleton />} />
         <MutationFeedback
           mutation={download}
           success="Laporan CSV siap diunduh."

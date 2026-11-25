@@ -1,5 +1,6 @@
 "use client";
 import { DataTable } from "@/components/ui/data-table";
+import { DataTableSkeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import { Radar, Search } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
@@ -56,7 +57,23 @@ export function ReadinessWorkspace() {
             {query.data?.meta.total ?? "—"} ujian
           </span>
         </div>
-        <QueryState query={query} />
+        <QueryState
+          query={query}
+          skeleton={
+            <DataTableSkeleton
+              label="Memeriksa kesiapan ujian"
+              className="readiness-table"
+              rows={6}
+              columns={[
+                { label: "Ujian & jadwal", kind: "stack" },
+                { label: "Siklus", kind: "badge" },
+                { label: "Kelengkapan", kind: "stack" },
+                { label: "Kesiapan", kind: "badge" },
+                { label: "Tindakan", kind: "actions", align: "center" },
+              ]}
+            />
+          }
+        />
         {query.data && (
           <>
             <DataTable caption="Kelengkapan dan kesiapan setiap ujian" className="readiness-table">

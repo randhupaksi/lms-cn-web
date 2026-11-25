@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { useQuality } from "../use-governance";
 import { QueryState, WorkspaceLink } from "./governance-shared";
 import { useAuth } from "@/providers/auth-provider";
+import { QualityWorkspaceSkeleton } from "./governance-skeletons";
 
 export function QualityWorkspace() {
   const principal = useAuth().user?.role === "principal";
@@ -18,7 +19,7 @@ export function QualityWorkspace() {
         description="Temukan keterkaitan akademik yang belum lengkap, lalu koordinasikan perbaikannya."
         icon={Database}
       />
-      <QueryState query={query} />
+      <QueryState query={query} skeleton={<QualityWorkspaceSkeleton />} />
       {query.data && (
         <>
           <div className="quality-summary">

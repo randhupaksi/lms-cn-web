@@ -16,6 +16,10 @@ import {
   QueryState,
   schoolTime,
 } from "./governance-shared";
+import {
+  SettingsFormSkeleton,
+  SettingsHistorySkeleton,
+} from "./governance-skeletons";
 
 function SettingsForm({
   initial,
@@ -178,7 +182,7 @@ export function SettingsWorkspace() {
           />
         }
       />
-      <QueryState query={query} />
+      <QueryState query={query} skeleton={<SettingsFormSkeleton />} />
       {saved && (
         <p className="feedback-message feedback-message-success" role="status">
           Pengaturan berhasil disimpan. Profil sekolah dan laporan memakai versi
@@ -197,7 +201,7 @@ export function SettingsWorkspace() {
         title="Riwayat pengaturan"
         action={<History size={20} aria-hidden="true" />}
       >
-        <QueryState query={history} />
+        <QueryState query={history} skeleton={<SettingsHistorySkeleton />} />
         {history.data?.length === 0 && (
           <p className="governance-empty">
             Belum ada perubahan sejak konfigurasi awal.

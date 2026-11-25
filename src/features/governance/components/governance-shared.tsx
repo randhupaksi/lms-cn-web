@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { AsyncFeedback } from "@/components/async-feedback";
-import { ErrorState, LoadingState } from "@/components/data-state";
+import { ErrorState } from "@/components/data-state";
 
 export const roleLabels: Record<string, string> = {
   superadmin: "Superadmin",
@@ -22,10 +22,6 @@ export const stateLabels: Record<string, string> = {
   approved: "Disetujui",
   rejected: "Ditolak",
   cancelled: "Dibatalkan",
-  academic: "Akademik",
-  holiday: "Hari libur",
-  meeting: "Rapat",
-  announcement: "Pengumuman",
   exam: "Ujian",
 };
 export function schoolTime(value: string, dateOnly = false) {
@@ -36,10 +32,6 @@ export function schoolTime(value: string, dateOnly = false) {
     year: "numeric",
     ...(dateOnly ? {} : { hour: "2-digit", minute: "2-digit" }),
   }).format(new Date(value));
-}
-export function localInput(value: string) {
-  const d = new Date(new Date(value).getTime() + 7 * 3600_000);
-  return d.toISOString().slice(0, 16);
 }
 export function inputToISO(value: string) {
   return new Date(`${value}:00+07:00`).toISOString();
@@ -101,14 +93,16 @@ export function WorkspaceLink({
 }
 export function QueryState({
   query,
-  label = "Memuat data sekolah…",
+  skeleton,
+  showLoading = true,
 }: {
   query: { isLoading: boolean; isError: boolean; refetch: () => unknown };
-  label?: string;
+  skeleton: ReactNode;
+  showLoading?: boolean;
 }) {
   return (
     <>
-      {query.isLoading && <LoadingState label={label} />}{" "}
+      {query.isLoading && showLoading && skeleton}{" "}
       {query.isError && (
         <ErrorState
           label="Data belum dapat dimuat. Coba kembali."
@@ -121,13 +115,16 @@ export function QueryState({
 export function MutationFeedback({
   mutation,
   success = "Perubahan berhasil disimpan.",
+  showSuccess = true,
 }: {
   mutation: { error: unknown; isError: boolean; isSuccess: boolean };
   success?: string;
+  showSuccess?: boolean;
 }) {
   return (
     <AsyncFeedback
       {...mutation}
+      isSuccess={showSuccess && mutation.isSuccess}
       errorMessage="Perubahan belum dapat diproses."
       successMessage={success}
     />

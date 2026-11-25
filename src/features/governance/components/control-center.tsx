@@ -11,10 +11,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/providers/auth-provider";
-import { useQuery } from "@tanstack/react-query";
-import { actionSummary } from "@/services/leadership.service";
 import { ActionButton } from "@/components/ui/action-button";
 import { useGovernanceOverview } from "../use-governance";
+import { ControlCenterSkeleton } from "./governance-skeletons";
 import {
   GovernanceBadge,
   GovernanceSection,
@@ -27,10 +26,6 @@ import {
 
 export function ControlCenter() {
   const query = useGovernanceOverview();
-  const actions = useQuery({
-    queryKey: ["leadership-summary"],
-    queryFn: actionSummary,
-  });
   const { user } = useAuth();
   const principal = user?.role === "principal";
   const data = query.data;
@@ -61,7 +56,7 @@ export function ControlCenter() {
           />
         </div>
       </header>
-      <QueryState query={query} />
+      <QueryState query={query} skeleton={<ControlCenterSkeleton />} />
       {data && (
         <>
           <div className="command-metrics">
@@ -93,7 +88,7 @@ export function ControlCenter() {
             ].map(({ label, value, detail, icon: Icon }) => (
               <div key={label} className="command-metric">
                 <span className="command-metric-icon">
-                  <Icon size={18} aria-hidden="true" />
+                  <Icon size={22} aria-hidden="true" />
                 </span>
                 <div className="command-metric-copy">
                   <span>{label}</span>
@@ -103,54 +98,6 @@ export function ControlCenter() {
               </div>
             ))}
           </div>
-          <GovernanceSection
-            eyebrow="Perlu perhatian"
-            title="Mulai dari yang penting"
-          >
-            <Link href="/governance/requests" className="command-priority">
-              <span className="command-priority-number">
-                {data.pending_requests}
-              </span>
-              <div>
-                <h3>Pengajuan jadwal</h3>
-                <p>Tinjau alasan, bandingkan waktu, lalu berikan keputusan.</p>
-              </div>
-              <ArrowRight size={20} aria-hidden="true" />
-            </Link>
-            <Link href="/governance/actions" className="command-priority">
-              <span className="command-priority-number">
-                {actions.data?.open ?? "—"}
-              </span>
-              <div>
-                <h3>Tindak lanjut sekolah</h3>
-                <p>
-                  {actions.data
-                    ? `${actions.data.overdue} melewati tenggat`
-                    : "Pantau tugas dan perkembangan."}
-                </p>
-              </div>
-              <ArrowRight size={20} aria-hidden="true" />
-            </Link>
-            <Link
-              href={principal ? "/principal/quality" : "/superadmin/quality"}
-              className="command-priority"
-            >
-              <span className="command-priority-number">{findings}</span>
-              <div>
-                <h3>Temuan kualitas data</h3>
-                <p>
-                  Periksa kelengkapan penugasan, peserta, dan persiapan ujian.
-                </p>
-              </div>
-              <ArrowRight size={20} aria-hidden="true" />
-            </Link>
-            <div className="command-footnote">
-              <span>{data.draft_results} hasil belum dipublikasikan</span>
-              <WorkspaceLink href="/teacher/results">
-                Tinjau hasil
-              </WorkspaceLink>
-            </div>
-          </GovernanceSection>
           <GovernanceSection
             eyebrow="Pelaksanaan asesmen"
             title="Siklus ujian sekolah"
@@ -189,6 +136,40 @@ export function ControlCenter() {
               ))}
             </dl>
           </GovernanceSection>
+          <GovernanceSection
+            eyebrow="Perlu perhatian"
+            title="Mulai dari yang penting"
+          >
+            <Link href="/governance/requests" className="command-priority">
+              <span className="command-priority-number">
+                {data.pending_requests}
+              </span>
+              <div>
+                <h3>Pengajuan jadwal</h3>
+                <p>Tinjau alasan, bandingkan waktu, lalu berikan keputusan.</p>
+              </div>
+              <ArrowRight size={20} aria-hidden="true" />
+            </Link>
+            <Link
+              href={principal ? "/principal/quality" : "/superadmin/quality"}
+              className="command-priority"
+            >
+              <span className="command-priority-number">{findings}</span>
+              <div>
+                <h3>Temuan kualitas data</h3>
+                <p>
+                  Periksa kelengkapan penugasan, peserta, dan persiapan ujian.
+                </p>
+              </div>
+              <ArrowRight size={20} aria-hidden="true" />
+            </Link>
+            <div className="command-footnote">
+              <span>{data.draft_results} hasil belum dipublikasikan</span>
+              <WorkspaceLink href="/teacher/results">
+                Tinjau hasil
+              </WorkspaceLink>
+            </div>
+          </GovernanceSection>
           <div className="command-main-grid">
             <GovernanceSection
               eyebrow="Berikutnya"
@@ -224,7 +205,7 @@ export function ControlCenter() {
             </GovernanceSection>
             <GovernanceSection
               eyebrow="30 hari ke depan"
-              title="Agenda sekolah"
+              title="Jadwal ujian"
               action={
                 <WorkspaceLink
                   href={
@@ -237,7 +218,7 @@ export function ControlCenter() {
             >
               {data.agenda.length === 0 ? (
                 <p className="governance-empty">
-                  Belum ada agenda pada rentang ini.
+                  Belum ada ujian terpublikasi pada rentang ini.
                 </p>
               ) : (
                 <div className="command-agenda">
