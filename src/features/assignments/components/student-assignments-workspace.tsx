@@ -1,7 +1,7 @@
 "use client";
 import { FilterBar } from "@/components/ui/filter-bar";
 import { useEffect, useState } from "react";
-import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
+import { EmptyState, ErrorState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
 import { useAllCourses } from "@/features/academics";
 import {
@@ -17,6 +17,10 @@ import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import { formatWibDateTime } from "@/lib/date-time";
 import { safeExternalHttpUrl } from "@/lib/safe-external-url";
+import {
+  AssignmentCardsSkeleton,
+  FilterOptionsSkeleton,
+} from "@/components/ui/skeleton-patterns";
 const PAGE_SIZE = 20;
 const submissionLabel = {
   submitted: "Menunggu penilaian",
@@ -86,7 +90,12 @@ export function StudentAssignmentsWorkspace() {
             />
           </label>
         </FilterBar>
-        {assignments.isLoading ? <LoadingState label="Memuat tugas…" /> : null}
+        {courses.isLoading ? (
+          <FilterOptionsSkeleton label="Memuat pilihan course" />
+        ) : null}
+        {assignments.isLoading ? (
+          <AssignmentCardsSkeleton label="Memuat daftar tugas" rows={3} />
+        ) : null}
         {assignments.isError ? (
           <ErrorState
             label="Tugas belum dapat dimuat."

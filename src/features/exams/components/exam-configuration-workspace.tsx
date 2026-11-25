@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Settings2, ArrowLeft } from "lucide-react";
 import { MetricGrid } from "@/components/metric-grid";
 import { AsyncFeedback } from "@/components/async-feedback";
-import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
+import { EmptyState, ErrorState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
@@ -13,6 +13,11 @@ import { Pagination } from "@/components/ui/pagination";
 import { useCourseMembers } from "@/features/academics";
 import { useConfigureExam, useExam } from "@/features/exams/use-exams";
 import { useQuestions } from "@/features/questions";
+import {
+  ExamConfigurationSkeleton,
+  MemberListSkeleton,
+  QuestionSelectionSkeleton,
+} from "@/components/ui/skeleton-patterns";
 
 export function ExamConfigurationWorkspace({ examId }: { examId: string }) {
   const exam = useExam(examId);
@@ -56,7 +61,7 @@ export function ExamConfigurationWorkspace({ examId }: { examId: string }) {
     participantPage * 20,
   );
 
-  if (exam.isLoading) return <LoadingState label="Memuat konfigurasi ujian…" />;
+  if (exam.isLoading) return <ExamConfigurationSkeleton />;
   if (exam.isError || !exam.data) {
     return (
       <ErrorState
@@ -132,7 +137,7 @@ export function ExamConfigurationWorkspace({ examId }: { examId: string }) {
               />
             </label>
             {questions.isLoading ? (
-              <LoadingState label="Memuat bank soal…" />
+              <QuestionSelectionSkeleton />
             ) : null}
             {questions.isError ? (
               <ErrorState
@@ -251,7 +256,7 @@ export function ExamConfigurationWorkspace({ examId }: { examId: string }) {
               />
             </label>
             {members.isLoading ? (
-              <LoadingState label="Memuat peserta course…" />
+              <MemberListSkeleton label="Memuat peserta course" rows={5} />
             ) : null}
             {members.isError ? (
               <ErrorState

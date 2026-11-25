@@ -2,9 +2,17 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Clock3, Cloud, CloudOff } from "lucide-react";
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Clock3,
+  Cloud,
+  CloudOff,
+} from "lucide-react";
 import { RoleBoundary } from "@/components/role-boundary";
-import { ErrorState, LoadingState } from "@/components/data-state";
+import { ErrorState } from "@/components/data-state";
+import { ExamSheetSkeleton } from "@/components/ui/skeleton-patterns";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { AsyncFeedback } from "@/components/async-feedback";
 import { Button } from "@/components/ui/button";
@@ -99,7 +107,7 @@ export function AttemptWorkspace({ attemptId }: { attemptId: string }) {
   }, [remaining, attempt.data, submit, router]);
 
   if (attempt.isLoading)
-    return <LoadingState label="Menyiapkan lembar ujian…" />;
+    return <ExamSheetSkeleton />;
   if (!attempt.data || !question) {
     return (
       <ErrorState
@@ -197,6 +205,7 @@ export function AttemptWorkspace({ attemptId }: { attemptId: string }) {
                 disabled={index === 0 || !attempt.data.allow_back_navigation}
                 onClick={() => setIndex((value) => value - 1)}
               >
+                <ChevronLeft size={16} aria-hidden="true" />
                 Sebelumnya
               </Button>
               <span
@@ -224,6 +233,7 @@ export function AttemptWorkspace({ attemptId }: { attemptId: string }) {
                 onClick={() => setIndex((value) => value + 1)}
               >
                 Berikutnya
+                <ChevronRight size={16} aria-hidden="true" />
               </Button>
             </div>
           </section>

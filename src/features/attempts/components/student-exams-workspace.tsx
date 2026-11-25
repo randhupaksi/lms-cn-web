@@ -9,9 +9,10 @@ import {
   useStartExam,
 } from "@/features/attempts/use-attempts";
 import { PageHeader } from "@/components/ui/page-header";
-import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
+import { EmptyState, ErrorState } from "@/components/data-state";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { ExamScheduleSkeleton } from "@/components/ui/skeleton-patterns";
 import { AsyncFeedback } from "@/components/async-feedback";
 import { Button } from "@/components/ui/button";
 import { formatWibDateTime } from "@/lib/date-time";
@@ -40,7 +41,7 @@ export function StudentExamsWorkspace() {
           </p>
         </div>
         {exams.isLoading ? (
-          <LoadingState label="Memuat ujian yang tersedia…" />
+          <ExamScheduleSkeleton label="Memuat ujian yang tersedia" rows={3} />
         ) : null}
         {exams.isError ? (
           <ErrorState
