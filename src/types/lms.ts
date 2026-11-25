@@ -205,7 +205,7 @@ export type ExamMonitoring = {
   in_progress: number;
   submitted: number;
   expired: number;
-  participants: ExamParticipantStatus[];
+  participants: ExamParticipantStatus[] | null;
 };
 
 export type AuditEvent = {

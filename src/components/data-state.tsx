@@ -2,31 +2,6 @@ import type { ReactNode } from "react";
 import { AlertCircle, Inbox, LockKeyhole, ListFilter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export function LoadingState({ label = "Memuat data…" }: { label?: string }) {
-  return (
-    <div
-      className="loading-state"
-      role="status"
-      aria-live="polite"
-      aria-busy="true"
-    >
-      <p className="text-sm font-medium text-muted">{label}</p>
-      <div aria-hidden="true" className="skeleton-list">
-        {[0, 1, 2].map((row) => (
-          <div className="skeleton-row" key={row}>
-            <span className="skeleton skeleton-square" />
-            <div className="flex-1 space-y-2">
-              <span className="skeleton skeleton-title" />
-              <span className="skeleton skeleton-text" />
-            </div>
-            <span className="skeleton skeleton-action" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function ErrorState({
   label = "Data belum dapat dimuat.",
   onRetry,

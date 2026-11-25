@@ -2,7 +2,7 @@
 import { ActionButton } from "@/components/ui/action-button";
 import { FilterBar } from "@/components/ui/filter-bar";
 import { useState } from "react";
-import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
+import { EmptyState, ErrorState } from "@/components/data-state";
 import { MetricGrid } from "@/components/metric-grid";
 import { useAllCourses } from "@/features/academics";
 import { useExams } from "@/features/exams";
@@ -10,6 +10,11 @@ import { useExamMonitoring } from "@/features/monitoring/use-monitoring";
 import { PageHeader } from "@/components/ui/page-header";
 import { Activity, Radar } from "lucide-react";
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
+import { DataTableSkeleton } from "@/components/ui/skeleton";
+import {
+  FilterOptionsSkeleton,
+  MetricStripSkeleton,
+} from "@/components/ui/skeleton-patterns";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Pagination } from "@/components/ui/pagination";
@@ -47,6 +52,7 @@ export function MonitoringWorkspace() {
     page: participantPage,
     per_page: PAGE_SIZE,
   });
+  const participants = monitoring.data?.data.participants ?? [];
   const courseOptions =
     courses.data?.map((item) => ({ value: item.id, label: item.name })) ?? [];
   return (
@@ -90,7 +96,25 @@ export function MonitoringWorkspace() {
             />
           </label>
         </FilterBar>
-        {exams.isLoading ? <LoadingState label="Memuat daftar ujian…" /> : null}
+        {courses.isLoading ? (
+          <FilterOptionsSkeleton label="Memuat pilihan course" />
+        ) : null}
+        {exams.isLoading ? (
+          <DataTableShell>
+            <DataTableSkeleton
+              label="Memuat daftar ujian untuk monitoring"
+              className="monitoring-table"
+              rows={5}
+              columns={[
+                { label: "Ujian", kind: "stack" },
+                { label: "Course", kind: "text" },
+                { label: "Status", kind: "badge" },
+                { label: "Jadwal", kind: "text" },
+                { label: "Aksi", kind: "actions", align: "center" },
+              ]}
+            />
+          </DataTableShell>
+        ) : null}
         {exams.isError ? (
           <ErrorState
             label="Daftar ujian belum dapat dimuat."
@@ -195,7 +219,22 @@ export function MonitoringWorkspace() {
             </label>
           </div>
           {monitoring.isLoading ? (
-            <LoadingState label="Memuat status peserta…" />
+            <div className="space-y-4">
+              <MetricStripSkeleton label="Memuat ringkasan peserta" />
+              <DataTableShell>
+                <DataTableSkeleton
+                  label="Memuat status peserta ujian"
+                  rows={6}
+                  columns={[
+                    { label: "Peserta", kind: "stack" },
+                    { label: "Identitas", kind: "text" },
+                    { label: "Status", kind: "badge" },
+                    { label: "Terjawab", kind: "progress", align: "right" },
+                    { label: "Aktivitas terakhir", kind: "text" },
+                  ]}
+                />
+              </DataTableShell>
+            </div>
           ) : null}
           {monitoring.isError ? (
             <ErrorState
@@ -230,7 +269,7 @@ export function MonitoringWorkspace() {
                   },
                 ]}
               />
-              {monitoring.data.data.participants.length === 0 ? (
+              {participants.length === 0 ? (
                 <EmptyState
                   title="Belum ada peserta"
                   description="Tidak ada peserta yang sesuai dengan pencarian saat ini."
@@ -248,32 +287,30 @@ export function MonitoringWorkspace() {
                       </tr>
                     </thead>
                     <tbody>
-                      {monitoring.data.data.participants.map(
-                        (participant) => (
-                          <tr key={participant.student_id}>
-                            <td className="font-semibold">
-                              {participant.student_name}
-                            </td>
-                            <td>{participant.identifier}</td>
-                            <td>
-                              <StatusBadge
-                                tone={statusTones[participant.status]}
-                              >
-                                {statusLabels[participant.status] ??
-                                  participant.status}
-                              </StatusBadge>
-                            </td>
-                            <td className="numeric-cell">
-                              {participant.answered_count}
-                            </td>
-                            <td>
-                              {participant.last_activity_at
-                                ? formatWibDateTime(participant.last_activity_at)
-                                : "—"}
-                            </td>
-                          </tr>
-                        ),
-                      )}
+                      {participants.map((participant) => (
+                        <tr key={participant.student_id}>
+                          <td className="font-semibold">
+                            {participant.student_name}
+                          </td>
+                          <td>{participant.identifier}</td>
+                          <td>
+                            <StatusBadge
+                              tone={statusTones[participant.status]}
+                            >
+                              {statusLabels[participant.status] ??
+                                participant.status}
+                            </StatusBadge>
+                          </td>
+                          <td className="numeric-cell">
+                            {participant.answered_count}
+                          </td>
+                          <td>
+                            {participant.last_activity_at
+                              ? formatWibDateTime(participant.last_activity_at)
+                              : "—"}
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </DataTable>
                   <Pagination

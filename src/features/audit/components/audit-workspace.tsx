@@ -2,12 +2,13 @@
 import { FilterBar } from "@/components/ui/filter-bar";
 
 import { useState } from "react";
-import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
+import { EmptyState, ErrorState } from "@/components/data-state";
 import { RoleBoundary } from "@/components/role-boundary";
 import { useAuditEvents } from "@/features/audit/use-audit";
 import { PageHeader } from "@/components/ui/page-header";
 import { ShieldCheck } from "lucide-react";
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
+import { DataTableSkeleton } from "@/components/ui/skeleton";
 import { Pagination } from "@/components/ui/pagination";
 import { formatWibDateTime } from "@/lib/date-time";
 
@@ -51,7 +52,22 @@ export function AuditWorkspace() {
             />
           </label>
         </FilterBar>
-        {events.isLoading && <LoadingState />}
+        {events.isLoading && (
+          <DataTableShell>
+            <DataTableSkeleton
+              label="Memuat audit aktivitas"
+              className="audit-table"
+              rows={6}
+              columns={[
+                { label: "Waktu", kind: "text" },
+                { label: "Aktor", kind: "stack" },
+                { label: "Action", kind: "stack" },
+                { label: "Entitas", kind: "text" },
+                { label: "ID", kind: "text" },
+              ]}
+            />
+          </DataTableShell>
+        )}
         {events.isError && (
           <ErrorState
             label="Audit aktivitas belum dapat dimuat."
