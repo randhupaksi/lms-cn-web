@@ -4,12 +4,13 @@ import { useParams } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 import { RoleBoundary } from "@/components/role-boundary";
 import { useAttempt } from "@/features/attempts/use-attempts";
-import { ErrorState, LoadingState } from "@/components/data-state";
+import { ErrorState } from "@/components/data-state";
+import { ReceiptSkeleton } from "@/components/ui/skeleton-patterns";
 export default function ReceiptPage() {
   const id = useParams<{ attemptId: string }>().attemptId;
   const attempt = useAttempt(id);
   if (attempt.isLoading)
-    return <LoadingState label="Memuat bukti pengumpulan…" />;
+    return <ReceiptSkeleton />;
   if (!attempt.data || attempt.isError)
     return (
       <ErrorState

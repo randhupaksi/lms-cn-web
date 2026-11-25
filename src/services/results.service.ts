@@ -34,9 +34,3 @@ export async function listStudentResults(filter: { search?: string; page?: numbe
   });
   return data;
 }
-export async function getStudentResult(id: string) {
-  const { data } = await apiClient.get<ApiEnvelope<ExamResult>>(
-    `/student/results/${id}`,
-  );
-  return data.data;
-}

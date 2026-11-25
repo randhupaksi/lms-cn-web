@@ -4,8 +4,9 @@ import { RoleBoundary } from "@/components/role-boundary";
 import { useStudentResults } from "@/features/results/use-results";
 import { PageHeader } from "@/components/ui/page-header";
 import { Trophy } from "lucide-react";
-import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
+import { EmptyState, ErrorState } from "@/components/data-state";
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
+import { DataTableSkeleton } from "@/components/ui/skeleton";
 import { FilterBar } from "@/components/ui/filter-bar";
 import { Pagination } from "@/components/ui/pagination";
 import { formatWibDateTime } from "@/lib/date-time";
@@ -39,7 +40,19 @@ export function StudentResultsWorkspace() {
           </label>
         </FilterBar>
         {results.isLoading ? (
-          <LoadingState label="Memuat hasil belajar…" />
+          <DataTableShell>
+            <DataTableSkeleton
+              label="Memuat hasil belajar"
+              className="student-score-table"
+              rows={6}
+              columns={[
+                { label: "Ujian", kind: "stack" },
+                { label: "Nilai (%)", kind: "numeric", align: "right" },
+                { label: "Poin", kind: "numeric", align: "right" },
+                { label: "Waktu penilaian", kind: "text" },
+              ]}
+            />
+          </DataTableShell>
         ) : null}
         {results.isError ? (
           <ErrorState

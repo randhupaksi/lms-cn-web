@@ -3,12 +3,17 @@ import { FilterBar } from "@/components/ui/filter-bar";
 import { useState } from "react";
 import { ChartNoAxesCombined } from "lucide-react";
 import { AsyncFeedback } from "@/components/async-feedback";
-import { EmptyState, ErrorState, LoadingState } from "@/components/data-state";
+import { EmptyState, ErrorState } from "@/components/data-state";
 import { MetricGrid } from "@/components/metric-grid";
 import { RoleBoundary } from "@/components/role-boundary";
 import { useAuth } from "@/providers/auth-provider";
 import { Button } from "@/components/ui/button";
 import { DataTable, DataTableShell } from "@/components/ui/data-table";
+import { DataTableSkeleton } from "@/components/ui/skeleton";
+import {
+  FilterOptionsSkeleton,
+  MetricStripSkeleton,
+} from "@/components/ui/skeleton-patterns";
 import { PageHeader } from "@/components/ui/page-header";
 import { RadixSelectField } from "@/components/ui/radix-select";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -142,11 +147,27 @@ export function TeacherResultsWorkspace() {
               />
             </label>
           </FilterBar>
+          {courses.isLoading ? (
+            <FilterOptionsSkeleton label="Memuat pilihan course" />
+          ) : null}
           {exams.isLoading ? (
-            <LoadingState label="Memuat pilihan ujian…" />
+            <FilterOptionsSkeleton label="Memuat pilihan ujian" />
           ) : null}
           {results.isLoading ? (
-            <LoadingState label="Memuat hasil ujian…" />
+            <DataTableShell>
+              <DataTableSkeleton
+                label="Memuat hasil ujian"
+                rows={6}
+                columns={[
+                  { label: "Ujian", kind: "stack" },
+                  { label: "Siswa", kind: "stack" },
+                  { label: "Identitas", kind: "text" },
+                  { label: "Nilai", kind: "numeric", align: "right" },
+                  { label: "Persentase", kind: "numeric", align: "right" },
+                  { label: "Status", kind: "badge" },
+                ]}
+              />
+            </DataTableShell>
           ) : null}
           {results.isError ? (
             <ErrorState
@@ -268,7 +289,21 @@ export function TeacherResultsWorkspace() {
         {selectedExam ? (
           <div className="space-y-6">
             {analytics.isLoading ? (
-              <LoadingState label="Menghitung analisis ujian…" />
+              <div className="space-y-4">
+                <MetricStripSkeleton label="Menghitung ringkasan ujian" />
+                <DataTableShell>
+                  <DataTableSkeleton
+                    label="Menghitung analisis butir soal"
+                    rows={5}
+                    columns={[
+                      { label: "Soal", kind: "stack" },
+                      { label: "Dijawab", kind: "numeric", align: "right" },
+                      { label: "Benar", kind: "numeric", align: "right" },
+                      { label: "Akurasi", kind: "progress", align: "right" },
+                    ]}
+                  />
+                </DataTableShell>
+              </div>
             ) : null}
             {analytics.isError ? (
               <ErrorState
